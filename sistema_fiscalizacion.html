@@ -627,9 +627,113 @@
             .field-row { background: #f8fafc !important; color: black !important; }
             .field-row .label, .field-row .value { color: black !important; }
         }
+
+        /* LOGIN OVERLAY */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 17, 32, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.2rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .login-header {
+            margin-bottom: 1.5rem;
+        }
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 0.6rem;
+            filter: drop-shadow(0 4px 12px rgba(37,99,235,0.4));
+        }
+        .login-header h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .login-header p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .user-session-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+        @media (max-width: 768px) {
+            .user-session-bar {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 0.5rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid rgba(255,255,255,0.08);
+            }
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- MODAL DE INICIO DE SESIÓN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">🏛️</div>
+                <h2>Sistema de Fiscalización Predial</h2>
+                <p>Municipalidad Distrital - Control de Acceso</p>
+            </div>
+            <form id="loginForm" onsubmit="validarLogin(event)" style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">👤 Usuario</label>
+                    <input type="text" id="login_user" placeholder="Ingrese usuario (admin)" autocomplete="username" required 
+                           style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">🔒 Contraseña</label>
+                    <div style="position: relative;">
+                        <input type="password" id="login_pass" placeholder="Ingrese contraseña" autocomplete="current-password" required 
+                               style="width: 100%; padding: 0.75rem 2.6rem 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                        <button type="button" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar contraseña"
+                                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0;">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div id="loginErrorMsg" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: #fca5a5; padding: 0.65rem; border-radius: 8px; font-size: 0.82rem; text-align: center;">
+                    ⚠️ Usuario o contraseña incorrectos.
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; margin-top: 0.4rem; justify-content: center;">
+                    🔑 Ingresar al Sistema
+                </button>
+            </form>
+            <div style="margin-top: 1.1rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                Acceso restringido para personal fiscalizador autorizado
+            </div>
+        </div>
+    </div>
 
     <!-- AVISO WHATSAPP CONTENT:// -->
     <div id="whatsapp-warning-banner">
@@ -659,6 +763,14 @@
                 📊 Reportes e Importación
             </button>
         </nav>
+        <div class="user-session-bar" id="userSessionBar">
+            <div style="background: rgba(37,99,235,0.2); border: 1px solid rgba(56,189,248,0.3); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+                <span>👤</span> <span id="sessionUsername">admin</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarSesion()" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                🚪 Salir
+            </button>
+        </div>
     </header>
 
     <!-- METRICS -->
@@ -796,7 +908,7 @@
                                 </div>
                                 <div id="lista_medidores_luz" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     <div class="meter-item-row">
-                                        <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Ej: LUZ-984210)" required>
+                                        <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Opcional - dejar vacío si no hay)">
                                     </div>
                                 </div>
                             </div>
@@ -813,7 +925,7 @@
                                 </div>
                                 <div id="lista_medidores_agua" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     <div class="meter-item-row">
-                                        <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Ej: AGU-33019)" required>
+                                        <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)">
                                     </div>
                                 </div>
                             </div>
@@ -960,6 +1072,65 @@
 
                     <form id="formContraste" onsubmit="guardarContraste(event)">
                         <div class="form-grid" style="grid-template-columns: 1fr;">
+                    <!-- EXPLICACIÓN Y SINCRONIZACIÓN MULTI-DISPOSITIVO (GITHUB PAGES) -->
+                    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+                                ☁️ Sincronización Multi-Dispositivo (Compartir entre Celulares y PC)
+                            </h3>
+                            <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                                GitHub Pages
+                            </span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.55;">
+                            💡 <strong>¿Por qué no se ven los datos al abrir el enlace en otro celular?</strong><br>
+                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
+                            <!-- OPCIÓN A: TRANSFERIR POR ARCHIVO / WHATSAPP -->
+                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A: Compartir por WhatsApp o Drive (Inmediato)</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        1. En el celular de campo presiona <strong>"Descargar Copia de Avance"</strong>.<br>
+                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu PC o supervisor.<br>
+                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="guardarAvanceRapido()">
+                                        💾 Descargar Avance (.json)
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('input_importar_json').click()">
+                                        📂 Importar en este equipo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- OPCIÓN B: SINCRONIZACIÓN EN LA NUBE REST -->
+                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B: Sincronización en la Nube en Tiempo Real</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase Realtime Database</strong> o un Webhook de <strong>Google Apps Script</strong>) para que todos los celulares envíen y reciban los registros con un solo clic.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="sincronizarSubirNube()">
+                                        📤 Subir a Nube
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="sincronizarDescargarNube()">
+                                        📥 Descargar de Nube
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirConfiguracionNube()">
+                                        ⚙️ Configurar URL
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                             <div class="form-group">
                                 <label>🏷️ Código de Predio</label>
                                 <input type="text" id="contraste_codigo_predio" placeholder="Ej: PR-2026-004589" required>
@@ -1030,6 +1201,65 @@
                 </div>
 
                 <div class="form-grid" style="grid-template-columns: 1fr;">
+                    <!-- EXPLICACIÓN Y SINCRONIZACIÓN MULTI-DISPOSITIVO (GITHUB PAGES) -->
+                    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+                                ☁️ Sincronización Multi-Dispositivo (Compartir entre Celulares y PC)
+                            </h3>
+                            <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                                GitHub Pages
+                            </span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.55;">
+                            💡 <strong>¿Por qué no se ven los datos al abrir el enlace en otro celular?</strong><br>
+                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
+                            <!-- OPCIÓN A: TRANSFERIR POR ARCHIVO / WHATSAPP -->
+                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A: Compartir por WhatsApp o Drive (Inmediato)</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        1. En el celular de campo presiona <strong>"Descargar Copia de Avance"</strong>.<br>
+                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu PC o supervisor.<br>
+                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="guardarAvanceRapido()">
+                                        💾 Descargar Avance (.json)
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('input_importar_json').click()">
+                                        📂 Importar en este equipo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- OPCIÓN B: SINCRONIZACIÓN EN LA NUBE REST -->
+                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B: Sincronización en la Nube en Tiempo Real</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase Realtime Database</strong> o un Webhook de <strong>Google Apps Script</strong>) para que todos los celulares envíen y reciban los registros con un solo clic.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="sincronizarSubirNube()">
+                                        📤 Subir a Nube
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="sincronizarDescargarNube()">
+                                        📥 Descargar de Nube
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirConfiguracionNube()">
+                                        ⚙️ Configurar URL
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     
                     <!-- GUARDAR AVANCE / BACKUP RÁPIDO -->
                     <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
@@ -1097,6 +1327,39 @@
         </div>
     </div>
 
+    <!-- MODAL CONFIGURACIÓN NUBE -->
+    <div id="modalConfigNube" class="modal" onclick="if(event.target === this) cerrarConfiguracionNube()">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3>⚙️ Configuración de Base de Datos en la Nube</h3>
+                <button class="btn btn-secondary btn-sm" onclick="cerrarConfiguracionNube()">Cerrar ✕</button>
+            </div>
+            <div class="modal-body" style="gap: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    Ingresa una URL de base de datos en la nube gratuita compatible con REST (ejemplo: <strong>Firebase Realtime Database</strong> terminada en <code style="color: #38bdf8;">.json</code> o un <strong>Google Apps Script WebApp</strong>).
+                </p>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">🔗 URL Endpoint de la Nube (REST JSON)</label>
+                    <input type="url" id="cloud_endpoint_input" placeholder="https://tu-proyecto.firebaseio.com/registros.json" style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.9rem;">
+                </div>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary" onclick="guardarEndpointNube()">
+                        💾 Guardar URL
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="sincronizarSubirNube()">
+                        📤 Subir a Nube
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="sincronizarDescargarNube()">
+                        📥 Descargar de Nube
+                    </button>
+                </div>
+                <div style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
+                    💡 <em>Si no deseas configurar una base de datos en la nube, puedes usar la <strong>Opción A</strong>: simplemente presiona <strong>"Descargar Copia de Avance"</strong> y envíala por WhatsApp para importarla en tu computadora.</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICADOR -->
     <div id="toast">
         <span id="toast-icon">ℹ️</span>
@@ -1130,6 +1393,153 @@
             }
         };
 
+        // ==========================================
+        // CONTROL DE SESIÓN Y AUTENTICACIÓN
+        // ==========================================
+        const AUTH_KEY = 'FISCALIZACION_AUTH_TOKEN';
+        const AUTH_USER = 'admin';
+        const AUTH_PASS = 'Roman111';
+
+        function verificarSesion() {
+            const token = SafeStorage.getItem(AUTH_KEY);
+            const overlay = document.getElementById('loginOverlay');
+            if (token === 'VALID_SESSION_ADMIN') {
+                if (overlay) overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            } else {
+                if (overlay) overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function validarLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('login_user').value.trim();
+            const pass = document.getElementById('login_pass').value;
+            const errorDiv = document.getElementById('loginErrorMsg');
+
+            if (user === AUTH_USER && pass === AUTH_PASS) {
+                SafeStorage.setItem(AUTH_KEY, 'VALID_SESSION_ADMIN');
+                errorDiv.style.display = 'none';
+                document.getElementById('loginForm').reset();
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                mostrarToast('¡Bienvenido al sistema!', 'success');
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = '⚠️ Usuario o contraseña incorrectos. Verifique sus credenciales.';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('login_pass');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function cerrarSesion() {
+            if (confirm('¿Desea cerrar la sesión actual?')) {
+                SafeStorage.removeItem(AUTH_KEY);
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                document.getElementById('login_user').value = '';
+                document.getElementById('login_pass').value = '';
+                mostrarToast('Sesión finalizada.', 'info');
+            }
+        }
+
+        // ==========================================
+        // SINCRONIZACIÓN EN LA NUBE (MULTI-DISPOSITIVO)
+        // ==========================================
+        const CLOUD_URL_KEY = 'FISCALIZACION_CLOUD_ENDPOINT';
+
+        function abrirConfiguracionNube() {
+            const guardada = SafeStorage.getItem(CLOUD_URL_KEY) || '';
+            document.getElementById('cloud_endpoint_input').value = guardada;
+            document.getElementById('modalConfigNube').classList.add('show');
+        }
+
+        function cerrarConfiguracionNube() {
+            document.getElementById('modalConfigNube').classList.remove('show');
+        }
+
+        function guardarEndpointNube() {
+            const url = document.getElementById('cloud_endpoint_input').value.trim();
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('URL de la nube guardada exitosamente.', 'success');
+        }
+
+        async function sincronizarSubirNube() {
+            const url = SafeStorage.getItem(CLOUD_URL_KEY) || document.getElementById('cloud_endpoint_input').value.trim();
+            if (!url) {
+                abrirConfiguracionNube();
+                mostrarToast('Ingrese primero la URL de la base de datos en la nube.', 'info');
+                return;
+            }
+            if (registros.length === 0) {
+                mostrarToast('No hay registros en este dispositivo para subir.', 'info');
+                return;
+            }
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('📤 Subiendo registros a la nube...', 'info');
+            try {
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registros)
+                });
+                if (res.ok) {
+                    mostrarToast('✅ Sincronización exitosa: Registros subidos a la nube.', 'success');
+                    cerrarConfiguracionNube();
+                } else {
+                    mostrarToast('Error del servidor: ' + res.statusText, 'error');
+                }
+            } catch (err) {
+                mostrarToast('Error de conexión: ' + err.message, 'error');
+            }
+        }
+
+        async function sincronizarDescargarNube() {
+            const url = SafeStorage.getItem(CLOUD_URL_KEY) || document.getElementById('cloud_endpoint_input').value.trim();
+            if (!url) {
+                abrirConfiguracionNube();
+                mostrarToast('Ingrese primero la URL de la base de datos en la nube.', 'info');
+                return;
+            }
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('📥 Descargando registros de la nube...', 'info');
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const cloudData = await res.json();
+                if (!cloudData || !Array.isArray(cloudData)) {
+                    mostrarToast('No hay registros válidos en la nube.', 'info');
+                    return;
+                }
+
+                let agregados = 0;
+                cloudData.forEach(nuevo => {
+                    const idxExacto = registros.findIndex(r => r.id === nuevo.id && r.timestamp === nuevo.timestamp);
+                    if (idxExacto >= 0) {
+                        registros[idxExacto] = nuevo;
+                    } else {
+                        if (registros.some(r => r.id === nuevo.id)) {
+                            nuevo.id = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+                        }
+                        registros.push(nuevo);
+                        agregados++;
+                    }
+                });
+
+                guardarRegistrosEnStorage();
+                actualizarMetricas();
+                renderTabla();
+                mostrarToast('✅ Descarga completa. Registros sincronizados: ' + registros.length, 'success');
+                cerrarConfiguracionNube();
+            } catch (err) {
+                mostrarToast('Error al descargar de la nube: ' + err.message, 'error');
+            }
+        }
+
         let registros = [];
         let registroSeleccionado = null;
 
@@ -1138,6 +1548,7 @@
         let gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
 
         document.addEventListener('DOMContentLoaded', () => {
+            verificarSesion();
             detectarEntornoWhatsApp();
             cargarRegistrosDesdeStorage();
             actualizarMetricas();
@@ -1161,7 +1572,7 @@
             const div = document.createElement('div');
             div.className = 'meter-item-row';
             div.innerHTML = `
-                <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #${total} (Ej: LUZ-${1000 + total})" value="${valor}" required>
+                <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #${total} (Opcional)" value="${valor}">
                 <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
             `;
             contenedor.appendChild(div);
@@ -1173,7 +1584,7 @@
             const div = document.createElement('div');
             div.className = 'meter-item-row';
             div.innerHTML = `
-                <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #${total} (Ej: AGU-${2000 + total})" value="${valor}" required>
+                <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #${total} (Opcional)" value="${valor}">
                 <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
             `;
             contenedor.appendChild(div);
@@ -1185,7 +1596,9 @@
             if (contenedor.querySelectorAll('.meter-item-row').length > 1) {
                 row.remove();
             } else {
-                mostrarToast("Debe conservar al menos un campo de medidor.", "info");
+                const inp = row.querySelector('input');
+                if (inp) inp.value = '';
+                mostrarToast("Campo de medidor vaciado.", "info");
             }
         }
 
@@ -1392,15 +1805,7 @@
 
             const medidoresLuz = obtenerListaMedidoresLuz();
             const medidoresAgua = obtenerListaMedidoresAgua();
-
-            if (medidoresLuz.length === 0) {
-                mostrarToast("Ingrese al menos un número de medidor de luz.", "error");
-                return;
-            }
-            if (medidoresAgua.length === 0) {
-                mostrarToast("Ingrese al menos un número de medidor de agua.", "error");
-                return;
-            }
+            // Los medidores ahora son opcionales (permiten valores vacíos)
 
             const idCorrelativo = 'MUE-' + String(registros.length + 1).padStart(4, '0');
 
@@ -1458,12 +1863,12 @@
             // Reset medidores a 1 solo input
             document.getElementById('lista_medidores_luz').innerHTML = `
                 <div class="meter-item-row">
-                    <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Ej: LUZ-984210)" required>
+                    <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Opcional - dejar vacío si no hay)">
                 </div>
             `;
             document.getElementById('lista_medidores_agua').innerHTML = `
                 <div class="meter-item-row">
-                    <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Ej: AGU-33019)" required>
+                    <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)">
                 </div>
             `;
         }
@@ -1505,8 +1910,14 @@
                 const propietarioText = r.propietarioNombre ? `${r.propietarioDNI} - ${r.propietarioNombre}` : '<span style="color:var(--text-muted); font-style:italic;">Sin contrastar</span>';
                 const codigoPredioText = r.codigoPredio || '<span style="color:var(--text-muted); font-style:italic;">Pendiente</span>';
 
-                const medidoresLuzHTML = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean).map(m => `<span class="meter-tag">${m}</span>`).join('');
-                const medidoresAguaHTML = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean).map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">${m}</span>`).join('');
+                const luzArr = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean);
+                const aguaArr = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean);
+                const medidoresLuzHTML = luzArr.length > 0 
+                    ? luzArr.map(m => `<span class="meter-tag">⚡ ${m}</span>`).join('') 
+                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
+                const medidoresAguaHTML = aguaArr.length > 0 
+                    ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('') 
+                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
 
                 tr.innerHTML = `
                     <td><strong>${r.id}</strong></td>
@@ -1557,8 +1968,8 @@
             const luzList = reg.medidoresLuz || [reg.medidorLuz];
             const aguaList = reg.medidoresAgua || [reg.medidorAgua];
 
-            document.getElementById('c_view_luz').innerHTML = luzList.filter(Boolean).map(m => `<span class="meter-tag">${m}</span>`).join(' ') || '-';
-            document.getElementById('c_view_agua').innerHTML = aguaList.filter(Boolean).map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">${m}</span>`).join(' ') || '-';
+            document.getElementById('c_view_luz').innerHTML = luzList.filter(Boolean).map(m => `<span class="meter-tag">⚡ ${m}</span>`).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de luz</span>';
+            document.getElementById('c_view_agua').innerHTML = aguaList.filter(Boolean).map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de agua</span>';
 
             document.getElementById('c_view_caracteristicas').innerText = `${reg.pisos} Pisos | Material: ${reg.material}`;
             document.getElementById('c_view_obs_campo').innerText = reg.observacionesCampo || 'Ninguna';
