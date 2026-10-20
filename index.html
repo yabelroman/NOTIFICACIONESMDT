@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +8,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -51,7 +54,9 @@
         }
 
         @media (min-width: 768px) {
-            body { padding: 1.5rem; }
+            body {
+                padding: 1.5rem;
+            }
         }
 
         /* BANNER AVISO WHATSAPP */
@@ -65,6 +70,7 @@
             font-size: 0.85rem;
             line-height: 1.4;
         }
+
         #whatsapp-warning-banner strong {
             color: #ffffff;
             display: block;
@@ -129,7 +135,9 @@
         }
 
         @media (min-width: 850px) {
-            .nav-tabs { width: auto; }
+            .nav-tabs {
+                width: auto;
+            }
         }
 
         .tab-btn {
@@ -169,7 +177,10 @@
         }
 
         @media (min-width: 768px) {
-            .stats-bar { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+            .stats-bar {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
         }
 
         .stat-card {
@@ -196,10 +207,21 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .stat-card.correcto { border-left: 4px solid var(--success); }
-        .stat-card.subvaluante { border-left: 4px solid var(--warning); }
-        .stat-card.omiso { border-left: 4px solid var(--danger); }
-        .stat-card.pendiente { border-left: 4px solid var(--purple); }
+        .stat-card.correcto {
+            border-left: 4px solid var(--success);
+        }
+
+        .stat-card.subvaluante {
+            border-left: 4px solid var(--warning);
+        }
+
+        .stat-card.omiso {
+            border-left: 4px solid var(--danger);
+        }
+
+        .stat-card.pendiente {
+            border-left: 4px solid var(--purple);
+        }
 
         /* MAIN CONTENT AREA */
         main {
@@ -208,12 +230,25 @@
             gap: 1.25rem;
         }
 
-        .module-section { display: none; }
-        .module-section.active { display: block; animation: fadeIn 0.3s ease; }
+        .module-section {
+            display: none;
+        }
+
+        .module-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* CARDS & FORMS */
@@ -226,7 +261,11 @@
             margin-bottom: 1.25rem;
         }
 
-        @media (min-width: 768px) { .card { padding: 1.5rem; } }
+        @media (min-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
 
         .card-header {
             display: flex;
@@ -255,7 +294,9 @@
         }
 
         @media (min-width: 640px) {
-            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .form-group {
@@ -264,7 +305,9 @@
             gap: 0.4rem;
         }
 
-        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
 
         label {
             font-size: 0.82rem;
@@ -291,12 +334,17 @@
             width: 100%;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             border-color: var(--border-focus);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
-        textarea { min-height: 80px; resize: vertical; }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
 
         /* BUTTONS */
         .btn {
@@ -320,32 +368,64 @@
             color: white;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
         }
-        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
 
         .btn-secondary {
             background: var(--bg-card-alt);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-        .btn-secondary:hover { background: #475569; }
 
-        .btn-success { background: #059669; color: white; }
-        .btn-success:hover { background: #10b981; }
+        .btn-secondary:hover {
+            background: #475569;
+        }
 
-        .btn-warning { background: #d97706; color: white; }
-        .btn-warning:hover { background: #f59e0b; }
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
 
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #ef4444; }
+        .btn-success:hover {
+            background: #10b981;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f59e0b;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+        }
 
         .btn-outline {
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-secondary);
         }
-        .btn-outline:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
 
-        .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.78rem; }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 0.45rem 0.8rem;
+            font-size: 0.78rem;
+        }
 
         /* STEP CARDS IN MUESTREO */
         .step-badge {
@@ -440,7 +520,9 @@
             align-items: center;
         }
 
-        .meter-item-row input { flex: 1; }
+        .meter-item-row input {
+            flex: 1;
+        }
 
         .btn-remove-meter {
             background: rgba(239, 68, 68, 0.15);
@@ -451,7 +533,11 @@
             cursor: pointer;
             font-weight: 700;
         }
-        .btn-remove-meter:hover { background: var(--danger); color: white; }
+
+        .btn-remove-meter:hover {
+            background: var(--danger);
+            color: white;
+        }
 
         /* STATUS BADGES */
         .status-badge {
@@ -466,10 +552,29 @@
             letter-spacing: 0.04em;
         }
 
-        .status-badge.correcto { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-badge.subvaluante { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .status-badge.omiso { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-badge.pendiente { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .status-badge.correcto {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.subvaluante {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-badge.omiso {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-badge.pendiente {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
 
         /* TABLE */
         .table-container {
@@ -479,7 +584,13 @@
             background: #0f172a;
         }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
         thead th {
             background: #1e293b;
             color: var(--text-secondary);
@@ -488,9 +599,19 @@
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
         }
-        tbody tr { border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
-        tbody tr:hover { background: rgba(56, 189, 248, 0.04); }
-        tbody td { padding: 0.8rem 1rem; vertical-align: middle; }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        tbody tr:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        tbody td {
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+        }
 
         .table-thumb {
             width: 48px;
@@ -508,7 +629,11 @@
             gap: 1.25rem;
         }
 
-        @media (min-width: 1024px) { .contrast-layout { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) {
+            .contrast-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
 
         .contrast-panel {
             background: var(--bg-card);
@@ -535,11 +660,24 @@
         }
 
         @media (min-width: 640px) {
-            .field-row { flex-direction: row; justify-content: space-between; align-items: center; }
+            .field-row {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
-        .field-row .label { color: var(--text-secondary); font-weight: 500; }
-        .field-row .value { font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+        .field-row .label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .field-row .value {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
 
         .meter-tag {
             display: inline-block;
@@ -562,7 +700,9 @@
         }
 
         @media (min-width: 480px) {
-            .status-radio-group { grid-template-columns: repeat(3, 1fr); }
+            .status-radio-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .status-radio-card {
@@ -575,63 +715,159 @@
             background: rgba(15, 23, 42, 0.6);
         }
 
-        .status-radio-card.active-correcto { border-color: var(--success); background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .status-radio-card.active-subvaluante { border-color: var(--warning); background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-        .status-radio-card.active-omiso { border-color: var(--danger); background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .status-radio-card.active-correcto {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .status-radio-card.active-subvaluante {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .status-radio-card.active-omiso {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
 
         /* MODAL */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.88);
             backdrop-filter: blur(8px);
             z-index: 9999;
-            align-items: center; justify-content: center;
+            align-items: center;
+            justify-content: center;
             padding: 1rem;
         }
-        .modal.active { display: flex; }
+
+        .modal.active {
+            display: flex;
+        }
 
         .modal-content {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            max-width: 900px; width: 100%; max-height: 90vh;
-            overflow-y: auto; display: flex; flex-direction: column;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        .modal-header { padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
-        .modal-img-container { width: 100%; max-height: 480px; background: black; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .modal-img-container img { max-width: 100%; max-height: 480px; object-fit: contain; }
+        .modal-header {
+            padding: 1.15rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-img-container {
+            width: 100%;
+            max-height: 480px;
+            background: black;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-img-container img {
+            max-width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+        }
 
         /* TOAST */
         #toast {
             position: fixed;
-            bottom: 1.5rem; right: 1.5rem; left: 1.5rem;
-            max-width: 450px; margin-left: auto;
-            background: #1e293b; color: white;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            left: 1.5rem;
+            max-width: 450px;
+            margin-left: auto;
+            background: #1e293b;
+            color: white;
             border-left: 4px solid var(--primary);
-            padding: 0.9rem 1.25rem; border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 0.75rem;
-            transform: translateY(120px); opacity: 0; transition: all 0.3s ease;
-            z-index: 10000; font-size: 0.88rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            font-size: 0.88rem;
         }
-        #toast.show { transform: translateY(0); opacity: 1; }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
         @media print {
-            body { background: white !important; color: black !important; padding: 0 !important; }
-            header, .nav-tabs, .stats-bar, .btn, #whatsapp-warning-banner, .no-print { display: none !important; }
-            .card, .contrast-panel { background: white !important; border: 1px solid #ccc !important; color: black !important; box-shadow: none !important; }
-            .field-row { background: #f8fafc !important; color: black !important; }
-            .field-row .label, .field-row .value { color: black !important; }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+
+            header,
+            .nav-tabs,
+            .stats-bar,
+            .btn,
+            #whatsapp-warning-banner,
+            .no-print {
+                display: none !important;
+            }
+
+            .card,
+            .contrast-panel {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                color: black !important;
+                box-shadow: none !important;
+            }
+
+            .field-row {
+                background: #f8fafc !important;
+                color: black !important;
+            }
+
+            .field-row .label,
+            .field-row .value {
+                color: black !important;
+            }
         }
 
         /* LOGIN OVERLAY */
         .login-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(11, 17, 32, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -642,11 +878,13 @@
             padding: 1.25rem;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
+
         .login-overlay.hidden {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
+
         .login-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -654,42 +892,48 @@
             padding: 2.2rem 2rem;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(56, 189, 248, 0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
+
         .login-header {
             margin-bottom: 1.5rem;
         }
+
         .login-icon {
             font-size: 3rem;
             margin-bottom: 0.6rem;
-            filter: drop-shadow(0 4px 12px rgba(37,99,235,0.4));
+            filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.4));
         }
+
         .login-header h2 {
             font-size: 1.35rem;
             font-weight: 800;
             color: var(--text-primary);
             margin-bottom: 0.35rem;
         }
+
         .login-header p {
             font-size: 0.82rem;
             color: var(--text-secondary);
         }
+
         .user-session-bar {
             display: flex;
             align-items: center;
             gap: 0.65rem;
         }
+
         @media (max-width: 768px) {
             .user-session-bar {
                 width: 100%;
                 justify-content: space-between;
                 margin-top: 0.5rem;
                 padding-top: 0.75rem;
-                border-top: 1px solid rgba(255,255,255,0.08);
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
             }
         }
 
@@ -706,12 +950,13 @@
             max-height: 240px;
             overflow-y: auto;
             z-index: 1000;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
             margin-top: 4px;
         }
+
         .search-item {
             padding: 0.65rem 0.85rem;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -719,10 +964,15 @@
             gap: 0.5rem;
             transition: background 0.15s ease;
         }
+
         .search-item:hover {
             background: rgba(56, 189, 248, 0.15);
         }
-        .search-item:last-child { border-bottom: none; }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
         .cruce-card {
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid var(--border-color);
@@ -733,6 +983,7 @@
             gap: 0.35rem;
             font-size: 0.82rem;
         }
+
         .sugerencia-card {
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(16, 185, 129, 0.3);
@@ -744,15 +995,16 @@
             gap: 0.6rem;
             transition: all 0.2s ease;
         }
+
         .sugerencia-card:hover {
             background: rgba(16, 185, 129, 0.18);
             border-color: var(--success);
         }
-
     </style>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="data_padron.js"></script>
 </head>
+
 <body>
 
     <!-- MODAL DE INICIO DE SESIÓN -->
@@ -763,27 +1015,36 @@
                 <h2>Sistema de Fiscalización Predial</h2>
                 <p>Municipalidad Distrital - Control de Acceso</p>
             </div>
-            <form id="loginForm" onsubmit="validarLogin(event)" style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+            <form id="loginForm" onsubmit="validarLogin(event)"
+                style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
                 <div class="form-group" style="text-align: left;">
-                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">👤 Usuario</label>
-                    <input type="text" id="login_user" placeholder="Ingrese usuario (admin)" autocomplete="username" required 
-                           style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">👤
+                        Usuario</label>
+                    <input type="text" id="login_user" placeholder="Ingrese usuario (admin)" autocomplete="username"
+                        required
+                        style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
                 </div>
                 <div class="form-group" style="text-align: left;">
-                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">🔒 Contraseña</label>
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">🔒
+                        Contraseña</label>
                     <div style="position: relative;">
-                        <input type="password" id="login_pass" placeholder="Ingrese contraseña" autocomplete="current-password" required 
-                               style="width: 100%; padding: 0.75rem 2.6rem 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                        <input type="password" id="login_pass" placeholder="Ingrese contraseña"
+                            autocomplete="current-password" required
+                            style="width: 100%; padding: 0.75rem 2.6rem 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
                         <button type="button" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar contraseña"
-                                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0;">
+                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0;">
                             👁️
                         </button>
                     </div>
                 </div>
-                <div id="loginErrorMsg" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: #fca5a5; padding: 0.65rem; border-radius: 8px; font-size: 0.82rem; text-align: center;">
+                <div id="loginErrorMsg"
+                    style="display: none; background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: #fca5a5; padding: 0.65rem; border-radius: 8px; font-size: 0.82rem; text-align: center;">
                     ⚠️ Usuario o contraseña incorrectos.
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; margin-top: 0.4rem; justify-content: center;">
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; margin-top: 0.4rem; justify-content: center;">
                     🔑 Ingresar al Sistema
                 </button>
             </form>
@@ -796,7 +1057,8 @@
     <!-- AVISO WHATSAPP CONTENT:// -->
     <div id="whatsapp-warning-banner">
         <strong>⚠️ Abierto en el visor de WhatsApp (`content://`)</strong>
-        <p>Toca los 3 puntos ⋮ en WhatsApp &gt; Guardar &gt; abre desde "Descargas" con Chrome, o utiliza el botón <strong>"💾 Guardar Avance"</strong> frecuentemente.</p>
+        <p>Toca los 3 puntos ⋮ en WhatsApp &gt; Guardar &gt; abre desde "Descargas" con Chrome, o utiliza el botón
+            <strong>"💾 Guardar Avance"</strong> frecuentemente.</p>
     </div>
 
     <!-- HEADER -->
@@ -806,7 +1068,9 @@
             <div class="header-title">
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                     <h1 style="margin: 0;">Fiscalización Predial</h1>
-                    <span class="badge" style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.8 (Eliminar/Editar + Preview)</span>
+                    <span class="badge"
+                        style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.8
+                        (Eliminar/Editar + Preview)</span>
                 </div>
                 <p>Muestreo Secuencial con GPS Interno & Contraste Catastral</p>
             </div>
@@ -818,17 +1082,20 @@
             </button>
             <button class="tab-btn" onclick="switchTab('contraste')">
                 📋 Contraste
-                <span id="badge-total-records" style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 999px; font-size: 0.72rem;">0</span>
+                <span id="badge-total-records"
+                    style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 999px; font-size: 0.72rem;">0</span>
             </button>
             <button class="tab-btn" onclick="switchTab('reportes')">
                 📊 Reportes e Importación
             </button>
         </nav>
         <div class="user-session-bar" id="userSessionBar">
-            <div style="background: rgba(37,99,235,0.2); border: 1px solid rgba(56,189,248,0.3); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+            <div
+                style="background: rgba(37,99,235,0.2); border: 1px solid rgba(56,189,248,0.3); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
                 <span>👤</span> <span id="sessionUsername">admin</span>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarSesion()" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarSesion()"
+                style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
                 🚪 Salir
             </button>
         </div>
@@ -870,7 +1137,7 @@
         <!-- ========================================== -->
         <section id="mod-muestreo" class="module-section active">
             <form id="muestreoForm" onsubmit="guardarMuestreo(event)">
-                
+
                 <!-- PASO 1: FOTO DEL PREDIO -->
                 <div class="card">
                     <div class="card-header">
@@ -884,8 +1151,10 @@
                     </div>
 
                     <div class="photo-uploader">
-                        <input type="file" id="input_foto_predio" accept="image/*" capture="environment" style="display: none;" onchange="procesarFotoPredio(event)">
-                        <button type="button" class="btn btn-primary" onclick="document.getElementById('input_foto_predio').click()">
+                        <input type="file" id="input_foto_predio" accept="image/*" capture="environment"
+                            style="display: none;" onchange="procesarFotoPredio(event)">
+                        <button type="button" class="btn btn-primary"
+                            onclick="document.getElementById('input_foto_predio').click()">
                             📷 Tomar / Subir Foto del Predio
                         </button>
                         <div class="photo-preview-box" id="box_foto_predio">
@@ -893,7 +1162,8 @@
                                 <span style="font-size: 2.2rem;">🏠</span>
                                 <span>Presione el botón para capturar la fachada del predio</span>
                             </div>
-                            <img id="img_preview_predio" style="display: none;" onclick="abrirModalZoom(this.src, 'Fotografía del Predio')" alt="Predio">
+                            <img id="img_preview_predio" style="display: none;"
+                                onclick="abrirModalZoom(this.src, 'Fotografía del Predio')" alt="Predio">
                             <div class="badge-base64" id="badge_predio_b64" style="display: none;">
                                 ⚡ Base64 OK (<span id="size_predio">0 KB</span>) | Fecha/Hora OK
                             </div>
@@ -914,8 +1184,10 @@
                     </div>
 
                     <div class="photo-uploader">
-                        <input type="file" id="input_foto_medidor" accept="image/*" capture="environment" style="display: none;" onchange="procesarFotoMedidorConGPS(event)">
-                        <button type="button" class="btn btn-success" onclick="document.getElementById('input_foto_medidor').click()">
+                        <input type="file" id="input_foto_medidor" accept="image/*" capture="environment"
+                            style="display: none;" onchange="procesarFotoMedidorConGPS(event)">
+                        <button type="button" class="btn btn-success"
+                            onclick="document.getElementById('input_foto_medidor').click()">
                             📷 Tomar / Subir Foto del Medidor (Activa GPS Automático)
                         </button>
 
@@ -924,7 +1196,8 @@
                                 <span style="font-size: 2.2rem;">⏱️</span>
                                 <span>Al tomar esta foto se obtendrán las coordenadas GPS en segundo plano</span>
                             </div>
-                            <img id="img_preview_medidor" style="display: none;" onclick="abrirModalZoom(this.src, 'Fotografía del Medidor')" alt="Medidor">
+                            <img id="img_preview_medidor" style="display: none;"
+                                onclick="abrirModalZoom(this.src, 'Fotografía del Medidor')" alt="Medidor">
                             <div class="badge-base64" id="badge_medidor_b64" style="display: none;">
                                 ⚡ Base64 OK (<span id="size_medidor">0 KB</span>) | GPS Incrustado
                             </div>
@@ -963,24 +1236,40 @@
                             <div class="meter-group-container">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <label>⚡ Suministro Eléctrico (Medidores de Luz)</label>
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="agregarMedidorLuz()">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="agregarMedidorLuz()">
                                         + Agregar otro medidor de luz
                                     </button>
                                 </div>
                                 <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
-                                    Ingrese el <strong>Verificador (2 dígitos)</strong> y luego el <strong>Número de Medidor</strong>:
+                                    Ingrese el <strong>Verificador (2 dígitos)</strong> y luego el <strong>Número de
+                                        Medidor</strong>:
                                 </div>
-                                <div id="lista_medidores_luz" style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                    <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
-                                        <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
-                                            <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
-                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                                <div id="lista_medidores_luz"
+                                    style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                    <div class="meter-item-row"
+                                        style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                                        <div
+                                            style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                                            <span
+                                                style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR
+                                                (2 DÍG)</span>
+                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13"
+                                                maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()"
+                                                style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
                                         </div>
                                         <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
-                                            <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
-                                            <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                                            <span
+                                                style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO
+                                                DE MEDIDOR LUZ</span>
+                                            <input type="text" class="input-medidor-luz-num"
+                                                placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric"
+                                                oninput="previewCruceMuestreo()"
+                                                style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
                                         </div>
-                                        <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
+                                        <button type="button" class="btn-remove-meter"
+                                            onclick="eliminarMedidorFila(this)" title="Limpiar este medidor"
+                                            style="height: 40px; margin-bottom: 1px;">✕</button>
                                     </div>
                                 </div>
                                 <!-- PREVIEW EN VIVO ELECTRO -->
@@ -993,13 +1282,17 @@
                             <div class="meter-group-container">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <label>💧 Suministro Sanitario (Medidores de Agua)</label>
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="agregarMedidorAgua()">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="agregarMedidorAgua()">
                                         + Agregar otro medidor de agua
                                     </button>
                                 </div>
-                                <div id="lista_medidores_agua" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div id="lista_medidores_agua"
+                                    style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     <div class="meter-item-row">
-                                        <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)" oninput="previewCruceMuestreo()">
+                                        <input type="text" class="input-medidor-agua"
+                                            placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)"
+                                            oninput="previewCruceMuestreo()">
                                     </div>
                                 </div>
                                 <!-- PREVIEW EN VIVO EMUSAP -->
@@ -1026,11 +1319,13 @@
 
                         <div class="form-group full-width">
                             <label>💬 Observaciones de Campo (Opcional)</label>
-                            <textarea id="observaciones_campo" placeholder="Detalles de inspección física, ampliaciones, etc."></textarea>
+                            <textarea id="observaciones_campo"
+                                placeholder="Detalles de inspección física, ampliaciones, etc."></textarea>
                         </div>
                     </div>
 
-                    <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                    <div
+                        style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
                         <button type="button" class="btn btn-secondary" onclick="limpiarFormularioMuestreo()">
                             🔄 Limpiar
                         </button>
@@ -1047,12 +1342,15 @@
         <!-- 2. MÓDULO DE CONTRASTE -->
         <!-- ========================================== -->
         <section id="mod-contraste" class="module-section">
-            
+
             <div class="card">
                 <div class="card-header">
                     <h2>🔍 Fichas Prediales Registradas</h2>
-                    <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 500px; flex-wrap: wrap;">
-                        <input type="text" id="filtro_busqueda" placeholder="Buscar por ID, Medidor, DNI, Propietario..." onkeyup="filtrarTabla()" style="flex: 1; font-size: 0.85rem;">
+                    <div
+                        style="display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 500px; flex-wrap: wrap;">
+                        <input type="text" id="filtro_busqueda"
+                            placeholder="Buscar por ID, Medidor, DNI, Propietario..." onkeyup="filtrarTabla()"
+                            style="flex: 1; font-size: 0.85rem;">
                         <select id="filtro_estado" onchange="filtrarTabla()" style="font-size: 0.85rem; width: auto;">
                             <option value="TODOS">Todos</option>
                             <option value="PENDIENTE">Pendientes</option>
@@ -1089,7 +1387,7 @@
 
             <!-- PANEL DE CONTRASTE ACTIVO -->
             <div id="panel_contraste_detalle" class="contrast-layout" style="display: none;">
-                
+
                 <!-- COLUMNA IZQUIERDA: FOTOS Y MUESTREO DECODIFICADO -->
                 <div class="contrast-panel">
                     <div class="card-header">
@@ -1099,15 +1397,19 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
                         <div>
-                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Predio (Estampada)</label>
+                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Predio
+                                (Estampada)</label>
                             <div class="photo-preview-box" style="height: 180px;">
-                                <img id="contraste_img_predio" src="" alt="Predio" onclick="abrirModalZoom(this.src, 'Foto Predio Decodificada')">
+                                <img id="contraste_img_predio" src="" alt="Predio"
+                                    onclick="abrirModalZoom(this.src, 'Foto Predio Decodificada')">
                             </div>
                         </div>
                         <div>
-                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Medidor (Estampada + GPS)</label>
+                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Medidor
+                                (Estampada + GPS)</label>
                             <div class="photo-preview-box" style="height: 180px;">
-                                <img id="contraste_img_medidor" src="" alt="Medidor" onclick="abrirModalZoom(this.src, 'Foto Medidor Decodificada')">
+                                <img id="contraste_img_medidor" src="" alt="Medidor"
+                                    onclick="abrirModalZoom(this.src, 'Foto Medidor Decodificada')">
                             </div>
                         </div>
                     </div>
@@ -1145,10 +1447,12 @@
                     <div class="card-header" style="flex-wrap: wrap; gap: 0.5rem;">
                         <h2>✏️ Dictamen y Datos de Contraste</h2>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="editarEnMuestreo()" style="font-size: 0.78rem;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="editarEnMuestreo()"
+                                style="font-size: 0.78rem;">
                                 🔧 Editar Muestreo
                             </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarRegistroActual()" style="font-size: 0.78rem;">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarRegistroActual()"
+                                style="font-size: 0.78rem;">
                                 🗑️ Eliminar
                             </button>
                         </div>
@@ -1158,28 +1462,40 @@
                         <div class="form-grid" style="grid-template-columns: 1fr;">
 
                             <!-- SECCIÓN 1: CRUCE AUTOMÁTICO DE MEDIDORES (ELECTRO & EMUSAP) -->
-                            <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                                    <h3 style="font-size: 0.92rem; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                            <div
+                                style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h3
+                                        style="font-size: 0.92rem; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
                                         ⚡ Cruce Automático de Medidores en Padrones (Electro & EMUSAP)
                                     </h3>
-                                    <span id="badge_cruce_estado" class="badge" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.72rem;">Consultando...</span>
+                                    <span id="badge_cruce_estado" class="badge"
+                                        style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.72rem;">Consultando...</span>
                                 </div>
-                                <div id="cruce_resultados_medidores" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div id="cruce_resultados_medidores"
+                                    style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     <!-- Inyección dinámica de resultados de Electro y EMUSAP -->
                                 </div>
                             </div>
 
                             <!-- SECCIÓN 2: PRECARGA AUTOMÁTICA DE SIMILITUDES EN CONTRIBUYENTES -->
-                            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                                    <h4 style="font-size: 0.88rem; color: #10b981; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                            <div
+                                style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h4
+                                        style="font-size: 0.88rem; color: #10b981; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
                                         🎯 Coincidencias Sugeridas en Contribuyentes (Según Medidores)
                                     </h4>
-                                    <span id="badge_total_sugerencias" class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.72rem;">0 encontradas</span>
+                                    <span id="badge_total_sugerencias" class="badge"
+                                        style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.72rem;">0
+                                        encontradas</span>
                                 </div>
-                                <div id="lista_sugerencias_contribuyentes" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">Abra un predio con medidor para precargar coincidencias automáticas.</span>
+                                <div id="lista_sugerencias_contribuyentes"
+                                    style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">Abra
+                                        un predio con medidor para precargar coincidencias automáticas.</span>
                                 </div>
                             </div>
 
@@ -1189,24 +1505,34 @@
                                     <span>🔍 Buscador Manual en Padrón de Contribuyentes (DNI o Nombre)</span>
                                     <span style="font-size: 0.75rem; color: var(--text-muted);">Mínimo 2 letras</span>
                                 </label>
-                                <input type="text" id="buscador_contribuyente_input" placeholder="Escriba apellido, nombre o DNI para autocompletar..." autocomplete="off" oninput="buscarContribuyentesInput(this.value)">
-                                <div id="dropdown_resultados_contribuyentes" class="search-dropdown-results" style="display: none;"></div>
+                                <input type="text" id="buscador_contribuyente_input"
+                                    placeholder="Escriba apellido, nombre o DNI para autocompletar..."
+                                    autocomplete="off" oninput="buscarContribuyentesInput(this.value)">
+                                <div id="dropdown_resultados_contribuyentes" class="search-dropdown-results"
+                                    style="display: none;"></div>
                             </div>
 
                             <!-- SECCIÓN 4: DATOS DEL PROPIETARIO (OPCIONALES PARA OMISOS) -->
                             <div class="form-group">
-                                <label>🏷️ Código de Predio <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional si es Omiso / Pendiente)</span></label>
-                                <input type="text" id="contraste_codigo_predio" placeholder="Ej: PR-2026-004589 (o dejar vacío)">
+                                <label>🏷️ Código de Predio <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional
+                                        si es Omiso / Pendiente)</span></label>
+                                <input type="text" id="contraste_codigo_predio"
+                                    placeholder="Ej: PR-2026-004589 (o dejar vacío)">
                             </div>
 
                             <div class="form-group">
-                                <label>🆔 DNI / RUC del Propietario <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
-                                <input type="text" id="contraste_propietario_dni" placeholder="Ej: 48435564" maxlength="12">
+                                <label>🆔 DNI / RUC del Propietario <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_dni" placeholder="Ej: 48435564"
+                                    maxlength="12">
                             </div>
 
                             <div class="form-group">
-                                <label>👤 Apellidos y Nombres / Razón Social <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
-                                <input type="text" id="contraste_propietario_nombre" placeholder="Ej: HERRERA TAIPE CIRILO">
+                                <label>👤 Apellidos y Nombres / Razón Social <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_nombre"
+                                    placeholder="Ej: HERRERA TAIPE CIRILO">
                             </div>
 
                             <!-- SECCIÓN 5: ESTADO DE FISCALIZACIÓN -->
@@ -1214,31 +1540,41 @@
                                 <label>⚖️ Estado de Fiscalización</label>
                                 <input type="hidden" id="contraste_estado" value="CORRECTO">
                                 <div class="status-radio-group">
-                                    <div class="status-radio-card active-correcto" id="card_st_correcto" onclick="seleccionarEstado('CORRECTO')">
+                                    <div class="status-radio-card active-correcto" id="card_st_correcto"
+                                        onclick="seleccionarEstado('CORRECTO')">
                                         <span style="font-size: 1.2rem;">✅</span>
-                                        <strong style="display:block; font-size:0.85rem; margin-top:3px;">CORRECTO</strong>
-                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Coincide con Rentas</span>
+                                        <strong
+                                            style="display:block; font-size:0.85rem; margin-top:3px;">CORRECTO</strong>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Coincide con
+                                            Rentas</span>
                                     </div>
-                                    <div class="status-radio-card" id="card_st_subvaluante" onclick="seleccionarEstado('SUBVALUANTE')">
+                                    <div class="status-radio-card" id="card_st_subvaluante"
+                                        onclick="seleccionarEstado('SUBVALUANTE')">
                                         <span style="font-size: 1.2rem;">⚠️</span>
-                                        <strong style="display:block; font-size:0.85rem; margin-top:3px;">SUBVALUANTE</strong>
-                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Declaró menos área/pisos</span>
+                                        <strong
+                                            style="display:block; font-size:0.85rem; margin-top:3px;">SUBVALUANTE</strong>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Declaró menos
+                                            área/pisos</span>
                                     </div>
-                                    <div class="status-radio-card" id="card_st_omiso" onclick="seleccionarEstado('OMISO')">
+                                    <div class="status-radio-card" id="card_st_omiso"
+                                        onclick="seleccionarEstado('OMISO')">
                                         <span style="font-size: 1.2rem;">❌</span>
                                         <strong style="display:block; font-size:0.85rem; margin-top:3px;">OMISO</strong>
-                                        <span style="font-size: 0.68rem; color: var(--text-muted);">No registrado en base</span>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">No registrado en
+                                            base</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>📋 Dictamen y Observaciones de Gabinete</label>
-                                <textarea id="contraste_observaciones_gabinete" placeholder="Conclusiones periciales y fundamentación..."></textarea>
+                                <textarea id="contraste_observaciones_gabinete"
+                                    placeholder="Conclusiones periciales y fundamentación..."></textarea>
                             </div>
                         </div>
 
-                        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                        <div
+                            style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
                             <button type="button" class="btn btn-outline" onclick="window.print()">
                                 🖨️ Imprimir Ficha
                             </button>
@@ -1266,57 +1602,80 @@
 
                 <div class="form-grid" style="grid-template-columns: 1fr;">
                     <!-- EXPLICACIÓN Y SINCRONIZACIÓN MULTI-DISPOSITIVO (GITHUB PAGES) -->
-                    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-                            <h3 style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+                    <div
+                        style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3
+                                style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
                                 ☁️ Sincronización Multi-Dispositivo (Compartir entre Celulares y PC)
                             </h3>
-                            <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                            <span class="badge"
+                                style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
                                 GitHub Pages
                             </span>
                         </div>
                         <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.55;">
                             💡 <strong>¿Por qué no se ven los datos al abrir el enlace en otro celular?</strong><br>
-                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
+                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos
+                            central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado
+                            de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro
+                            dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
                         </p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
+
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
                             <!-- OPCIÓN A: TRANSFERIR POR ARCHIVO / WHATSAPP -->
-                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                            <div
+                                style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
                                 <div>
-                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A: Compartir por WhatsApp o Drive (Inmediato)</h4>
+                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A:
+                                        Compartir por WhatsApp o Drive (Inmediato)</h4>
                                     <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
-                                        1. En el celular de campo presiona <strong>"Descargar Copia de Avance"</strong>.<br>
-                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu PC o supervisor.<br>
-                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
+                                        1. En el celular de campo presiona <strong>"Descargar Copia de
+                                            Avance"</strong>.<br>
+                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu
+                                        PC o supervisor.<br>
+                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar
+                                            Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
                                     </p>
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="guardarAvanceRapido()">
+                                    <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="guardarAvanceRapido()">
                                         💾 Descargar Avance (.json)
                                     </button>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('input_importar_json').click()">
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('input_importar_json').click()">
                                         📂 Importar en este equipo
                                     </button>
                                 </div>
                             </div>
 
                             <!-- OPCIÓN B: SINCRONIZACIÓN EN LA NUBE REST -->
-                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                            <div
+                                style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
                                 <div>
-                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B: Sincronización en la Nube en Tiempo Real</h4>
+                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B:
+                                        Sincronización en la Nube en Tiempo Real</h4>
                                     <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
-                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase Realtime Database</strong> o un Webhook de <strong>Google Apps Script</strong>) para que todos los celulares envíen y reciban los registros con un solo clic.
+                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase
+                                            Realtime Database</strong> o un Webhook de <strong>Google Apps
+                                            Script</strong>) para que todos los celulares envíen y reciban los registros
+                                        con un solo clic.
                                     </p>
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button type="button" class="btn btn-success btn-sm" onclick="sincronizarSubirNube()">
+                                    <button type="button" class="btn btn-success btn-sm"
+                                        onclick="sincronizarSubirNube()">
                                         📤 Subir a Nube
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="sincronizarDescargarNube()">
+                                    <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="sincronizarDescargarNube()">
                                         📥 Descargar de Nube
                                     </button>
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirConfiguracionNube()">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="abrirConfiguracionNube()">
                                         ⚙️ Configurar URL
                                     </button>
                                 </div>
@@ -1324,46 +1683,59 @@
                         </div>
                     </div>
 
-                    
-                                        <!-- CARGA Y ACTUALIZACIÓN DE PADRÓN EXCEL (DATA.xlsx) -->
-                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.85rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+
+                    <!-- CARGA Y ACTUALIZACIÓN DE PADRÓN EXCEL (DATA.xlsx) -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.85rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                             <h3 style="display: flex; align-items: center; gap: 0.45rem;">
                                 📁 Padrón Institucional (DATA.xlsx: Contribuyentes, Electro y EMUSAP)
                             </h3>
-                            <span class="badge" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">
+                            <span class="badge"
+                                style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">
                                 IndexedDB Offline
                             </span>
                         </div>
                         <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">
-                            Los padrones se cargan automáticamente al iniciar. Si deseas actualizar los datos de contribuyentes o medidores, puedes subir un nuevo archivo <strong>DATA.xlsx</strong> aquí. Se procesará localmente y se guardará en tu navegador.
+                            Los padrones se cargan automáticamente al iniciar. Si deseas actualizar los datos de
+                            contribuyentes o medidores, puedes subir un nuevo archivo <strong>DATA.xlsx</strong> aquí.
+                            Se procesará localmente y se guardará en tu navegador.
                         </p>
-                        
+
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
-                                👤 Contribuyentes: <strong id="badge_count_contribuyentes" style="color: #38bdf8;">0</strong>
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                👤 Contribuyentes: <strong id="badge_count_contribuyentes"
+                                    style="color: #38bdf8;">0</strong>
                             </div>
-                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
                                 ⚡ Electro Sur Este: <strong id="badge_count_electro" style="color: #f59e0b;">0</strong>
                             </div>
-                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
                                 💧 EMUSAP: <strong id="badge_count_emusap" style="color: #10b981;">0</strong>
                             </div>
                         </div>
 
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                            <input type="file" id="input_data_xlsx" accept=".xlsx" style="display: none;" onchange="procesarSubidaExcelData(event)">
-                            <button type="button" class="btn btn-primary" onclick="document.getElementById('input_data_xlsx').click()">
+                            <input type="file" id="input_data_xlsx" accept=".xlsx" style="display: none;"
+                                onchange="procesarSubidaExcelData(event)">
+                            <button type="button" class="btn btn-primary"
+                                onclick="document.getElementById('input_data_xlsx').click()">
                                 📂 Subir / Actualizar Archivo DATA.xlsx
                             </button>
                         </div>
                     </div>
 
                     <!-- GUARDAR AVANCE / BACKUP RÁPIDO -->
-                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>💾 Guardar Avance Actual</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Descarga un archivo de respaldo con todos los predios muestreados y contrastados hasta el momento. Te permite asegurar el trabajo en cualquier celular o PC.
+                            Descarga un archivo de respaldo con todos los predios muestreados y contrastados hasta el
+                            momento. Te permite asegurar el trabajo en cualquier celular o PC.
                         </p>
                         <button class="btn btn-warning" onclick="guardarAvanceRapido()" style="align-self: flex-start;">
                             📥 Descargar Copia de Avance
@@ -1371,22 +1743,28 @@
                     </div>
 
                     <!-- IMPORTAR DATOS (AGREGAR A LOS EXISTENTES) -->
-                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>📥 Importar y Agregar Datos</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Sube un archivo JSON de respaldo. Los registros importados <strong>se agregarán automáticamente a los datos ya existentes</strong> sin borrar tu avance.
+                            Sube un archivo JSON de respaldo. Los registros importados <strong>se agregarán
+                                automáticamente a los datos ya existentes</strong> sin borrar tu avance.
                         </p>
-                        <input type="file" id="input_importar_json" accept=".json" style="display: none;" onchange="importarYAgregarDatos(event)">
-                        <button class="btn btn-primary" onclick="document.getElementById('input_importar_json').click()" style="align-self: flex-start;">
+                        <input type="file" id="input_importar_json" accept=".json" style="display: none;"
+                            onchange="importarYAgregarDatos(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('input_importar_json').click()"
+                            style="align-self: flex-start;">
                             📂 Seleccionar Archivo JSON para Importar y Agregar
                         </button>
                     </div>
 
                     <!-- EXPORTAR EXCEL CSV -->
-                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>📗 Exportar a Excel (CSV)</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Descarga una tabla completa con todos los medidores, coordenadas GPS, características y dictámenes para abrir en Microsoft Excel o Google Sheets.
+                            Descarga una tabla completa con todos los medidores, coordenadas GPS, características y
+                            dictámenes para abrir en Microsoft Excel o Google Sheets.
                         </p>
                         <button class="btn btn-secondary" onclick="exportarCSV()" style="align-self: flex-start;">
                             ⬇️ Descargar Archivo Excel (CSV)
@@ -1394,7 +1772,8 @@
                     </div>
 
                     <!-- REINICIAR BASE LOCAL -->
-                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>🗑️ Limpiar Base de Datos</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
                             Elimina los registros en la memoria de este navegador para iniciar una nueva jornada.
@@ -1434,11 +1813,17 @@
             </div>
             <div class="modal-body" style="gap: 1rem;">
                 <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                    Ingresa una URL de base de datos en la nube gratuita compatible con REST (ejemplo: <strong>Firebase Realtime Database</strong> terminada en <code style="color: #38bdf8;">.json</code> o un <strong>Google Apps Script WebApp</strong>).
+                    Ingresa una URL de base de datos en la nube gratuita compatible con REST (ejemplo: <strong>Firebase
+                        Realtime Database</strong> terminada en <code style="color: #38bdf8;">.json</code> o un
+                    <strong>Google Apps Script WebApp</strong>).
                 </p>
                 <div class="form-group" style="text-align: left;">
-                    <label style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">🔗 URL Endpoint de la Nube (REST JSON)</label>
-                    <input type="url" id="cloud_endpoint_input" placeholder="https://tu-proyecto.firebaseio.com/registros.json" style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.9rem;">
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">🔗
+                        URL Endpoint de la Nube (REST JSON)</label>
+                    <input type="url" id="cloud_endpoint_input"
+                        placeholder="https://tu-proyecto.firebaseio.com/registros.json"
+                        style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.9rem;">
                 </div>
                 <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
                     <button type="button" class="btn btn-primary" onclick="guardarEndpointNube()">
@@ -1451,8 +1836,11 @@
                         📥 Descargar de Nube
                     </button>
                 </div>
-                <div style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
-                    💡 <em>Si no deseas configurar una base de datos en la nube, puedes usar la <strong>Opción A</strong>: simplemente presiona <strong>"Descargar Copia de Avance"</strong> y envíala por WhatsApp para importarla en tu computadora.</em>
+                <div
+                    style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
+                    💡 <em>Si no deseas configurar una base de datos en la nube, puedes usar la <strong>Opción
+                            A</strong>: simplemente presiona <strong>"Descargar Copia de Avance"</strong> y envíala por
+                        WhatsApp para importarla en tu computadora.</em>
                 </div>
             </div>
         </div>
@@ -1480,13 +1868,13 @@
             setItem(key, value) {
                 try {
                     if (window.localStorage) window.localStorage.setItem(key, value);
-                } catch (e) {}
+                } catch (e) { }
                 memoriaVolatil[key] = value;
             },
             removeItem(key) {
                 try {
                     if (window.localStorage) window.localStorage.removeItem(key);
-                } catch (e) {}
+                } catch (e) { }
                 delete memoriaVolatil[key];
             }
         };
@@ -1507,7 +1895,7 @@
         async function inicializarPadronDB() {
             return new Promise((resolve) => {
                 const req = indexedDB.open(PADRON_DB_NAME, PADRON_DB_VERSION);
-                req.onupgradeneeded = function(e) {
+                req.onupgradeneeded = function (e) {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains('contribuyentes')) {
                         db.createObjectStore('contribuyentes', { keyPath: 'id', autoIncrement: true });
@@ -1519,12 +1907,12 @@
                         db.createObjectStore('emusap', { keyPath: 'id', autoIncrement: true });
                     }
                 };
-                req.onsuccess = async function(e) {
+                req.onsuccess = async function (e) {
                     padronDB = e.target.result;
                     await cargarOCrearDatosPadron();
                     resolve();
                 };
-                req.onerror = function() {
+                req.onerror = function () {
                     console.warn("IndexedDB no disponible, usando memoria volatil.");
                     cargarDesdeVariableGlobal();
                     resolve();
@@ -1566,7 +1954,7 @@
             return new Promise((resolve) => {
                 if (!padronDB) return resolve();
                 const tx = padronDB.transaction(['contribuyentes', 'electro', 'emusap'], 'readwrite');
-                
+
                 const storeC = tx.objectStore('contribuyentes');
                 storeC.clear();
                 contribuyentes.forEach(c => {
@@ -1635,7 +2023,7 @@
                     const v_n = v.replace(/^0+/, '') || '0';
                     const m_n = m.replace(/^0+/, '') || '0';
                     // Registrar múltiples variantes de clave
-                    for (const vk of [v, v_n, v.padStart(2,'0')]) {
+                    for (const vk of [v, v_n, v.padStart(2, '0')]) {
                         for (const mk of [m, m_n]) {
                             if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, e);
                         }
@@ -1677,7 +2065,7 @@
             if (!window.PADRON_INICIAL) return;
             const pi = window.PADRON_INICIAL;
             cacheContribuyentes = (pi.contribuyentes || []).map(c => ({ dni: String(c[0]), nombre: String(c[1]), conyugue: String(c[2]) }));
-            
+
             cacheElectroMap.clear();
             cacheElectroCompositeMap.clear();
             (pi.electro || []).forEach(e => {
@@ -1686,7 +2074,7 @@
                 const m = String(item.medidor || '').trim();
                 const v_n = v.replace(/^0+/, '') || '0';
                 const m_n = m.replace(/^0+/, '') || '0';
-                for (const vk of [v, v_n, v.padStart(2,'0')]) {
+                for (const vk of [v, v_n, v.padStart(2, '0')]) {
                     for (const mk of [m, m_n]) {
                         if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, item);
                     }
@@ -1737,7 +2125,7 @@
             mostrarToast("Leyendo archivo DATA.xlsx... Un momento por favor.", "info");
 
             const reader = new FileReader();
-            reader.onload = async function(e) {
+            reader.onload = async function (e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
@@ -1787,7 +2175,7 @@
 
                     mostrarToast(`✅ DATA.xlsx procesado con éxito: ${cList.length} contribuyentes, ${eList.length} electro, ${mList.length} emusap.`, "success");
                     event.target.value = '';
-                } catch(err) {
+                } catch (err) {
                     mostrarToast("Error al leer DATA.xlsx: " + err.message, "error");
                 }
             };
@@ -2283,9 +2671,9 @@
             const fechaStr = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString();
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
 
@@ -2366,9 +2754,9 @@
                 ind.style.display = 'flex';
 
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const img = new Image();
-                    img.onload = function() {
+                    img.onload = function () {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
 
@@ -2514,7 +2902,7 @@
 
             mostrarToast(`Ficha ${idCorrelativo} registrada.`, "success");
             limpiarFormularioMuestreo();
-            
+
             setTimeout(() => {
                 switchTab('contraste');
                 abrirPanelContraste(nuevoRegistro.id);
@@ -2580,7 +2968,7 @@
                 const luzStr = (r.medidoresLuz || []).join(' ').toLowerCase();
                 const aguaStr = (r.medidoresAgua || []).join(' ').toLowerCase();
 
-                const matchTexto = 
+                const matchTexto =
                     r.id.toLowerCase().includes(busqueda) ||
                     luzStr.includes(busqueda) ||
                     aguaStr.includes(busqueda) ||
@@ -2605,17 +2993,17 @@
 
                 const luzArr = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean);
                 const aguaArr = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean);
-                const medidoresLuzHTML = luzArr.length > 0 
+                const medidoresLuzHTML = luzArr.length > 0
                     ? luzArr.map(m => {
                         if (typeof m === 'object' && m.verificador) {
                             return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ [${m.verificador}] ${m.medidor}</span>`;
                         }
                         const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
                         return `<span class="meter-tag">⚡ ${str}</span>`;
-                    }).join('') 
+                    }).join('')
                     : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
-                const medidoresAguaHTML = aguaArr.length > 0 
-                    ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('') 
+                const medidoresAguaHTML = aguaArr.length > 0
+                    ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('')
                     : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
 
                 tr.innerHTML = `
@@ -2930,7 +3318,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const datosImportados = JSON.parse(e.target.result);
                     if (!Array.isArray(datosImportados)) {
@@ -2974,7 +3362,7 @@
             }
 
             const headers = ["ID", "Fecha_Levantamiento", "Latitud", "Longitud", "Precision_GPS", "Medidores_Luz", "Medidores_Agua", "Pisos", "Material", "Obs_Campo", "Codigo_Predio", "DNI_Propietario", "Nombre_Propietario", "Estado_Fiscal", "Obs_Gabinete", "Fecha_Contraste"];
-            
+
             const rows = registros.map(r => [
                 `"${r.id}"`,
                 `"${r.timestamp}"`,
@@ -2999,7 +3387,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Fiscalizacion_Predial_${new Date().toISOString().slice(0,10)}.csv`;
+            a.download = `Fiscalizacion_Predial_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
             URL.revokeObjectURL(url);
             mostrarToast("Archivo CSV exportado exitosamente.", "success");
@@ -3053,7 +3441,7 @@
         function cargarRegistrosDesdeStorage() {
             const raw = SafeStorage.getItem(DB_KEY);
             if (raw) {
-                try { registros = JSON.parse(raw); } catch(e) { registros = []; }
+                try { registros = JSON.parse(raw); } catch (e) { registros = []; }
             } else {
                 registros = [];
             }
@@ -3095,4 +3483,5 @@
         }
     </script>
 </body>
+
 </html>
