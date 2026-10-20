@@ -804,7 +804,10 @@
         <div class="header-title-group">
             <div class="header-icon">🏛️</div>
             <div class="header-title">
-                <h1>Fiscalización Predial</h1>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h1 style="margin: 0;">Fiscalización Predial</h1>
+                    <span class="badge" style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.6 (Verif + Medidor Electro)</span>
+                </div>
                 <p>Muestreo Secuencial con GPS Interno & Contraste Catastral</p>
             </div>
         </div>
@@ -967,11 +970,17 @@
                                 <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
                                     Ingrese el <strong>Verificador (2 dígitos)</strong> y luego el <strong>Número de Medidor</strong>:
                                 </div>
-                                <div id="lista_medidores_luz" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                    <div class="meter-item-row" style="display: flex; gap: 0.5rem; align-items: center;">
-                                        <input type="text" class="input-medidor-luz-verif" placeholder="Verif (2 díg)" maxlength="2" inputmode="numeric" style="width: 105px; flex: 0 0 105px; text-align: center; font-weight: 700; color: #f59e0b;">
-                                        <input type="text" class="input-medidor-luz-num" placeholder="N° Medidor Luz #1 (Ej: 890)" inputmode="numeric" style="flex: 1; font-weight: 600;">
-                                        <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor">✕</button>
+                                <div id="lista_medidores_luz" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                    <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                                        <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                                            <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
+                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                                            <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
+                                            <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                                        </div>
+                                        <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
                                     </div>
                                 </div>
                             </div>
@@ -2152,11 +2161,17 @@
             const total = contenedor.querySelectorAll('.meter-item-row').length + 1;
             const div = document.createElement('div');
             div.className = 'meter-item-row';
-            div.style.cssText = 'display: flex; gap: 0.5rem; align-items: center;';
+            div.style.cssText = 'display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; margin-top: 0.4rem;';
             div.innerHTML = `
-                <input type="text" class="input-medidor-luz-verif" placeholder="Verif (2 díg)" maxlength="2" inputmode="numeric" value="${verif}" style="width: 105px; flex: 0 0 105px; text-align: center; font-weight: 700; color: #f59e0b;">
-                <input type="text" class="input-medidor-luz-num" placeholder="N° Medidor Luz #${total} (Ej: 890)" inputmode="numeric" value="${medidor}" style="flex: 1; font-weight: 600;">
-                <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
+                <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                    <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR #${total}</span>
+                    <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" value="${verif}" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                </div>
+                <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                    <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">N° MEDIDOR LUZ #${total}</span>
+                    <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890" inputmode="numeric" value="${medidor}" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                </div>
+                <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
             `;
             contenedor.appendChild(div);
         }
@@ -2452,10 +2467,18 @@
             document.getElementById('badge_medidor_b64').style.display = 'none';
             document.getElementById('gps_indicator_box').style.display = 'none';
 
-            // Reset medidores a 1 solo input
+            // Reset medidores a 1 solo conjunto con Verificador (2 dígitos) + Número de Medidor
             document.getElementById('lista_medidores_luz').innerHTML = `
-                <div class="meter-item-row">
-                    <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Opcional - dejar vacío si no hay)">
+                <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
+                        <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                        <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
+                        <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                    </div>
+                    <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
                 </div>
             `;
             document.getElementById('lista_medidores_agua').innerHTML = `
