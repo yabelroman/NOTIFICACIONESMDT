@@ -806,7 +806,7 @@
             <div class="header-title">
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                     <h1 style="margin: 0;">Fiscalización Predial</h1>
-                    <span class="badge" style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.6 (Verif + Medidor Electro)</span>
+                    <span class="badge" style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.8 (Eliminar/Editar + Preview)</span>
                 </div>
                 <p>Muestreo Secuencial con GPS Interno & Contraste Catastral</p>
             </div>
@@ -974,15 +974,17 @@
                                     <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
                                         <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
                                             <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
-                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
                                         </div>
                                         <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
                                             <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
-                                            <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                                            <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
                                         </div>
                                         <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
                                     </div>
                                 </div>
+                                <!-- PREVIEW EN VIVO ELECTRO -->
+                                <div id="preview_cruce_muestreo_luz" style="display:none; margin-top: 0.35rem;"></div>
                             </div>
                         </div>
 
@@ -997,9 +999,11 @@
                                 </div>
                                 <div id="lista_medidores_agua" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                     <div class="meter-item-row">
-                                        <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)">
+                                        <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)" oninput="previewCruceMuestreo()">
                                     </div>
                                 </div>
+                                <!-- PREVIEW EN VIVO EMUSAP -->
+                                <div id="preview_cruce_muestreo_agua" style="display:none; margin-top: 0.35rem;"></div>
                             </div>
                         </div>
 
@@ -1073,7 +1077,7 @@
                                 <th>Código Predio</th>
                                 <th>Propietario</th>
                                 <th>Estado Fiscal</th>
-                                <th>Acción</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla_registros_body">
@@ -1138,8 +1142,16 @@
 
                 <!-- COLUMNA DERECHA: FORMULARIO DE AUDITORÍA -->
                 <div class="contrast-panel">
-                    <div class="card-header">
+                    <div class="card-header" style="flex-wrap: wrap; gap: 0.5rem;">
                         <h2>✏️ Dictamen y Datos de Contraste</h2>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="editarEnMuestreo()" style="font-size: 0.78rem;">
+                                🔧 Editar Muestreo
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarRegistroActual()" style="font-size: 0.78rem;">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
                     </div>
 
                     <form id="formContraste" onsubmit="guardarContraste(event)">
@@ -1484,7 +1496,7 @@
         // GESTIÓN DEL PADRÓN INSTITUCIONAL (INDEXEDDB)
         // ==========================================
         const PADRON_DB_NAME = 'PADRON_MUNICIPAL_FISCALIZACION';
-        const PADRON_DB_VERSION = 1;
+        const PADRON_DB_VERSION = 2; // Incrementar para forzar reimportación con verificador+medidor
         let padronDB = null;
 
         let cacheContribuyentes = [];
@@ -1522,8 +1534,15 @@
 
         async function cargarOCrearDatosPadron() {
             const countContrib = await contarRegistrosStore('contribuyentes');
-            if (countContrib === 0 && window.PADRON_INICIAL) {
-                mostrarToast("Inicializando padrón municipal en la base de datos local...", "info");
+            // Verificar si los datos existentes tienen verificador (si no, forzar reimportación)
+            let necesitaReimportar = countContrib === 0;
+            if (!necesitaReimportar && countContrib > 0) {
+                // Muestra de comprobación: si el primer registro electro no tiene verificador, reimportar
+                const electroCount = await contarRegistrosStore('electro');
+                if (electroCount === 0) necesitaReimportar = true;
+            }
+            if (necesitaReimportar && window.PADRON_INICIAL) {
+                mostrarToast("Inicializando padrón municipal (v2) en la base de datos local...", "info");
                 await guardarDatosCompletosEnIndexedDB(
                     window.PADRON_INICIAL.contribuyentes || [],
                     window.PADRON_INICIAL.electro || [],
@@ -1610,17 +1629,23 @@
             cacheElectroMap.clear();
             cacheElectroCompositeMap.clear();
             electroList.forEach(e => {
-                if (e.verificador && e.medidor) {
-                    const v = String(e.verificador).trim();
-                    const m = String(e.medidor).trim();
-                    cacheElectroCompositeMap.set(`${v}|${m}`, e);
-                    const mNum = parseInt(m);
-                    if (!isNaN(mNum)) {
-                        cacheElectroCompositeMap.set(`${v}|${mNum}`, e);
+                if (e.verificador !== undefined || e.medidor !== undefined) {
+                    const v = String(e.verificador || '').trim();
+                    const m = String(e.medidor || '').trim();
+                    const v_n = v.replace(/^0+/, '') || '0';
+                    const m_n = m.replace(/^0+/, '') || '0';
+                    // Registrar múltiples variantes de clave
+                    for (const vk of [v, v_n, v.padStart(2,'0')]) {
+                        for (const mk of [m, m_n]) {
+                            if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, e);
+                        }
                     }
+                    // Fallback por solo medidor
+                    if (m) cacheElectroCompositeMap.set(`|${m}`, e);
+                    if (m_n) cacheElectroCompositeMap.set(`|${m_n}`, e);
                 }
-                if (e.cod_largo) cacheElectroMap.set(String(e.cod_largo), e);
-                if (e.cod_corto) cacheElectroMap.set(String(e.cod_corto), e);
+                if (e.cod_largo) cacheElectroMap.set(String(e.cod_largo).trim(), e);
+                if (e.cod_corto) cacheElectroMap.set(String(e.cod_corto).trim(), e);
             });
 
             // 3. Emusap
@@ -1632,8 +1657,17 @@
             });
             cacheEmusapMap.clear();
             emusapList.forEach(m => {
-                if (m.medidor) cacheEmusapMap.set(m.medidor, m);
-                if (m.inscripc) cacheEmusapMap.set(m.inscripc, m);
+                if (m.medidor) {
+                    const med = String(m.medidor).trim().toUpperCase();
+                    cacheEmusapMap.set(med, m);
+                    const digits = med.replace(/[^0-9]/g, '');
+                    if (digits) cacheEmusapMap.set(digits, m);
+                }
+                if (m.inscripc) {
+                    const ins = String(m.inscripc).trim();
+                    cacheEmusapMap.set(ins, m);
+                }
+                if (m.cod) cacheEmusapMap.set(String(m.cod).trim().toUpperCase(), m);
             });
 
             actualizarBadgesPadron(cacheContribuyentes.length, electroList.length, emusapList.length);
@@ -1648,24 +1682,32 @@
             cacheElectroCompositeMap.clear();
             (pi.electro || []).forEach(e => {
                 const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5], verificador: e[6] || '', medidor: e[7] || '' };
-                if (item.verificador && item.medidor) {
-                    const v = String(item.verificador).trim();
-                    const m = String(item.medidor).trim();
-                    cacheElectroCompositeMap.set(`${v}|${m}`, item);
-                    const mNum = parseInt(m);
-                    if (!isNaN(mNum)) {
-                        cacheElectroCompositeMap.set(`${v}|${mNum}`, item);
+                const v = String(item.verificador || '').trim();
+                const m = String(item.medidor || '').trim();
+                const v_n = v.replace(/^0+/, '') || '0';
+                const m_n = m.replace(/^0+/, '') || '0';
+                for (const vk of [v, v_n, v.padStart(2,'0')]) {
+                    for (const mk of [m, m_n]) {
+                        if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, item);
                     }
                 }
-                if (e[5]) cacheElectroMap.set(String(e[5]), item);
-                if (e[4]) cacheElectroMap.set(String(e[4]), item);
+                if (m) cacheElectroCompositeMap.set(`|${m}`, item);
+                if (m_n) cacheElectroCompositeMap.set(`|${m_n}`, item);
+                if (e[5]) cacheElectroMap.set(String(e[5]).trim(), item);
+                if (e[4]) cacheElectroMap.set(String(e[4]).trim(), item);
             });
 
             cacheEmusapMap.clear();
             (pi.emusap || []).forEach(m => {
                 const item = { nombre: m[0], direccion: m[1], inscripc: m[2], medidor: m[3], cod: m[4] };
-                if (m[3]) cacheEmusapMap.set(String(m[3]).toUpperCase(), item);
-                if (m[2]) cacheEmusapMap.set(String(m[2]), item);
+                if (m[3]) {
+                    const med = String(m[3]).trim().toUpperCase();
+                    cacheEmusapMap.set(med, item);
+                    const digits = med.replace(/[^0-9]/g, '');
+                    if (digits) cacheEmusapMap.set(digits, item);
+                }
+                if (m[2]) cacheEmusapMap.set(String(m[2]).trim(), item);
+                if (m[4]) cacheEmusapMap.set(String(m[4]).trim().toUpperCase(), item);
             });
 
             actualizarBadgesPadron(cacheContribuyentes.length, pi.electro ? pi.electro.length : 0, pi.emusap ? pi.emusap.length : 0);
@@ -1785,18 +1827,17 @@
 
                 let encontrado = null;
                 if (verif && med) {
-                    const claveExacta = `${verif}|${med}`;
-                    const claveNum = `${verif}|${parseInt(med) || med}`;
-                    encontrado = cacheElectroCompositeMap.get(claveExacta) || cacheElectroCompositeMap.get(claveNum);
+                    const v_n = verif.replace(/^0+/, '') || '0';
+                    const m_n = med.replace(/^0+/, '') || '0';
+                    encontrado = cacheElectroCompositeMap.get(`${verif}|${med}`)
+                        || cacheElectroCompositeMap.get(`${v_n}|${m_n}`)
+                        || cacheElectroCompositeMap.get(`${verif}|${m_n}`)
+                        || cacheElectroCompositeMap.get(`${v_n}|${med}`);
                 } else if (med) {
-                    // Fallback si solo ingresaron medidor
-                    for (let [k, v] of cacheElectroCompositeMap.entries()) {
-                        if (k.endsWith(`|${med}`)) {
-                            encontrado = v;
-                            break;
-                        }
-                    }
-                    if (!encontrado) encontrado = cacheElectroMap.get(med);
+                    const m_n = med.replace(/^0+/, '') || '0';
+                    encontrado = cacheElectroCompositeMap.get(`|${med}`)
+                        || cacheElectroCompositeMap.get(`|${m_n}`)
+                        || cacheElectroMap.get(med);
                 }
 
                 if (encontrado) {
@@ -1825,9 +1866,11 @@
 
             // 2. Cruce EMUSAP
             aguaMedidores.forEach(med => {
-                const medUpper = med.toUpperCase().trim();
-                const numLimpio = med.replace(/[^0-9]/g, '');
-                let encontrado = cacheEmusapMap.get(medUpper) || cacheEmusapMap.get(numLimpio);
+                const medUpper = String(med).toUpperCase().trim();
+                const numLimpio = medUpper.replace(/[^0-9]/g, '');
+                let encontrado = cacheEmusapMap.get(medUpper)
+                    || (numLimpio ? cacheEmusapMap.get(numLimpio) : null)
+                    || cacheEmusapMap.get(med.trim());
 
                 if (encontrado) {
                     totalCruces++;
@@ -2165,11 +2208,11 @@
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
                     <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR #${total}</span>
-                    <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" value="${verif}" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                    <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" value="${verif}" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
                 </div>
                 <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
                     <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">N° MEDIDOR LUZ #${total}</span>
-                    <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890" inputmode="numeric" value="${medidor}" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                    <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890" inputmode="numeric" value="${medidor}" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
                 </div>
                 <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
             `;
@@ -2182,7 +2225,7 @@
             const div = document.createElement('div');
             div.className = 'meter-item-row';
             div.innerHTML = `
-                <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #${total} (Opcional)" value="${valor}">
+                <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #${total} (Opcional)" value="${valor}" oninput="previewCruceMuestreo()">
                 <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
             `;
             contenedor.appendChild(div);
@@ -2412,8 +2455,35 @@
 
             const medidoresLuz = obtenerListaMedidoresLuz();
             const medidoresAgua = obtenerListaMedidoresAgua();
-            // Los medidores ahora son opcionales (permiten valores vacíos)
 
+            // MODO EDICIÓN: actualizar registro existente
+            if (modoEdicionId) {
+                const idx = registros.findIndex(r => r.id === modoEdicionId);
+                if (idx !== -1) {
+                    registros[idx].fotoPredioB64 = fotoPredioBase64;
+                    registros[idx].fotoMedidorB64 = fotoMedidorBase64;
+                    registros[idx].medidoresLuz = medidoresLuz;
+                    registros[idx].medidoresAgua = medidoresAgua;
+                    registros[idx].pisos = document.getElementById('predio_pisos').value;
+                    registros[idx].material = document.getElementById('predio_material').value;
+                    registros[idx].observacionesCampo = document.getElementById('observaciones_campo').value.trim();
+                    registros[idx].latitud = document.getElementById('geo_lat').value || registros[idx].latitud;
+                    registros[idx].longitud = document.getElementById('geo_lng').value || registros[idx].longitud;
+                    registros[idx].precision = document.getElementById('geo_accuracy').value || registros[idx].precision;
+                    guardarRegistrosEnStorage();
+                    actualizarMetricas();
+                    renderTabla();
+                    mostrarToast(`✅ Ficha ${modoEdicionId} actualizada correctamente.`, "success");
+                    limpiarFormularioMuestreo();
+                    setTimeout(() => {
+                        switchTab('contraste');
+                        abrirPanelContraste(registros[idx].id);
+                    }, 600);
+                    return;
+                }
+            }
+
+            // MODO NUEVO REGISTRO
             const idCorrelativo = 'MUE-' + String(registros.length + 1).padStart(4, '0');
 
             const nuevoRegistro = {
@@ -2429,7 +2499,6 @@
                 pisos: document.getElementById('predio_pisos').value,
                 material: document.getElementById('predio_material').value,
                 observacionesCampo: document.getElementById('observaciones_campo').value.trim(),
-                
                 codigoPredio: '',
                 estadoFiscal: 'PENDIENTE',
                 propietarioDNI: '',
@@ -2457,6 +2526,7 @@
             fotoPredioBase64 = null;
             fotoMedidorBase64 = null;
             gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
+            modoEdicionId = null;
 
             document.getElementById('img_preview_predio').style.display = 'none';
             document.getElementById('ph_foto_predio').style.display = 'flex';
@@ -2472,20 +2542,28 @@
                 <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
                     <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
                         <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
-                        <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                        <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
                     </div>
                     <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
                         <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
-                        <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                        <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
                     </div>
                     <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
                 </div>
             `;
             document.getElementById('lista_medidores_agua').innerHTML = `
                 <div class="meter-item-row">
-                    <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)">
+                    <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)" oninput="previewCruceMuestreo()">
                 </div>
             `;
+            // Limpiar previews
+            const pl = document.getElementById('preview_cruce_muestreo_luz');
+            const pa = document.getElementById('preview_cruce_muestreo_agua');
+            if (pl) { pl.innerHTML = ''; pl.style.display = 'none'; }
+            if (pa) { pa.innerHTML = ''; pa.style.display = 'none'; }
+            // Restaurar botón
+            const submitBtn = document.querySelector('#muestreoForm button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = '💾 Guardar Ficha de Muestreo';
         }
 
         // ==========================================
@@ -2559,9 +2637,12 @@
                     <td><code>${codigoPredioText}</code></td>
                     <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${propietarioText}</td>
                     <td><span class="status-badge ${badgeClass}">${r.estadoFiscal}</span></td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" onclick="abrirPanelContraste('${r.id}')">
+                    <td style="white-space: nowrap;">
+                        <button class="btn btn-primary btn-sm" onclick="abrirPanelContraste('${r.id}')" style="margin-bottom: 4px;">
                             ✏️ Contrastar
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarRegistro('${r.id}')" style="margin-bottom: 4px;">
+                            🗑️
                         </button>
                     </td>
                 `;
@@ -2621,6 +2702,8 @@
             else if (estado === 'OMISO') document.getElementById('card_st_omiso').className = 'status-radio-card active-omiso';
         }
 
+        let modoEdicionId = null;
+
         function guardarContraste(event) {
             event.preventDefault();
             if (!registroSeleccionado) return;
@@ -2637,6 +2720,192 @@
             renderTabla();
 
             mostrarToast(`Contraste guardado para el predio ${registroSeleccionado.codigoPredio} [${registroSeleccionado.estadoFiscal}]`, "success");
+        }
+
+        // ==========================================
+        // ELIMINAR REGISTRO
+        // ==========================================
+        function eliminarRegistro(id) {
+            const reg = registros.find(r => r.id === id);
+            if (!reg) return;
+            if (!confirm(`¿Está seguro de eliminar la ficha ${id}?\nEsta acción no se puede deshacer.`)) return;
+            registros = registros.filter(r => r.id !== id);
+            // Cerrar panel si es el seleccionado
+            if (registroSeleccionado && registroSeleccionado.id === id) {
+                registroSeleccionado = null;
+                document.getElementById('panel_contraste_detalle').style.display = 'none';
+            }
+            guardarRegistrosEnStorage();
+            actualizarMetricas();
+            renderTabla();
+            mostrarToast(`🗑️ Ficha ${id} eliminada.`, "info");
+        }
+
+        function eliminarRegistroActual() {
+            if (!registroSeleccionado) return;
+            eliminarRegistro(registroSeleccionado.id);
+        }
+
+        // ==========================================
+        // EDITAR MUESTREO (cargar datos en el form)
+        // ==========================================
+        function editarEnMuestreo() {
+            if (!registroSeleccionado) return;
+            const reg = registroSeleccionado;
+            modoEdicionId = reg.id;
+
+            // Cambiar a módulo de muestreo
+            switchTab('muestreo');
+
+            // Restaurar fotos
+            fotoPredioBase64 = reg.fotoPredioB64 || null;
+            fotoMedidorBase64 = reg.fotoMedidorB64 || null;
+
+            if (fotoPredioBase64) {
+                const img = document.getElementById('img_preview_predio');
+                img.src = fotoPredioBase64; img.style.display = 'block';
+                document.getElementById('ph_foto_predio').style.display = 'none';
+                document.getElementById('badge_predio_b64').style.display = 'inline-flex';
+            }
+            if (fotoMedidorBase64) {
+                const img = document.getElementById('img_preview_medidor');
+                img.src = fotoMedidorBase64; img.style.display = 'block';
+                document.getElementById('ph_foto_medidor').style.display = 'none';
+                document.getElementById('badge_medidor_b64').style.display = 'inline-flex';
+            }
+
+            // GPS
+            if (reg.latitud && reg.latitud !== 'Sin GPS') {
+                document.getElementById('geo_lat').value = reg.latitud;
+                document.getElementById('geo_lng').value = reg.longitud;
+                document.getElementById('geo_accuracy').value = reg.precision || '';
+                const box = document.getElementById('gps_indicator_box');
+                if (box) { box.style.display = 'flex'; }
+            }
+            document.getElementById('timestamp_captura').value = reg.timestamp || '';
+
+            // Medidores Luz
+            document.getElementById('lista_medidores_luz').innerHTML = '';
+            const luzArr = reg.medidoresLuz || [];
+            if (luzArr.length === 0) {
+                agregarMedidorLuz('', '');
+            } else {
+                luzArr.forEach(m => {
+                    if (typeof m === 'object') agregarMedidorLuz(m.verificador || '', m.medidor || '');
+                    else {
+                        const parts = String(m).split('-');
+                        agregarMedidorLuz(parts[0] || '', parts[1] || parts[0] || '');
+                    }
+                });
+            }
+
+            // Medidores Agua
+            document.getElementById('lista_medidores_agua').innerHTML = '';
+            const aguaArr = reg.medidoresAgua || [];
+            if (aguaArr.length === 0) {
+                agregarMedidorAgua('');
+            } else {
+                aguaArr.forEach(val => agregarMedidorAgua(val));
+            }
+
+            // Pisos y material
+            document.getElementById('predio_pisos').value = reg.pisos || '2';
+            document.getElementById('predio_material').value = reg.material || '';
+            document.getElementById('observaciones_campo').value = reg.observacionesCampo || '';
+
+            // Actualizar botón submit
+            const submitBtn = document.querySelector('#muestreoForm button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = `🔄 Actualizar Ficha ${reg.id}`;
+
+            mostrarToast(`📝 Cargando ficha ${reg.id} para edición...`, "info");
+            previewCruceMuestreo();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // PREVIEW EN VIVO EN MUESTREO
+        // ==========================================
+        function previewCruceMuestreo() {
+            const previewLuz = document.getElementById('preview_cruce_muestreo_luz');
+            const previewAgua = document.getElementById('preview_cruce_muestreo_agua');
+
+            // === ELECTRO ===
+            if (previewLuz) {
+                const rows = document.querySelectorAll('#lista_medidores_luz .meter-item-row');
+                let htmlLuz = '';
+                rows.forEach(row => {
+                    const verifInp = row.querySelector('.input-medidor-luz-verif');
+                    const numInp = row.querySelector('.input-medidor-luz-num');
+                    const verif = (verifInp ? verifInp.value.trim() : '');
+                    const med = (numInp ? numInp.value.trim() : '');
+                    if (!verif && !med) return;
+
+                    let encontrado = null;
+                    if (verif && med) {
+                        const v_n = verif.replace(/^0+/, '') || '0';
+                        const m_n = med.replace(/^0+/, '') || '0';
+                        encontrado = cacheElectroCompositeMap.get(`${verif}|${med}`)
+                            || cacheElectroCompositeMap.get(`${v_n}|${m_n}`)
+                            || cacheElectroCompositeMap.get(`${verif}|${m_n}`)
+                            || cacheElectroCompositeMap.get(`${v_n}|${med}`);
+                    } else if (med) {
+                        const m_n = med.replace(/^0+/, '') || '0';
+                        encontrado = cacheElectroCompositeMap.get(`|${med}`)
+                            || cacheElectroCompositeMap.get(`|${m_n}`)
+                            || cacheElectroMap.get(med);
+                    }
+
+                    if (encontrado) {
+                        htmlLuz += `<div style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.4); border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                            <div style="color: #f59e0b; font-weight: 700;">⚡ Electro: Verif ${encontrado.verificador || verif} - Med ${encontrado.medidor || med}</div>
+                            <div style="color: #f8fafc;">👤 ${encontrado.nombre}</div>
+                            <div style="color: #94a3b8; font-size: 0.77rem;">📍 ${encontrado.direccion || 'Sin dirección'} | Suministro: ${encontrado.cod_largo || encontrado.cod_corto || '-'}</div>
+                        </div>`;
+                    } else if (verif || med) {
+                        htmlLuz += `<div style="background: rgba(100,116,139,0.12); border: 1px dashed rgba(100,116,139,0.4); border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.8rem; color: #64748b;">⚡ Verif: ${verif || '?'} / Med: ${med || '?'} — Sin coincidencia en padrón</div>`;
+                    }
+                });
+                if (htmlLuz) {
+                    previewLuz.innerHTML = htmlLuz;
+                    previewLuz.style.display = 'flex';
+                    previewLuz.style.flexDirection = 'column';
+                    previewLuz.style.gap = '0.4rem';
+                } else {
+                    previewLuz.innerHTML = ''; previewLuz.style.display = 'none';
+                }
+            }
+
+            // === EMUSAP ===
+            if (previewAgua) {
+                const inputs = document.querySelectorAll('.input-medidor-agua');
+                let htmlAgua = '';
+                inputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if (!val) return;
+                    const valUp = val.toUpperCase();
+                    const digits = valUp.replace(/[^0-9]/g, '');
+                    const encontrado = cacheEmusapMap.get(valUp)
+                        || (digits ? cacheEmusapMap.get(digits) : null)
+                        || cacheEmusapMap.get(val);
+                    if (encontrado) {
+                        htmlAgua += `<div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                            <div style="color: #10b981; font-weight: 700;">💧 EMUSAP: ${encontrado.medidor || encontrado.inscripc || val}</div>
+                            <div style="color: #f8fafc;">👤 ${encontrado.nombre}</div>
+                            <div style="color: #94a3b8; font-size: 0.77rem;">📍 ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
+                        </div>`;
+                    } else if (val) {
+                        htmlAgua += `<div style="background: rgba(100,116,139,0.12); border: 1px dashed rgba(100,116,139,0.4); border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.8rem; color: #64748b;">💧 Medidor ${val} — Sin coincidencia en padrón EMUSAP</div>`;
+                    }
+                });
+                if (htmlAgua) {
+                    previewAgua.innerHTML = htmlAgua;
+                    previewAgua.style.display = 'flex';
+                    previewAgua.style.flexDirection = 'column';
+                    previewAgua.style.gap = '0.4rem';
+                } else {
+                    previewAgua.innerHTML = ''; previewAgua.style.display = 'none';
+                }
+            }
         }
 
         // ==========================================
