@@ -1004,9 +1004,14 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                                         + Agregar otro medidor de luz
                                     </button>
                                 </div>
+                                <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                                    Ingrese el <strong>Verificador (2 dígitos)</strong> y luego el <strong>Número de Medidor</strong>:
+                                </div>
                                 <div id="lista_medidores_luz" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                    <div class="meter-item-row">
-                                        <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #1 (Opcional - dejar vacío si no hay)">
+                                    <div class="meter-item-row" style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <input type="text" class="input-medidor-luz-verif" placeholder="Verif (2 díg)" maxlength="2" inputmode="numeric" style="width: 105px; flex: 0 0 105px; text-align: center; font-weight: 700; color: #f59e0b;">
+                                        <input type="text" class="input-medidor-luz-num" placeholder="N° Medidor Luz #1 (Ej: 890)" inputmode="numeric" style="flex: 1; font-weight: 600;">
+                                        <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor">✕</button>
                                     </div>
                                 </div>
                             </div>
@@ -1515,6 +1520,7 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
 
         let cacheContribuyentes = [];
         let cacheElectroMap = new Map();
+        let cacheElectroCompositeMap = new Map();
         let cacheEmusapMap = new Map();
 
         async function inicializarPadronDB() {
@@ -1588,7 +1594,9 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                         lat: String(e[2] || ''),
                         lng: String(e[3] || ''),
                         cod_corto: String(e[4] || ''),
-                        cod_largo: String(e[5] || '')
+                        cod_largo: String(e[5] || ''),
+                        verificador: String(e[6] || '').trim(),
+                        medidor: String(e[7] || '').trim()
                     });
                 });
 
@@ -1631,9 +1639,19 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                 req.onerror = () => resolve([]);
             });
             cacheElectroMap.clear();
+            cacheElectroCompositeMap.clear();
             electroList.forEach(e => {
-                if (e.cod_largo) cacheElectroMap.set(e.cod_largo, e);
-                if (e.cod_corto) cacheElectroMap.set(e.cod_corto, e);
+                if (e.verificador && e.medidor) {
+                    const v = String(e.verificador).trim();
+                    const m = String(e.medidor).trim();
+                    cacheElectroCompositeMap.set(`${v}|${m}`, e);
+                    const mNum = parseInt(m);
+                    if (!isNaN(mNum)) {
+                        cacheElectroCompositeMap.set(`${v}|${mNum}`, e);
+                    }
+                }
+                if (e.cod_largo) cacheElectroMap.set(String(e.cod_largo), e);
+                if (e.cod_corto) cacheElectroMap.set(String(e.cod_corto), e);
             });
 
             // 3. Emusap
@@ -1658,8 +1676,18 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             cacheContribuyentes = (pi.contribuyentes || []).map(c => ({ dni: String(c[0]), nombre: String(c[1]), conyugue: String(c[2]) }));
             
             cacheElectroMap.clear();
+            cacheElectroCompositeMap.clear();
             (pi.electro || []).forEach(e => {
-                const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5] };
+                const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5], verificador: e[6] || '', medidor: e[7] || '' };
+                if (item.verificador && item.medidor) {
+                    const v = String(item.verificador).trim();
+                    const m = String(item.medidor).trim();
+                    cacheElectroCompositeMap.set(`${v}|${m}`, item);
+                    const mNum = parseInt(m);
+                    if (!isNaN(mNum)) {
+                        cacheElectroCompositeMap.set(`${v}|${mNum}`, item);
+                    }
+                }
                 if (e[5]) cacheElectroMap.set(String(e[5]), item);
                 if (e[4]) cacheElectroMap.set(String(e[4]), item);
             });
@@ -1724,7 +1752,9 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                             r[2] ? String(r[2]).trim() : '',
                             r[3] ? String(r[3]).trim() : '',
                             r[5] !== undefined ? String(r[5]).trim() : '',
-                            r[6] !== undefined ? String(r[6]).trim() : ''
+                            r[6] !== undefined ? String(r[6]).trim() : '',
+                            r[7] !== undefined ? String(r[7]).trim() : '',
+                            r[8] !== undefined ? String(r[8]).trim() : ''
                         ]);
                     }
 
@@ -1767,19 +1797,37 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             const titularesEncontrados = new Set();
             let totalCruces = 0;
 
-            // 1. Cruce Electro
-            luzMedidores.forEach(med => {
-                const numLimpio = med.replace(/[^0-9]/g, '');
-                let encontrado = cacheElectroMap.get(med) || cacheElectroMap.get(numLimpio);
+            // 1. Cruce Electro por Verificador (2 dígitos) + Medidor
+            luzMedidores.forEach(item => {
+                let verif = '';
+                let med = '';
+                if (typeof item === 'object') {
+                    verif = String(item.verificador || '').trim();
+                    med = String(item.medidor || '').trim();
+                } else if (typeof item === 'string') {
+                    if (item.includes('-')) {
+                        const parts = item.split('-');
+                        verif = parts[0].trim();
+                        med = parts[1].trim();
+                    } else {
+                        med = item.trim();
+                    }
+                }
 
-                if (!encontrado && numLimpio) {
-                    // Búsqueda parcial si no es exacto
-                    for (let [k, v] of cacheElectroMap.entries()) {
-                        if (k.endsWith(numLimpio) || numLimpio.endsWith(k)) {
+                let encontrado = null;
+                if (verif && med) {
+                    const claveExacta = `${verif}|${med}`;
+                    const claveNum = `${verif}|${parseInt(med) || med}`;
+                    encontrado = cacheElectroCompositeMap.get(claveExacta) || cacheElectroCompositeMap.get(claveNum);
+                } else if (med) {
+                    // Fallback si solo ingresaron medidor
+                    for (let [k, v] of cacheElectroCompositeMap.entries()) {
+                        if (k.endsWith(`|${med}`)) {
                             encontrado = v;
                             break;
                         }
                     }
+                    if (!encontrado) encontrado = cacheElectroMap.get(med);
                 }
 
                 if (encontrado) {
@@ -1787,19 +1835,20 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                     titularesEncontrados.add(encontrado.nombre);
                     contenedorCruce.innerHTML += `
                         <div class="cruce-card" style="border-left: 4px solid var(--warning);">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <strong style="color: #f59e0b;">⚡ Electro Sur Este (Suministro: ${encontrado.cod_largo || encontrado.cod_corto})</strong>
-                                <span class="badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; font-size: 0.7rem;">Coincidencia OK</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
+                                <strong style="color: #f59e0b;">⚡ Electro Sur Este [Verif: ${encontrado.verificador || verif} | Medidor: ${encontrado.medidor || med}]</strong>
+                                <span class="badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; font-size: 0.7rem;">Coincidencia Verificador + Medidor OK</span>
                             </div>
                             <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
-                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'}</div>
+                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Suministro: <code>${encontrado.cod_largo || encontrado.cod_corto}</code></div>
                             ${encontrado.lat ? `<div style="color: #38bdf8; font-size: 0.75rem; font-family: monospace;">🌐 GPS Empresa: Lat ${encontrado.lat}, Lng ${encontrado.lng}</div>` : ''}
                         </div>
                     `;
                 } else {
+                    const desc = verif ? `Verif: ${verif} y Medidor: ${med}` : `Medidor: ${med || 'vacío'}`;
                     contenedorCruce.innerHTML += `
-                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.8;">
-                            <span style="color: var(--text-muted);">⚡ Medidor Luz <strong>${med}</strong>: No figura en el padrón de Electro.</span>
+                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.85;">
+                            <span style="color: var(--text-muted);">⚡ Electro Sur Este (${desc}): No figura coincidencia en el padrón.</span>
                         </div>
                     `;
                 }
@@ -2138,13 +2187,15 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
         // ==========================================
         // GESTIÓN DINÁMICA DE MÚLTIPLES MEDIDORES
         // ==========================================
-        function agregarMedidorLuz(valor = '') {
+        function agregarMedidorLuz(verif = '', medidor = '') {
             const contenedor = document.getElementById('lista_medidores_luz');
             const total = contenedor.querySelectorAll('.meter-item-row').length + 1;
             const div = document.createElement('div');
             div.className = 'meter-item-row';
+            div.style.cssText = 'display: flex; gap: 0.5rem; align-items: center;';
             div.innerHTML = `
-                <input type="text" class="input-medidor-luz" placeholder="N° Medidor Luz #${total} (Opcional)" value="${valor}">
+                <input type="text" class="input-medidor-luz-verif" placeholder="Verif (2 díg)" maxlength="2" inputmode="numeric" value="${verif}" style="width: 105px; flex: 0 0 105px; text-align: center; font-weight: 700; color: #f59e0b;">
+                <input type="text" class="input-medidor-luz-num" placeholder="N° Medidor Luz #${total} (Ej: 890)" inputmode="numeric" value="${medidor}" style="flex: 1; font-weight: 600;">
                 <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
             `;
             contenedor.appendChild(div);
@@ -2175,11 +2226,20 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
         }
 
         function obtenerListaMedidoresLuz() {
-            const inputs = document.querySelectorAll('.input-medidor-luz');
+            const rows = document.querySelectorAll('#lista_medidores_luz .meter-item-row');
             const lista = [];
-            inputs.forEach(inp => {
-                const val = inp.value.trim().toUpperCase();
-                if (val) lista.push(val);
+            rows.forEach(row => {
+                const verifInp = row.querySelector('.input-medidor-luz-verif');
+                const numInp = row.querySelector('.input-medidor-luz-num');
+                const verif = verifInp ? verifInp.value.trim() : '';
+                const num = numInp ? numInp.value.trim() : '';
+                if (verif || num) {
+                    lista.push({
+                        verificador: verif,
+                        medidor: num,
+                        texto: verif ? `${verif}-${num}` : num
+                    });
+                }
             });
             return lista;
         }
@@ -2485,7 +2545,13 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                 const luzArr = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean);
                 const aguaArr = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean);
                 const medidoresLuzHTML = luzArr.length > 0 
-                    ? luzArr.map(m => `<span class="meter-tag">⚡ ${m}</span>`).join('') 
+                    ? luzArr.map(m => {
+                        if (typeof m === 'object' && m.verificador) {
+                            return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ [${m.verificador}] ${m.medidor}</span>`;
+                        }
+                        const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
+                        return `<span class="meter-tag">⚡ ${str}</span>`;
+                    }).join('') 
                     : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
                 const medidoresAguaHTML = aguaArr.length > 0 
                     ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('') 
@@ -2540,7 +2606,13 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             const luzList = reg.medidoresLuz || [reg.medidorLuz];
             const aguaList = reg.medidoresAgua || [reg.medidorAgua];
 
-            document.getElementById('c_view_luz').innerHTML = luzList.filter(Boolean).map(m => `<span class="meter-tag">⚡ ${m}</span>`).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de luz</span>';
+            document.getElementById('c_view_luz').innerHTML = luzList.filter(Boolean).map(m => {
+                if (typeof m === 'object' && m.verificador) {
+                    return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ Verif: ${m.verificador} | Medidor: ${m.medidor}</span>`;
+                }
+                const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
+                return `<span class="meter-tag">⚡ ${str}</span>`;
+            }).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de luz</span>';
             document.getElementById('c_view_agua').innerHTML = aguaList.filter(Boolean).map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de agua</span>';
 
             document.getElementById('c_view_caracteristicas').innerText = `${reg.pisos} Pisos | Material: ${reg.material}`;
@@ -2775,13 +2847,22 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
 '''
 
 def generar_data_padron_js(cwd):
-    """Si existe DATA.xlsx, extrae contribuyentes, electro y emusap a data_padron.js."""
+    """Si existe DATA.xlsx, extrae contribuyentes, electro y emusap a data_padron.js con soporte anti-bloqueo."""
     xlsx_path = cwd / "DATA.xlsx"
     if not xlsx_path.exists():
         return
     try:
-        import openpyxl, json
-        wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+        import openpyxl, json, os, subprocess
+        # Si el archivo está abierto en Excel, hacemos copia segura vía PowerShell
+        read_path = xlsx_path
+        try:
+            wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+        except PermissionError:
+            temp_copy = Path(os.path.expandvars(r"%TEMP%\DATA_PADRON_READ.xlsx"))
+            cmd = ["powershell", "-NoProfile", "-Command", f"Copy-Item -Path '{xlsx_path}' -Destination '{temp_copy}' -Force"]
+            subprocess.run(cmd, check=True)
+            wb = openpyxl.load_workbook(temp_copy, data_only=True)
+
         c_list = []
         if 'contribuyentes' in wb.sheetnames:
             for r in wb['contribuyentes'].iter_rows(min_row=2, values_only=True):
@@ -2797,7 +2878,9 @@ def generar_data_padron_js(cwd):
                         str(r[2]).strip() if r[2] else '',
                         str(r[3]).strip() if r[3] else '',
                         str(r[5]).strip() if r[5] is not None else '',
-                        str(r[6]).strip() if r[6] is not None else ''
+                        str(r[6]).strip() if r[6] is not None else '',
+                        str(r[7]).strip() if len(r) > 7 and r[7] is not None else '',
+                        str(r[8]).strip() if len(r) > 8 and r[8] is not None else ''
                     ])
         m_list = []
         if 'emusap' in wb.sheetnames:
