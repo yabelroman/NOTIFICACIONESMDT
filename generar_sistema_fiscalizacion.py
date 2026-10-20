@@ -733,7 +733,65 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             }
         }
 
+
+        /* BUSCADOR Y TARJETAS DE CONTRASTE AUTOMÁTICO */
+        .search-dropdown-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border: 1px solid var(--border-focus);
+            border-radius: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            margin-top: 4px;
+        }
+        .search-item {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.15s ease;
+        }
+        .search-item:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+        .search-item:last-child { border-bottom: none; }
+        .cruce-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.82rem;
+        }
+        .sugerencia-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+        }
+        .sugerencia-card:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: var(--success);
+        }
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="data_padron.js"></script>
 </head>
 <body>
 
@@ -1112,80 +1170,60 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
 
                     <form id="formContraste" onsubmit="guardarContraste(event)">
                         <div class="form-grid" style="grid-template-columns: 1fr;">
-                    <!-- EXPLICACIÓN Y SINCRONIZACIÓN MULTI-DISPOSITIVO (GITHUB PAGES) -->
-                    <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-                            <h3 style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
-                                ☁️ Sincronización Multi-Dispositivo (Compartir entre Celulares y PC)
-                            </h3>
-                            <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
-                                GitHub Pages
-                            </span>
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.55;">
-                            💡 <strong>¿Por qué no se ven los datos al abrir el enlace en otro celular?</strong><br>
-                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
-                        </p>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
-                            <!-- OPCIÓN A: TRANSFERIR POR ARCHIVO / WHATSAPP -->
-                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
-                                <div>
-                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A: Compartir por WhatsApp o Drive (Inmediato)</h4>
-                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
-                                        1. En el celular de campo presiona <strong>"Descargar Copia de Avance"</strong>.<br>
-                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu PC o supervisor.<br>
-                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
-                                    </p>
+
+                            <!-- SECCIÓN 1: CRUCE AUTOMÁTICO DE MEDIDORES (ELECTRO & EMUSAP) -->
+                            <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h3 style="font-size: 0.92rem; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                                        ⚡ Cruce Automático de Medidores en Padrones (Electro & EMUSAP)
+                                    </h3>
+                                    <span id="badge_cruce_estado" class="badge" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.72rem;">Consultando...</span>
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="guardarAvanceRapido()">
-                                        💾 Descargar Avance (.json)
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('input_importar_json').click()">
-                                        📂 Importar en este equipo
-                                    </button>
+                                <div id="cruce_resultados_medidores" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <!-- Inyección dinámica de resultados de Electro y EMUSAP -->
                                 </div>
                             </div>
 
-                            <!-- OPCIÓN B: SINCRONIZACIÓN EN LA NUBE REST -->
-                            <div style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
-                                <div>
-                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B: Sincronización en la Nube en Tiempo Real</h4>
-                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
-                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase Realtime Database</strong> o un Webhook de <strong>Google Apps Script</strong>) para que todos los celulares envíen y reciban los registros con un solo clic.
-                                    </p>
+                            <!-- SECCIÓN 2: PRECARGA AUTOMÁTICA DE SIMILITUDES EN CONTRIBUYENTES -->
+                            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h4 style="font-size: 0.88rem; color: #10b981; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                                        🎯 Coincidencias Sugeridas en Contribuyentes (Según Medidores)
+                                    </h4>
+                                    <span id="badge_total_sugerencias" class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.72rem;">0 encontradas</span>
                                 </div>
-                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button type="button" class="btn btn-success btn-sm" onclick="sincronizarSubirNube()">
-                                        📤 Subir a Nube
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="sincronizarDescargarNube()">
-                                        📥 Descargar de Nube
-                                    </button>
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirConfiguracionNube()">
-                                        ⚙️ Configurar URL
-                                    </button>
+                                <div id="lista_sugerencias_contribuyentes" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">Abra un predio con medidor para precargar coincidencias automáticas.</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
+                            <!-- SECCIÓN 3: BUSCADOR MANUAL PREDICTIVO DE CONTRIBUYENTES -->
+                            <div class="form-group" style="position: relative;">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>🔍 Buscador Manual en Padrón de Contribuyentes (DNI o Nombre)</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">Mínimo 2 letras</span>
+                                </label>
+                                <input type="text" id="buscador_contribuyente_input" placeholder="Escriba apellido, nombre o DNI para autocompletar..." autocomplete="off" oninput="buscarContribuyentesInput(this.value)">
+                                <div id="dropdown_resultados_contribuyentes" class="search-dropdown-results" style="display: none;"></div>
+                            </div>
+
+                            <!-- SECCIÓN 4: DATOS DEL PROPIETARIO (OPCIONALES PARA OMISOS) -->
                             <div class="form-group">
-                                <label>🏷️ Código de Predio</label>
-                                <input type="text" id="contraste_codigo_predio" placeholder="Ej: PR-2026-004589" required>
+                                <label>🏷️ Código de Predio <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional si es Omiso / Pendiente)</span></label>
+                                <input type="text" id="contraste_codigo_predio" placeholder="Ej: PR-2026-004589 (o dejar vacío)">
                             </div>
 
                             <div class="form-group">
-                                <label>🆔 DNI / RUC del Propietario</label>
-                                <input type="text" id="contraste_propietario_dni" placeholder="Ej: 45892147" required maxlength="12">
+                                <label>🆔 DNI / RUC del Propietario <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_dni" placeholder="Ej: 48435564" maxlength="12">
                             </div>
 
                             <div class="form-group">
-                                <label>👤 Apellidos y Nombres / Razón Social</label>
-                                <input type="text" id="contraste_propietario_nombre" placeholder="Ej: PEREZ ALVAREZ, JUAN CARLOS" required>
+                                <label>👤 Apellidos y Nombres / Razón Social <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_nombre" placeholder="Ej: HERRERA TAIPE CIRILO">
                             </div>
 
+                            <!-- SECCIÓN 5: ESTADO DE FISCALIZACIÓN -->
                             <div class="form-group">
                                 <label>⚖️ Estado de Fiscalización</label>
                                 <input type="hidden" id="contraste_estado" value="CORRECTO">
@@ -1210,7 +1248,7 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
 
                             <div class="form-group">
                                 <label>📋 Dictamen y Observaciones de Gabinete</label>
-                                <textarea id="contraste_observaciones_gabinete" placeholder="Conclusiones periciales y fundamento legal..."></textarea>
+                                <textarea id="contraste_observaciones_gabinete" placeholder="Conclusiones periciales y fundamentación..."></textarea>
                             </div>
                         </div>
 
@@ -1218,7 +1256,7 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                             <button type="button" class="btn btn-outline" onclick="window.print()">
                                 🖨️ Imprimir Ficha
                             </button>
-                            <button type="submit" class="btn btn-success" style="padding: 0.85rem 1.6rem;">
+                            <button type="submit" class="btn btn-success" style="padding: 0.85rem 1.8rem;">
                                 ✔️ Confirmar y Guardar Contraste
                             </button>
                         </div>
@@ -1301,6 +1339,40 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
                     </div>
 
                     
+                                        <!-- CARGA Y ACTUALIZACIÓN DE PADRÓN EXCEL (DATA.xlsx) -->
+                    <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.85rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 style="display: flex; align-items: center; gap: 0.45rem;">
+                                📁 Padrón Institucional (DATA.xlsx: Contribuyentes, Electro y EMUSAP)
+                            </h3>
+                            <span class="badge" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">
+                                IndexedDB Offline
+                            </span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">
+                            Los padrones se cargan automáticamente al iniciar. Si deseas actualizar los datos de contribuyentes o medidores, puedes subir un nuevo archivo <strong>DATA.xlsx</strong> aquí. Se procesará localmente y se guardará en tu navegador.
+                        </p>
+                        
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                👤 Contribuyentes: <strong id="badge_count_contribuyentes" style="color: #38bdf8;">0</strong>
+                            </div>
+                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                ⚡ Electro Sur Este: <strong id="badge_count_electro" style="color: #f59e0b;">0</strong>
+                            </div>
+                            <div style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                💧 EMUSAP: <strong id="badge_count_emusap" style="color: #10b981;">0</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            <input type="file" id="input_data_xlsx" accept=".xlsx" style="display: none;" onchange="procesarSubidaExcelData(event)">
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('input_data_xlsx').click()">
+                                📂 Subir / Actualizar Archivo DATA.xlsx
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- GUARDAR AVANCE / BACKUP RÁPIDO -->
                     <div style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>💾 Guardar Avance Actual</h3>
@@ -1434,6 +1506,465 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
         };
 
         // ==========================================
+        // ==========================================
+        // GESTIÓN DEL PADRÓN INSTITUCIONAL (INDEXEDDB)
+        // ==========================================
+        const PADRON_DB_NAME = 'PADRON_MUNICIPAL_FISCALIZACION';
+        const PADRON_DB_VERSION = 1;
+        let padronDB = null;
+
+        let cacheContribuyentes = [];
+        let cacheElectroMap = new Map();
+        let cacheEmusapMap = new Map();
+
+        async function inicializarPadronDB() {
+            return new Promise((resolve) => {
+                const req = indexedDB.open(PADRON_DB_NAME, PADRON_DB_VERSION);
+                req.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('contribuyentes')) {
+                        db.createObjectStore('contribuyentes', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('electro')) {
+                        db.createObjectStore('electro', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('emusap')) {
+                        db.createObjectStore('emusap', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = async function(e) {
+                    padronDB = e.target.result;
+                    await cargarOCrearDatosPadron();
+                    resolve();
+                };
+                req.onerror = function() {
+                    console.warn("IndexedDB no disponible, usando memoria volatil.");
+                    cargarDesdeVariableGlobal();
+                    resolve();
+                };
+            });
+        }
+
+        async function cargarOCrearDatosPadron() {
+            const countContrib = await contarRegistrosStore('contribuyentes');
+            if (countContrib === 0 && window.PADRON_INICIAL) {
+                mostrarToast("Inicializando padrón municipal en la base de datos local...", "info");
+                await guardarDatosCompletosEnIndexedDB(
+                    window.PADRON_INICIAL.contribuyentes || [],
+                    window.PADRON_INICIAL.electro || [],
+                    window.PADRON_INICIAL.emusap || []
+                );
+            }
+            await cargarCacheEnMemoria();
+        }
+
+        function contarRegistrosStore(storeName) {
+            return new Promise((resolve) => {
+                if (!padronDB) return resolve(0);
+                const tx = padronDB.transaction(storeName, 'readonly');
+                const req = tx.objectStore(storeName).count();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => resolve(0);
+            });
+        }
+
+        async function guardarDatosCompletosEnIndexedDB(contribuyentes, electro, emusap) {
+            return new Promise((resolve) => {
+                if (!padronDB) return resolve();
+                const tx = padronDB.transaction(['contribuyentes', 'electro', 'emusap'], 'readwrite');
+                
+                const storeC = tx.objectStore('contribuyentes');
+                storeC.clear();
+                contribuyentes.forEach(c => {
+                    storeC.add({ dni: String(c[0] || ''), nombre: String(c[1] || '').toUpperCase(), conyugue: String(c[2] || '').toUpperCase() });
+                });
+
+                const storeE = tx.objectStore('electro');
+                storeE.clear();
+                electro.forEach(e => {
+                    storeE.add({
+                        nombre: String(e[0] || '').toUpperCase(),
+                        direccion: String(e[1] || '').toUpperCase(),
+                        lat: String(e[2] || ''),
+                        lng: String(e[3] || ''),
+                        cod_corto: String(e[4] || ''),
+                        cod_largo: String(e[5] || '')
+                    });
+                });
+
+                const storeM = tx.objectStore('emusap');
+                storeM.clear();
+                emusap.forEach(m => {
+                    storeM.add({
+                        nombre: String(m[0] || '').toUpperCase(),
+                        direccion: String(m[1] || '').toUpperCase(),
+                        inscripc: String(m[2] || ''),
+                        medidor: String(m[3] || '').toUpperCase(),
+                        cod: String(m[4] || '')
+                    });
+                });
+
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        }
+
+        async function cargarCacheEnMemoria() {
+            if (!padronDB) {
+                cargarDesdeVariableGlobal();
+                return;
+            }
+
+            // 1. Contribuyentes
+            cacheContribuyentes = await new Promise((resolve) => {
+                const tx = padronDB.transaction('contribuyentes', 'readonly');
+                const req = tx.objectStore('contribuyentes').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+
+            // 2. Electro
+            const electroList = await new Promise((resolve) => {
+                const tx = padronDB.transaction('electro', 'readonly');
+                const req = tx.objectStore('electro').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+            cacheElectroMap.clear();
+            electroList.forEach(e => {
+                if (e.cod_largo) cacheElectroMap.set(e.cod_largo, e);
+                if (e.cod_corto) cacheElectroMap.set(e.cod_corto, e);
+            });
+
+            // 3. Emusap
+            const emusapList = await new Promise((resolve) => {
+                const tx = padronDB.transaction('emusap', 'readonly');
+                const req = tx.objectStore('emusap').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+            cacheEmusapMap.clear();
+            emusapList.forEach(m => {
+                if (m.medidor) cacheEmusapMap.set(m.medidor, m);
+                if (m.inscripc) cacheEmusapMap.set(m.inscripc, m);
+            });
+
+            actualizarBadgesPadron(cacheContribuyentes.length, electroList.length, emusapList.length);
+        }
+
+        function cargarDesdeVariableGlobal() {
+            if (!window.PADRON_INICIAL) return;
+            const pi = window.PADRON_INICIAL;
+            cacheContribuyentes = (pi.contribuyentes || []).map(c => ({ dni: String(c[0]), nombre: String(c[1]), conyugue: String(c[2]) }));
+            
+            cacheElectroMap.clear();
+            (pi.electro || []).forEach(e => {
+                const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5] };
+                if (e[5]) cacheElectroMap.set(String(e[5]), item);
+                if (e[4]) cacheElectroMap.set(String(e[4]), item);
+            });
+
+            cacheEmusapMap.clear();
+            (pi.emusap || []).forEach(m => {
+                const item = { nombre: m[0], direccion: m[1], inscripc: m[2], medidor: m[3], cod: m[4] };
+                if (m[3]) cacheEmusapMap.set(String(m[3]).toUpperCase(), item);
+                if (m[2]) cacheEmusapMap.set(String(m[2]), item);
+            });
+
+            actualizarBadgesPadron(cacheContribuyentes.length, pi.electro ? pi.electro.length : 0, pi.emusap ? pi.emusap.length : 0);
+        }
+
+        function actualizarBadgesPadron(totalC, totalE, totalM) {
+            const elC = document.getElementById('badge_count_contribuyentes');
+            const elE = document.getElementById('badge_count_electro');
+            const elM = document.getElementById('badge_count_emusap');
+            if (elC) elC.innerText = totalC.toLocaleString();
+            if (elE) elE.innerText = totalE.toLocaleString();
+            if (elM) elM.innerText = totalM.toLocaleString();
+        }
+
+        // ==========================================
+        // SUBIDA Y LECTURA DE DATA.xlsx EN CLIENTE
+        // ==========================================
+        async function procesarSubidaExcelData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                mostrarToast("Librería SheetJS cargando... intente en 3 segundos.", "error");
+                return;
+            }
+
+            mostrarToast("Leyendo archivo DATA.xlsx... Un momento por favor.", "info");
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // 1. Contribuyentes
+                    let cList = [];
+                    if (workbook.Sheets['contribuyentes']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['contribuyentes'], { header: 1 });
+                        cList = raw.slice(1).filter(r => r[0] && r[1]).map(r => [
+                            String(r[0]).trim(),
+                            String(r[1]).trim().toUpperCase(),
+                            r[2] ? String(r[2]).trim().toUpperCase() : ''
+                        ]);
+                    }
+
+                    // 2. Electro
+                    let eList = [];
+                    if (workbook.Sheets['electro']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['electro'], { header: 1 });
+                        eList = raw.slice(1).filter(r => r[0]).map(r => [
+                            String(r[0]).trim().toUpperCase(),
+                            r[1] ? String(r[1]).trim().toUpperCase() : '',
+                            r[2] ? String(r[2]).trim() : '',
+                            r[3] ? String(r[3]).trim() : '',
+                            r[5] !== undefined ? String(r[5]).trim() : '',
+                            r[6] !== undefined ? String(r[6]).trim() : ''
+                        ]);
+                    }
+
+                    // 3. Emusap
+                    let mList = [];
+                    if (workbook.Sheets['emusap']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['emusap'], { header: 1 });
+                        mList = raw.slice(1).filter(r => r[4]).map(r => [
+                            String(r[4]).trim().toUpperCase(),
+                            r[6] ? String(r[6]).trim().toUpperCase() : '',
+                            r[3] !== undefined ? String(r[3]).trim() : '',
+                            r[7] ? String(r[7]).trim().toUpperCase() : '',
+                            r[0] ? String(r[0]).trim() : ''
+                        ]);
+                    }
+
+                    await guardarDatosCompletosEnIndexedDB(cList, eList, mList);
+                    await cargarCacheEnMemoria();
+
+                    mostrarToast(`✅ DATA.xlsx procesado con éxito: ${cList.length} contribuyentes, ${eList.length} electro, ${mList.length} emusap.`, "success");
+                    event.target.value = '';
+                } catch(err) {
+                    mostrarToast("Error al leer DATA.xlsx: " + err.message, "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ==========================================
+        // CRUCE DE MEDIDORES Y SUGERENCIAS CONTRIBUYENTES
+        // ==========================================
+        function ejecutarCruceMedidores(reg) {
+            const contenedorCruce = document.getElementById('cruce_resultados_medidores');
+            const badgeCruce = document.getElementById('badge_cruce_estado');
+            contenedorCruce.innerHTML = '';
+
+            const luzMedidores = (reg.medidoresLuz || [reg.medidorLuz || '']).filter(Boolean);
+            const aguaMedidores = (reg.medidoresAgua || [reg.medidorAgua || '']).filter(Boolean);
+
+            const titularesEncontrados = new Set();
+            let totalCruces = 0;
+
+            // 1. Cruce Electro
+            luzMedidores.forEach(med => {
+                const numLimpio = med.replace(/[^0-9]/g, '');
+                let encontrado = cacheElectroMap.get(med) || cacheElectroMap.get(numLimpio);
+
+                if (!encontrado && numLimpio) {
+                    // Búsqueda parcial si no es exacto
+                    for (let [k, v] of cacheElectroMap.entries()) {
+                        if (k.endsWith(numLimpio) || numLimpio.endsWith(k)) {
+                            encontrado = v;
+                            break;
+                        }
+                    }
+                }
+
+                if (encontrado) {
+                    totalCruces++;
+                    titularesEncontrados.add(encontrado.nombre);
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--warning);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #f59e0b;">⚡ Electro Sur Este (Suministro: ${encontrado.cod_largo || encontrado.cod_corto})</strong>
+                                <span class="badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; font-size: 0.7rem;">Coincidencia OK</span>
+                            </div>
+                            <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
+                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'}</div>
+                            ${encontrado.lat ? `<div style="color: #38bdf8; font-size: 0.75rem; font-family: monospace;">🌐 GPS Empresa: Lat ${encontrado.lat}, Lng ${encontrado.lng}</div>` : ''}
+                        </div>
+                    `;
+                } else {
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.8;">
+                            <span style="color: var(--text-muted);">⚡ Medidor Luz <strong>${med}</strong>: No figura en el padrón de Electro.</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // 2. Cruce EMUSAP
+            aguaMedidores.forEach(med => {
+                const medUpper = med.toUpperCase().trim();
+                const numLimpio = med.replace(/[^0-9]/g, '');
+                let encontrado = cacheEmusapMap.get(medUpper) || cacheEmusapMap.get(numLimpio);
+
+                if (encontrado) {
+                    totalCruces++;
+                    titularesEncontrados.add(encontrado.nombre);
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--success);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #10b981;">💧 EMUSAP Abancay (Medidor: ${encontrado.medidor || encontrado.inscripc})</strong>
+                                <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.7rem;">Coincidencia OK</span>
+                            </div>
+                            <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
+                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
+                        </div>
+                    `;
+                } else {
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.8;">
+                            <span style="color: var(--text-muted);">💧 Medidor Agua <strong>${med}</strong>: No figura en el padrón de EMUSAP.</span>
+                        </div>
+                    `;
+                }
+            });
+
+            badgeCruce.innerText = `${totalCruces} servicio(s) cruzado(s)`;
+            badgeCruce.style.background = totalCruces > 0 ? 'rgba(16,185,129,0.2)' : 'rgba(100,116,139,0.2)';
+            badgeCruce.style.color = totalCruces > 0 ? '#10b981' : '#94a3b8';
+
+            // 3. Precarga automática de similitudes en Contribuyentes
+            precargarSugerenciasContribuyentes(Array.from(titularesEncontrados));
+        }
+
+        function precargarSugerenciasContribuyentes(titulares) {
+            const contenedorSugerencias = document.getElementById('lista_sugerencias_contribuyentes');
+            const badgeTotal = document.getElementById('badge_total_sugerencias');
+            contenedorSugerencias.innerHTML = '';
+
+            if (titulares.length === 0) {
+                contenedorSugerencias.innerHTML = `<span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No se detectaron titulares en los medidores para buscar sugerencias automáticas. Use el buscador manual.</span>`;
+                badgeTotal.innerText = '0 sugerencias';
+                return;
+            }
+
+            const sugerenciasSet = new Map();
+            const stopWords = new Set(['DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y', 'SAN', 'SANTA', 'EL', 'EIRL', 'SAC', 'SRL']);
+
+            titulares.forEach(titular => {
+                const tokens = titular.toUpperCase().split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+                if (tokens.length === 0) return;
+
+                cacheContribuyentes.forEach(c => {
+                    let matches = 0;
+                    tokens.forEach(t => {
+                        if (c.nombre.includes(t)) matches++;
+                    });
+
+                    if (matches >= 2 || (tokens.length === 1 && matches === 1)) {
+                        const score = matches / tokens.length;
+                        if (!sugerenciasSet.has(c.dni) || sugerenciasSet.get(c.dni).score < score) {
+                            sugerenciasSet.set(c.dni, { contribuyente: c, score: score, titularOrigen: titular });
+                        }
+                    }
+                });
+            });
+
+            const listaOrdenada = Array.from(sugerenciasSet.values()).sort((a, b) => b.score - a.score).slice(0, 5);
+
+            if (listaOrdenada.length === 0) {
+                contenedorSugerencias.innerHTML = `<span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No se encontraron contribuyentes que coincidan con los nombres de los medidores (${titulares.join(', ')}).</span>`;
+                badgeTotal.innerText = '0 sugerencias';
+                return;
+            }
+
+            badgeTotal.innerText = `${listaOrdenada.length} sugerencia(s)`;
+
+            listaOrdenada.forEach(item => {
+                const c = item.contribuyente;
+                const div = document.createElement('div');
+                div.className = 'sugerencia-card';
+                div.innerHTML = `
+                    <div style="font-size: 0.83rem;">
+                        <div style="font-weight: 700; color: #f8fafc;">${c.nombre}</div>
+                        <div style="color: var(--text-secondary); font-size: 0.76rem;">
+                            🪪 DNI: <strong style="color: #38bdf8;">${c.dni}</strong> ${c.conyugue ? `| Cónyuge: ${c.conyugue}` : ''}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" onclick="asignarContribuyente('${c.dni}', '${c.nombre.replace(/'/g, "\'")}')" style="white-space: nowrap; padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                        ✔️ Asignar
+                    </button>
+                `;
+                contenedorSugerencias.appendChild(div);
+            });
+        }
+
+        function asignarContribuyente(dni, nombre) {
+            document.getElementById('contraste_propietario_dni').value = dni;
+            document.getElementById('contraste_propietario_nombre').value = nombre;
+            mostrarToast(`✅ Contribuyente asignado: ${nombre}`, "success");
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            if (drop) drop.style.display = 'none';
+        }
+
+        // ==========================================
+        // BUSCADOR PREDICTIVO MANUAL
+        // ==========================================
+        function buscarContribuyentesInput(query) {
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            const q = query.trim().toUpperCase();
+
+            if (q.length < 2) {
+                drop.style.display = 'none';
+                drop.innerHTML = '';
+                return;
+            }
+
+            const tokens = q.split(/\s+/).filter(Boolean);
+            const resultados = [];
+
+            for (let c of cacheContribuyentes) {
+                const matchDNI = c.dni.startsWith(q);
+                const matchNombre = tokens.every(t => c.nombre.includes(t));
+
+                if (matchDNI || matchNombre) {
+                    resultados.push(c);
+                    if (resultados.length >= 8) break;
+                }
+            }
+
+            if (resultados.length === 0) {
+                drop.innerHTML = `<div style="padding: 0.75rem; font-size: 0.8rem; color: var(--text-muted); text-align: center;">No se encontraron contribuyentes con "${query}"</div>`;
+                drop.style.display = 'block';
+                return;
+            }
+
+            drop.innerHTML = resultados.map(c => `
+                <div class="search-item" onclick="asignarContribuyente('${c.dni}', '${c.nombre.replace(/'/g, "\'")}')">
+                    <div>
+                        <strong style="color: #f8fafc; font-size: 0.83rem;">${c.nombre}</strong>
+                        <div style="font-size: 0.74rem; color: var(--text-muted);">
+                            DNI: <span style="color: #38bdf8;">${c.dni}</span> ${c.conyugue ? `| Cónyuge: ${c.conyugue}` : ''}
+                        </div>
+                    </div>
+                    <span style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Elegir ↵</span>
+                </div>
+            `).join('');
+            drop.style.display = 'block';
+        }
+
+        document.addEventListener('click', (e) => {
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            const input = document.getElementById('buscador_contribuyente_input');
+            if (drop && input && !input.contains(e.target) && !drop.contains(e.target)) {
+                drop.style.display = 'none';
+            }
+        });
+
         // CONTROL DE SESIÓN Y AUTENTICACIÓN
         // ==========================================
         const AUTH_KEY = 'FISCALIZACION_AUTH_TOKEN';
@@ -1587,8 +2118,9 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
         let fotoMedidorBase64 = null;
         let gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             verificarSesion();
+            await inicializarPadronDB();
             detectarEntornoWhatsApp();
             cargarRegistrosDesdeStorage();
             actualizarMetricas();
@@ -2020,6 +2552,7 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             document.getElementById('contraste_observaciones_gabinete').value = reg.observacionesGabinete || '';
 
             seleccionarEstado(reg.estadoFiscal === 'PENDIENTE' ? 'CORRECTO' : reg.estadoFiscal);
+            ejecutarCruceMedidores(reg);
             panel.scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -2037,7 +2570,7 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
             event.preventDefault();
             if (!registroSeleccionado) return;
 
-            registroSeleccionado.codigoPredio = document.getElementById('contraste_codigo_predio').value.trim().toUpperCase();
+            registroSeleccionado.codigoPredio = document.getElementById('contraste_codigo_predio').value.trim().toUpperCase() || 'S/C';
             registroSeleccionado.propietarioDNI = document.getElementById('contraste_propietario_dni').value.trim();
             registroSeleccionado.propietarioNombre = document.getElementById('contraste_propietario_nombre').value.trim().toUpperCase();
             registroSeleccionado.estadoFiscal = document.getElementById('contraste_estado').value;
@@ -2241,9 +2774,54 @@ HTML_TEMPLATE = r'''<!DOCTYPE html>
 </html>
 '''
 
+def generar_data_padron_js(cwd):
+    """Si existe DATA.xlsx, extrae contribuyentes, electro y emusap a data_padron.js."""
+    xlsx_path = cwd / "DATA.xlsx"
+    if not xlsx_path.exists():
+        return
+    try:
+        import openpyxl, json
+        wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+        c_list = []
+        if 'contribuyentes' in wb.sheetnames:
+            for r in wb['contribuyentes'].iter_rows(min_row=2, values_only=True):
+                if r[0] and r[1]:
+                    c_list.append([str(r[0]).strip(), str(r[1]).strip().upper(), str(r[2]).strip().upper() if r[2] else ''])
+        e_list = []
+        if 'electro' in wb.sheetnames:
+            for r in wb['electro'].iter_rows(min_row=2, values_only=True):
+                if r[0]:
+                    e_list.append([
+                        str(r[0]).strip().upper(),
+                        str(r[1]).strip().upper() if r[1] else '',
+                        str(r[2]).strip() if r[2] else '',
+                        str(r[3]).strip() if r[3] else '',
+                        str(r[5]).strip() if r[5] is not None else '',
+                        str(r[6]).strip() if r[6] is not None else ''
+                    ])
+        m_list = []
+        if 'emusap' in wb.sheetnames:
+            for r in wb['emusap'].iter_rows(min_row=2, values_only=True):
+                if r[4]:
+                    m_list.append([
+                        str(r[4]).strip().upper(),
+                        str(r[6]).strip().upper() if r[6] else '',
+                        str(r[3]).strip() if r[3] is not None else '',
+                        str(r[7]).strip().upper() if r[7] else '',
+                        str(r[0]).strip() if r[0] else ''
+                    ])
+        payload = {'contribuyentes': c_list, 'electro': e_list, 'emusap': m_list}
+        out_padron = cwd / "data_padron.js"
+        with open(out_padron, 'w', encoding='utf-8') as f:
+            f.write('window.PADRON_INICIAL = ' + json.dumps(payload, separators=(',', ':'), ensure_ascii=False) + ';')
+        print(f"[OK] data_padron.js generado automáticamente ({out_padron.stat().st_size / 1024 / 1024:.2f} MB)")
+    except Exception as ex:
+        print(f"[AVISO] No se pudo generar data_padron.js automáticamente: {ex}")
+
 def generar_html(output_filename="sistema_fiscalizacion.html"):
     """Genera el archivo HTML autocontenido optimizado para fiscalización predial."""
     cwd = Path(__file__).resolve().parent
+    generar_data_padron_js(cwd)
     output_path = cwd / output_filename
     
     with open(output_path, "w", encoding="utf-8") as f:
