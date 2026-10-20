@@ -1,0 +1,3625 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema Optimizado de Fiscalización Predial</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #0b1120;
+            --bg-card: #1e293b;
+            --bg-card-alt: #334155;
+            --border-color: #334155;
+            --border-focus: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent: #0284c7;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+        }
+
+        /* BANNER AVISO WHATSAPP */
+        #whatsapp-warning-banner {
+            display: none;
+            background: linear-gradient(135deg, #78350f, #92400e);
+            border: 1px solid #d97706;
+            border-radius: var(--radius-md);
+            padding: 0.9rem 1.2rem;
+            color: #fef3c7;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        #whatsapp-warning-banner strong {
+            color: #ffffff;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            font-size: 1.4rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* NAVIGATION TABS */
+        .nav-tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 0.35rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            gap: 0.35rem;
+            width: 100%;
+        }
+
+        @media (min-width: 850px) {
+            .nav-tabs {
+                width: auto;
+            }
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.65rem 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        /* METRICS / STATS BAR */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-bar {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.85rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-info h4 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-info p {
+            font-size: 1.35rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-card.correcto {
+            border-left: 4px solid var(--success);
+        }
+
+        .stat-card.subvaluante {
+            border-left: 4px solid var(--warning);
+        }
+
+        .stat-card.omiso {
+            border-left: 4px solid var(--danger);
+        }
+
+        .stat-card.pendiente {
+            border-left: 4px solid var(--purple);
+        }
+
+        /* MAIN CONTENT AREA */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .module-section {
+            display: none;
+        }
+
+        .module-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CARDS & FORMS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.15rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            background-color: #0b1120;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+            touch-action: manipulation;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-alt);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #10b981;
+        }
+
+        .btn-warning {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f59e0b;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ef4444;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 0.45rem 0.8rem;
+            font-size: 0.78rem;
+        }
+
+        /* STEP CARDS IN MUESTREO */
+        .step-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .photo-uploader {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.5);
+            position: relative;
+        }
+
+        .photo-preview-box {
+            width: 100%;
+            height: 220px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #0b1120;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.75rem;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .photo-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .photo-placeholder {
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+        }
+
+        .badge-base64 {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(4px);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .gps-status-indicator {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34d399;
+            padding: 0.6rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* DYNAMIC METERS LIST (MEDIDORES DINÁMICOS) */
+        .meter-group-container {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .meter-item-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .meter-item-row input {
+            flex: 1;
+        }
+
+        .btn-remove-meter {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-remove-meter:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* STATUS BADGES */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-badge.correcto {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.subvaluante {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-badge.omiso {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-badge.pendiente {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #0f172a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        thead th {
+            background: #1e293b;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        tbody tr:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        tbody td {
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+        }
+
+        .table-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        /* CONTRASTE SPLIT */
+        .contrast-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 1024px) {
+            .contrast-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .contrast-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+        }
+
+        .panel-field-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .field-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.6rem 0.85rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            font-size: 0.84rem;
+        }
+
+        @media (min-width: 640px) {
+            .field-row {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .field-row .label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .field-row .value {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+
+        .meter-tag {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-size: 0.75rem;
+            margin: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* STATUS RADIO CARDS */
+        .status-radio-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (min-width: 480px) {
+            .status-radio-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .status-radio-card {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.85rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .status-radio-card.active-correcto {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .status-radio-card.active-subvaluante {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .status-radio-card.active-omiso {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.15rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-img-container {
+            width: 100%;
+            max-height: 480px;
+            background: black;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-img-container img {
+            max-width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+        }
+
+        /* TOAST */
+        #toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            left: 1.5rem;
+            max-width: 450px;
+            margin-left: auto;
+            background: #1e293b;
+            color: white;
+            border-left: 4px solid var(--primary);
+            padding: 0.9rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            font-size: 0.88rem;
+        }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+
+            header,
+            .nav-tabs,
+            .stats-bar,
+            .btn,
+            #whatsapp-warning-banner,
+            .no-print {
+                display: none !important;
+            }
+
+            .card,
+            .contrast-panel {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                color: black !important;
+                box-shadow: none !important;
+            }
+
+            .field-row {
+                background: #f8fafc !important;
+                color: black !important;
+            }
+
+            .field-row .label,
+            .field-row .value {
+                color: black !important;
+            }
+        }
+
+        /* LOGIN OVERLAY */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 17, 32, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.2rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(56, 189, 248, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 0.6rem;
+            filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.4));
+        }
+
+        .login-header h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .login-header p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .user-session-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        @media (max-width: 768px) {
+            .user-session-bar {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 0.5rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
+
+        /* BUSCADOR Y TARJETAS DE CONTRASTE AUTOMÁTICO */
+        .search-dropdown-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border: 1px solid var(--border-focus);
+            border-radius: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            margin-top: 4px;
+        }
+
+        .search-item {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.15s ease;
+        }
+
+        .search-item:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .cruce-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.82rem;
+        }
+
+        .sugerencia-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+        }
+
+        .sugerencia-card:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: var(--success);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="data_padron.js"></script>
+</head>
+
+<body>
+
+    <!-- MODAL DE INICIO DE SESIÓN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">🏛️</div>
+                <h2>Sistema de Fiscalización Predial</h2>
+                <p>Municipalidad Distrital - Control de Acceso</p>
+            </div>
+            <form id="loginForm" onsubmit="validarLogin(event)"
+                style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                <div class="form-group" style="text-align: left;">
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">👤
+                        Usuario</label>
+                    <input type="text" id="login_user" placeholder="Ingrese usuario (admin)" autocomplete="username"
+                        required
+                        style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; font-weight: 500;">🔒
+                        Contraseña</label>
+                    <div style="position: relative;">
+                        <input type="password" id="login_pass" placeholder="Ingrese contraseña"
+                            autocomplete="current-password" required
+                            style="width: 100%; padding: 0.75rem 2.6rem 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.95rem;">
+                        <button type="button" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar contraseña"
+                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0;">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div id="loginErrorMsg"
+                    style="display: none; background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: #fca5a5; padding: 0.65rem; border-radius: 8px; font-size: 0.82rem; text-align: center;">
+                    ⚠️ Usuario o contraseña incorrectos.
+                </div>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; margin-top: 0.4rem; justify-content: center;">
+                    🔑 Ingresar al Sistema
+                </button>
+            </form>
+            <div style="margin-top: 1.1rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                Acceso restringido para personal fiscalizador autorizado
+            </div>
+        </div>
+    </div>
+
+    <!-- AVISO WHATSAPP CONTENT:// -->
+    <div id="whatsapp-warning-banner">
+        <strong>⚠️ Abierto en el visor de WhatsApp (`content://`)</strong>
+        <p>Toca los 3 puntos ⋮ en WhatsApp &gt; Guardar &gt; abre desde "Descargas" con Chrome, o utiliza el botón
+            <strong>"💾 Guardar Avance"</strong> frecuentemente.</p>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-title-group">
+            <div class="header-icon">🏛️</div>
+            <div class="header-title">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h1 style="margin: 0;">Fiscalización Predial</h1>
+                    <span class="badge"
+                        style="background: rgba(56,189,248,0.2); color: #38bdf8; font-size: 0.72rem; border: 1px solid rgba(56,189,248,0.4);">v2.8
+                        (Eliminar/Editar + Preview)</span>
+                </div>
+                <p>Muestreo Secuencial con GPS Interno & Contraste Catastral</p>
+            </div>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('muestreo')">
+                📷 Muestreo
+            </button>
+            <button class="tab-btn" onclick="switchTab('contraste')">
+                📋 Contraste
+                <span id="badge-total-records"
+                    style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 999px; font-size: 0.72rem;">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('reportes')">
+                📊 Reportes e Importación
+            </button>
+            <button class="tab-btn" onclick="switchTab('cartas')">
+                ✉️ Generar Cartas
+            </button>
+        </nav>
+        <div class="user-session-bar" id="userSessionBar">
+            <div
+                style="background: rgba(37,99,235,0.2); border: 1px solid rgba(56,189,248,0.3); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+                <span>👤</span> <span id="sessionUsername">admin</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarSesion()"
+                style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                🚪 Salir
+            </button>
+        </div>
+    </header>
+
+    <!-- METRICS -->
+    <section class="stats-bar">
+        <div class="stat-card pendiente">
+            <div class="stat-info">
+                <h4>Total Predios</h4>
+                <p id="stat-total">0</p>
+            </div>
+        </div>
+        <div class="stat-card correcto">
+            <div class="stat-info">
+                <h4>Correcto</h4>
+                <p id="stat-correcto" style="color: var(--success);">0</p>
+            </div>
+        </div>
+        <div class="stat-card subvaluante">
+            <div class="stat-info">
+                <h4>Subvaluante</h4>
+                <p id="stat-subvaluante" style="color: var(--warning);">0</p>
+            </div>
+        </div>
+        <div class="stat-card omiso">
+            <div class="stat-info">
+                <h4>Omiso</h4>
+                <p id="stat-omiso" style="color: var(--danger);">0</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- ========================================== -->
+        <!-- 1. MÓDULO DE MUESTREO (OPTIMIZADO) -->
+        <!-- ========================================== -->
+        <section id="mod-muestreo" class="module-section active">
+            <form id="muestreoForm" onsubmit="guardarMuestreo(event)">
+
+                <!-- PASO 1: FOTO DEL PREDIO -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>
+                            <span class="step-badge">PASO 1</span>
+                            Fotografía de Fachada del Predio
+                        </h2>
+                        <span style="font-size: 0.78rem; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
+                            Estampado automático: Fecha y Hora
+                        </span>
+                    </div>
+
+                    <div class="photo-uploader">
+                        <input type="file" id="input_foto_predio" accept="image/*" capture="environment"
+                            style="display: none;" onchange="procesarFotoPredio(event)">
+                        <button type="button" class="btn btn-primary"
+                            onclick="document.getElementById('input_foto_predio').click()">
+                            📷 Tomar / Subir Foto del Predio
+                        </button>
+                        <div class="photo-preview-box" id="box_foto_predio">
+                            <div class="photo-placeholder" id="ph_foto_predio">
+                                <span style="font-size: 2.2rem;">🏠</span>
+                                <span>Presione el botón para capturar la fachada del predio</span>
+                            </div>
+                            <img id="img_preview_predio" style="display: none;"
+                                onclick="abrirModalZoom(this.src, 'Fotografía del Predio')" alt="Predio">
+                            <div class="badge-base64" id="badge_predio_b64" style="display: none;">
+                                ⚡ Base64 OK (<span id="size_predio">0 KB</span>) | Fecha/Hora OK
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: FOTO DEL MEDIDOR + GPS AUTOMÁTICO INTERNO -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>
+                            <span class="step-badge" style="background: #10b981;">PASO 2</span>
+                            Fotografía del Medidor (Captura GPS Automática Interna)
+                        </h2>
+                        <span style="font-size: 0.78rem; color: #10b981; font-family: 'JetBrains Mono', monospace;">
+                            Captura GPS Automática al instante
+                        </span>
+                    </div>
+
+                    <div class="photo-uploader">
+                        <input type="file" id="input_foto_medidor" accept="image/*" capture="environment"
+                            style="display: none;" onchange="procesarFotoMedidorConGPS(event)">
+                        <button type="button" class="btn btn-success"
+                            onclick="document.getElementById('input_foto_medidor').click()">
+                            📷 Tomar / Subir Foto del Medidor (Activa GPS Automático)
+                        </button>
+
+                        <div class="photo-preview-box" id="box_foto_medidor">
+                            <div class="photo-placeholder" id="ph_foto_medidor">
+                                <span style="font-size: 2.2rem;">⏱️</span>
+                                <span>Al tomar esta foto se obtendrán las coordenadas GPS en segundo plano</span>
+                            </div>
+                            <img id="img_preview_medidor" style="display: none;"
+                                onclick="abrirModalZoom(this.src, 'Fotografía del Medidor')" alt="Medidor">
+                            <div class="badge-base64" id="badge_medidor_b64" style="display: none;">
+                                ⚡ Base64 OK (<span id="size_medidor">0 KB</span>) | GPS Incrustado
+                            </div>
+                        </div>
+
+                        <!-- INDICADOR DE GPS CAPTURADO INTERNAMENTE -->
+                        <div id="gps_indicator_box" class="gps-status-indicator" style="display: none;">
+                            <span>📍</span>
+                            <div>
+                                <strong>GPS Capturado Internamente:</strong>
+                                <span id="gps_coords_text">Esperando captura...</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="geo_lat" value="">
+                        <input type="hidden" id="geo_lng" value="">
+                        <input type="hidden" id="geo_accuracy" value="">
+                        <input type="hidden" id="timestamp_captura" value="">
+                    </div>
+                </div>
+
+                <!-- PASO 3: NÚMEROS DE MEDIDORES (1 A MÁS DE LUZ Y AGUA) Y CARACTERÍSTICAS -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>
+                            <span class="step-badge" style="background: #f59e0b;">PASO 3</span>
+                            Números de Medidores y Características Físicas
+                        </h2>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">
+                            Permite 1 o múltiples medidores de luz y agua
+                        </span>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- MEDIDORES DE LUZ DINÁMICOS -->
+                        <div class="form-group full-width">
+                            <div class="meter-group-container">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <label>⚡ Suministro Eléctrico (Medidores de Luz)</label>
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="agregarMedidorLuz()">
+                                        + Agregar otro medidor de luz
+                                    </button>
+                                </div>
+                                <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                                    Ingrese el <strong>Verificador (2 dígitos)</strong> y luego el <strong>Número de
+                                        Medidor</strong>:
+                                </div>
+                                <div id="lista_medidores_luz"
+                                    style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                    <div class="meter-item-row"
+                                        style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                                        <div
+                                            style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                                            <span
+                                                style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR
+                                                (2 DÍG)</span>
+                                            <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13"
+                                                maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()"
+                                                style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                                            <span
+                                                style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO
+                                                DE MEDIDOR LUZ</span>
+                                            <input type="text" class="input-medidor-luz-num"
+                                                placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric"
+                                                oninput="previewCruceMuestreo()"
+                                                style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                                        </div>
+                                        <button type="button" class="btn-remove-meter"
+                                            onclick="eliminarMedidorFila(this)" title="Limpiar este medidor"
+                                            style="height: 40px; margin-bottom: 1px;">✕</button>
+                                    </div>
+                                </div>
+                                <!-- PREVIEW EN VIVO ELECTRO -->
+                                <div id="preview_cruce_muestreo_luz" style="display:none; margin-top: 0.35rem;"></div>
+                            </div>
+                        </div>
+
+                        <!-- MEDIDORES DE AGUA DINÁMICOS -->
+                        <div class="form-group full-width">
+                            <div class="meter-group-container">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <label>💧 Suministro Sanitario (Medidores de Agua)</label>
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="agregarMedidorAgua()">
+                                        + Agregar otro medidor de agua
+                                    </button>
+                                </div>
+                                <div id="lista_medidores_agua"
+                                    style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <div class="meter-item-row">
+                                        <input type="text" class="input-medidor-agua"
+                                            placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)"
+                                            oninput="previewCruceMuestreo()">
+                                    </div>
+                                </div>
+                                <!-- PREVIEW EN VIVO EMUSAP -->
+                                <div id="preview_cruce_muestreo_agua" style="display:none; margin-top: 0.35rem;"></div>
+                            </div>
+                        </div>
+
+                        <!-- PISOS Y MATERIAL (SIN USO, SIN CONSERVACIÓN, SIN DIRECCIÓN REFERENCIAL) -->
+                        <div class="form-group">
+                            <label>🏢 Número de Pisos / Niveles</label>
+                            <input type="number" id="predio_pisos" min="1" max="50" value="2" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>🧱 Material Estructural Predominante</label>
+                            <select id="predio_material" required>
+                                <option value="Ladrillo y Concreto (Noble)">Ladrillo y Concreto Armado (Noble)</option>
+                                <option value="Adobe / Quincha">Adobe / Quincha</option>
+                                <option value="Drywall / Pre-fabricado">Drywall / Prefabricado</option>
+                                <option value="Madera">Madera tratada</option>
+                                <option value="Estructura Metálica">Estructura Metálica</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>💬 Observaciones de Campo (Opcional)</label>
+                            <textarea id="observaciones_campo"
+                                placeholder="Detalles de inspección física, ampliaciones, etc."></textarea>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormularioMuestreo()">
+                            🔄 Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">
+                            💾 Guardar Ficha de Muestreo
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 2. MÓDULO DE CONTRASTE -->
+        <!-- ========================================== -->
+        <section id="mod-contraste" class="module-section">
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>🔍 Fichas Prediales Registradas</h2>
+                    <div
+                        style="display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 500px; flex-wrap: wrap;">
+                        <input type="text" id="filtro_busqueda"
+                            placeholder="Buscar por ID, Medidor, DNI, Propietario..." onkeyup="filtrarTabla()"
+                            style="flex: 1; font-size: 0.85rem;">
+                        <select id="filtro_estado" onchange="filtrarTabla()" style="font-size: 0.85rem; width: auto;">
+                            <option value="TODOS">Todos</option>
+                            <option value="PENDIENTE">Pendientes</option>
+                            <option value="CORRECTO">Correcto</option>
+                            <option value="SUBVALUANTE">Subvaluante</option>
+                            <option value="OMISO">Omiso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Foto Predio</th>
+                                <th>Foto Medidor</th>
+                                <th>Geolocalización GPS</th>
+                                <th>Medidores Luz</th>
+                                <th>Medidores Agua</th>
+                                <th>Pisos / Material</th>
+                                <th>Código Predio</th>
+                                <th>Propietario</th>
+                                <th>Estado Fiscal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla_registros_body">
+                            <!-- Inyección dinámica -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PANEL DE CONTRASTE ACTIVO -->
+            <div id="panel_contraste_detalle" class="contrast-layout" style="display: none;">
+
+                <!-- COLUMNA IZQUIERDA: FOTOS Y MUESTREO DECODIFICADO -->
+                <div class="contrast-panel">
+                    <div class="card-header">
+                        <h2>👁️ Evidencia Decodificada de Base64</h2>
+                        <span id="contraste_badge_id" class="status-badge pendiente">ID: #000</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Predio
+                                (Estampada)</label>
+                            <div class="photo-preview-box" style="height: 180px;">
+                                <img id="contraste_img_predio" src="" alt="Predio"
+                                    onclick="abrirModalZoom(this.src, 'Foto Predio Decodificada')">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="margin-bottom: 4px; display: block; font-size: 0.78rem;">Foto Medidor
+                                (Estampada + GPS)</label>
+                            <div class="photo-preview-box" style="height: 180px;">
+                                <img id="contraste_img_medidor" src="" alt="Medidor"
+                                    onclick="abrirModalZoom(this.src, 'Foto Medidor Decodificada')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-field-list">
+                        <div class="field-row">
+                            <span class="label">Fecha y Hora de Captura:</span>
+                            <span class="value" id="c_view_fecha">-</span>
+                        </div>
+                        <div class="field-row">
+                            <span class="label">Geolocalización GPS:</span>
+                            <span class="value" id="c_view_gps" style="color: #38bdf8;">-</span>
+                        </div>
+                        <div class="field-row">
+                            <span class="label">Medidor(es) de Luz:</span>
+                            <div id="c_view_luz" style="text-align: right;">-</div>
+                        </div>
+                        <div class="field-row">
+                            <span class="label">Medidor(es) de Agua:</span>
+                            <div id="c_view_agua" style="text-align: right;">-</div>
+                        </div>
+                        <div class="field-row">
+                            <span class="label">Pisos y Material:</span>
+                            <span class="value" id="c_view_caracteristicas">-</span>
+                        </div>
+                        <div class="field-row">
+                            <span class="label">Observaciones de Campo:</span>
+                            <span class="value" id="c_view_obs_campo" style="font-style: italic;">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: FORMULARIO DE AUDITORÍA -->
+                <div class="contrast-panel">
+                    <div class="card-header" style="flex-wrap: wrap; gap: 0.5rem;">
+                        <h2>✏️ Dictamen y Datos de Contraste</h2>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="editarEnMuestreo()"
+                                style="font-size: 0.78rem;">
+                                🔧 Editar Muestreo
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarRegistroActual()"
+                                style="font-size: 0.78rem;">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="formContraste" onsubmit="guardarContraste(event)">
+                        <div class="form-grid" style="grid-template-columns: 1fr;">
+
+                            <!-- SECCIÓN 1: CRUCE AUTOMÁTICO DE MEDIDORES (ELECTRO & EMUSAP) -->
+                            <div
+                                style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h3
+                                        style="font-size: 0.92rem; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                                        ⚡ Cruce Automático de Medidores en Padrones (Electro & EMUSAP)
+                                    </h3>
+                                    <span id="badge_cruce_estado" class="badge"
+                                        style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.72rem;">Consultando...</span>
+                                </div>
+                                <div id="cruce_resultados_medidores"
+                                    style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <!-- Inyección dinámica de resultados de Electro y EMUSAP -->
+                                </div>
+                            </div>
+
+                            <!-- SECCIÓN 2: PRECARGA AUTOMÁTICA DE SIMILITUDES EN CONTRIBUYENTES -->
+                            <div
+                                style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h4
+                                        style="font-size: 0.88rem; color: #10b981; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
+                                        🎯 Coincidencias Sugeridas en Contribuyentes (Según Medidores)
+                                    </h4>
+                                    <span id="badge_total_sugerencias" class="badge"
+                                        style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.72rem;">0
+                                        encontradas</span>
+                                </div>
+                                <div id="lista_sugerencias_contribuyentes"
+                                    style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">Abra
+                                        un predio con medidor para precargar coincidencias automáticas.</span>
+                                </div>
+                            </div>
+
+                            <!-- SECCIÓN 3: BUSCADOR MANUAL PREDICTIVO DE CONTRIBUYENTES -->
+                            <div class="form-group" style="position: relative;">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>🔍 Buscador Manual en Padrón de Contribuyentes (DNI o Nombre)</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">Mínimo 2 letras</span>
+                                </label>
+                                <input type="text" id="buscador_contribuyente_input"
+                                    placeholder="Escriba apellido, nombre o DNI para autocompletar..."
+                                    autocomplete="off" oninput="buscarContribuyentesInput(this.value)">
+                                <div id="dropdown_resultados_contribuyentes" class="search-dropdown-results"
+                                    style="display: none;"></div>
+                            </div>
+
+                            <!-- SECCIÓN 4: DATOS DEL PROPIETARIO (OPCIONALES PARA OMISOS) -->
+                            <div class="form-group">
+                                <label>🏷️ Código de Predio <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional
+                                        si es Omiso / Pendiente)</span></label>
+                                <input type="text" id="contraste_codigo_predio"
+                                    placeholder="Ej: PR-2026-004589 (o dejar vacío)">
+                            </div>
+
+                            <div class="form-group">
+                                <label>🆔 DNI / RUC del Propietario <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_dni" placeholder="Ej: 48435564"
+                                    maxlength="12">
+                            </div>
+
+                            <div class="form-group">
+                                <label>👤 Apellidos y Nombres / Razón Social <span
+                                        style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span></label>
+                                <input type="text" id="contraste_propietario_nombre"
+                                    placeholder="Ej: HERRERA TAIPE CIRILO">
+                            </div>
+
+                            <!-- SECCIÓN 5: ESTADO DE FISCALIZACIÓN -->
+                            <div class="form-group">
+                                <label>⚖️ Estado de Fiscalización</label>
+                                <input type="hidden" id="contraste_estado" value="CORRECTO">
+                                <div class="status-radio-group">
+                                    <div class="status-radio-card active-correcto" id="card_st_correcto"
+                                        onclick="seleccionarEstado('CORRECTO')">
+                                        <span style="font-size: 1.2rem;">✅</span>
+                                        <strong
+                                            style="display:block; font-size:0.85rem; margin-top:3px;">CORRECTO</strong>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Coincide con
+                                            Rentas</span>
+                                    </div>
+                                    <div class="status-radio-card" id="card_st_subvaluante"
+                                        onclick="seleccionarEstado('SUBVALUANTE')">
+                                        <span style="font-size: 1.2rem;">⚠️</span>
+                                        <strong
+                                            style="display:block; font-size:0.85rem; margin-top:3px;">SUBVALUANTE</strong>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">Declaró menos
+                                            área/pisos</span>
+                                    </div>
+                                    <div class="status-radio-card" id="card_st_omiso"
+                                        onclick="seleccionarEstado('OMISO')">
+                                        <span style="font-size: 1.2rem;">❌</span>
+                                        <strong style="display:block; font-size:0.85rem; margin-top:3px;">OMISO</strong>
+                                        <span style="font-size: 0.68rem; color: var(--text-muted);">No registrado en
+                                            base</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📋 Dictamen y Observaciones de Gabinete</label>
+                                <textarea id="contraste_observaciones_gabinete"
+                                    placeholder="Conclusiones periciales y fundamentación..."></textarea>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-outline" onclick="window.print()">
+                                🖨️ Imprimir Ficha
+                            </button>
+                            <button type="submit" class="btn btn-success" style="padding: 0.85rem 1.8rem;">
+                                ✔️ Confirmar y Guardar Contraste
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MÓDULO DE GENERACIÓN DE CARTAS INDUCTIVAS -->
+        <section id="mod-cartas" class="module-section">
+            <div class="card">
+                <div class="card-header"><h2>✉️ Generar cartas inductivas</h2></div>
+                <p style="color:var(--text-secondary); margin-bottom:1rem;">Se utilizarán los registros clasificados como OMISO o SUBVALUANTE en el módulo Contraste. Revise que los datos del contribuyente y la dirección estén completos antes de imprimir.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cartas_tipo">Contribuyentes a incluir</label>
+                        <select id="cartas_tipo" onchange="actualizarResumenCartas()">
+                            <option value="AMBOS">Omiso y subvaluante</option>
+                            <option value="OMISO">Solo omisos</option>
+                            <option value="SUBVALUANTE">Solo subvaluantes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cartas_fecha">Fecha de la carta</label>
+                        <input type="text" id="cartas_fecha" placeholder="Tamburco, 21 de octubre del 2026">
+                    </div>
+                </div>
+                <div id="cartas_resumen" style="margin:1rem 0;color:var(--text-secondary);"></div>
+                <button class="btn btn-primary" onclick="prepararGeneracionCartas()">🔢 Definir numeración y preparar cartas</button>
+                <div id="cartas_acciones" style="display:none; margin-top:1rem; gap:.75rem; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="imprimirCartas()">🖨️ Imprimir / Guardar como PDF</button>
+                    <button class="btn btn-secondary" onclick="prepararGeneracionCartas()">↻ Cambiar numeración o selección</button>
+                </div>
+                <div id="cartas_preview" style="margin-top:1rem;"></div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. MÓDULO DE REPORTES, IMPORTACIÓN Y AVANCE -->
+        <!-- ========================================== -->
+        <section id="mod-reportes" class="module-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Gestión de Datos, Avance e Integración</h2>
+                    <button class="btn btn-warning" onclick="guardarAvanceRapido()">
+                        💾 Guardar Avance en Archivo
+                    </button>
+                </div>
+
+                <div class="form-grid" style="grid-template-columns: 1fr;">
+                    <!-- EXPLICACIÓN Y SINCRONIZACIÓN MULTI-DISPOSITIVO (GITHUB PAGES) -->
+                    <div
+                        style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85)); padding: 1.4rem; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.35); display: flex; flex-direction: column; gap: 0.9rem;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3
+                                style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+                                ☁️ Sincronización Multi-Dispositivo (Compartir entre Celulares y PC)
+                            </h3>
+                            <span class="badge"
+                                style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">
+                                GitHub Pages
+                            </span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.55;">
+                            💡 <strong>¿Por qué no se ven los datos al abrir el enlace en otro celular?</strong><br>
+                            GitHub Pages es un alojamiento gratuito de archivos web estáticos (no posee base de datos
+                            central). Cada celular o computadora guarda sus datos y fotos en el almacenamiento privado
+                            de su propio navegador (<code style="color: #38bdf8;">localStorage</code>). Para que otro
+                            dispositivo vea tu trabajo, dispones de dos soluciones inmediatas:
+                        </p>
+
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.35rem;">
+                            <!-- OPCIÓN A: TRANSFERIR POR ARCHIVO / WHATSAPP -->
+                            <div
+                                style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #f8fafc; margin-bottom: 0.4rem;">📱 Opción A:
+                                        Compartir por WhatsApp o Drive (Inmediato)</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        1. En el celular de campo presiona <strong>"Descargar Copia de
+                                            Avance"</strong>.<br>
+                                        2. Envía el archivo <code style="color: #38bdf8;">.json</code> por WhatsApp a tu
+                                        PC o supervisor.<br>
+                                        3. En el otro dispositivo, abre la web y presiona <strong>"Importar y Agregar
+                                            Datos"</strong>. Los datos se sumarán acumulativamente sin borrar nada.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="guardarAvanceRapido()">
+                                        💾 Descargar Avance (.json)
+                                    </button>
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="document.getElementById('input_importar_json').click()">
+                                        📂 Importar en este equipo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- OPCIÓN B: SINCRONIZACIÓN EN LA NUBE REST -->
+                            <div
+                                style="background: rgba(15,23,42,0.7); padding: 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; color: #38bdf8; margin-bottom: 0.4rem;">🌐 Opción B:
+                                        Sincronización en la Nube en Tiempo Real</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        Puedes conectar una base de datos en la nube gratuita (como <strong>Firebase
+                                            Realtime Database</strong> o un Webhook de <strong>Google Apps
+                                            Script</strong>) para que todos los celulares envíen y reciban los registros
+                                        con un solo clic.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button type="button" class="btn btn-success btn-sm"
+                                        onclick="sincronizarSubirNube()">
+                                        📤 Subir a Nube
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="sincronizarDescargarNube()">
+                                        📥 Descargar de Nube
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                        onclick="abrirConfiguracionNube()">
+                                        ⚙️ Configurar URL
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- CARGA Y ACTUALIZACIÓN DE PADRÓN EXCEL (DATA.xlsx) -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.85rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 style="display: flex; align-items: center; gap: 0.45rem;">
+                                📁 Padrón Institucional (DATA.xlsx: Contribuyentes, Electro y EMUSAP)
+                            </h3>
+                            <span class="badge"
+                                style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">
+                                IndexedDB Offline
+                            </span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">
+                            Los padrones se cargan automáticamente al iniciar. Si deseas actualizar los datos de
+                            contribuyentes o medidores, puedes subir un nuevo archivo <strong>DATA.xlsx</strong> aquí.
+                            Se procesará localmente y se guardará en tu navegador.
+                        </p>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                👤 Contribuyentes: <strong id="badge_count_contribuyentes"
+                                    style="color: #38bdf8;">0</strong>
+                            </div>
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                ⚡ Electro Sur Este: <strong id="badge_count_electro" style="color: #f59e0b;">0</strong>
+                            </div>
+                            <div
+                                style="background: rgba(30,41,59,0.8); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.82rem;">
+                                💧 EMUSAP: <strong id="badge_count_emusap" style="color: #10b981;">0</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                            <input type="file" id="input_data_xlsx" accept=".xlsx" style="display: none;"
+                                onchange="procesarSubidaExcelData(event)">
+                            <button type="button" class="btn btn-primary"
+                                onclick="document.getElementById('input_data_xlsx').click()">
+                                📂 Subir / Actualizar Archivo DATA.xlsx
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GUARDAR AVANCE / BACKUP RÁPIDO -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                        <h3>💾 Guardar Avance Actual</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Descarga un archivo de respaldo con todos los predios muestreados y contrastados hasta el
+                            momento. Te permite asegurar el trabajo en cualquier celular o PC.
+                        </p>
+                        <button class="btn btn-warning" onclick="guardarAvanceRapido()" style="align-self: flex-start;">
+                            📥 Descargar Copia de Avance
+                        </button>
+                    </div>
+
+                    <!-- IMPORTAR DATOS (AGREGAR A LOS EXISTENTES) -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                        <h3>📥 Importar y Agregar Datos</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Sube un archivo JSON de respaldo. Los registros importados <strong>se agregarán
+                                automáticamente a los datos ya existentes</strong> sin borrar tu avance.
+                        </p>
+                        <input type="file" id="input_importar_json" accept=".json" style="display: none;"
+                            onchange="importarYAgregarDatos(event)">
+                        <button class="btn btn-primary" onclick="document.getElementById('input_importar_json').click()"
+                            style="align-self: flex-start;">
+                            📂 Seleccionar Archivo JSON para Importar y Agregar
+                        </button>
+                    </div>
+
+                    <!-- EXPORTAR EXCEL CSV -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                        <h3>📗 Exportar a Excel (CSV)</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Descarga una tabla completa con todos los medidores, coordenadas GPS, características y
+                            dictámenes para abrir en Microsoft Excel o Google Sheets.
+                        </p>
+                        <button class="btn btn-secondary" onclick="exportarCSV()" style="align-self: flex-start;">
+                            ⬇️ Descargar Archivo Excel (CSV)
+                        </button>
+                    </div>
+
+                    <!-- REINICIAR BASE LOCAL -->
+                    <div
+                        style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                        <h3>🗑️ Limpiar Base de Datos</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Elimina los registros en la memoria de este navegador para iniciar una nueva jornada.
+                        </p>
+                        <button class="btn btn-danger" onclick="limpiarTodaLaBase()" style="align-self: flex-start;">
+                            ⚠️ Reiniciar Base de Datos Local
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL ZOOM DE FOTO -->
+    <div id="modalZoom" class="modal" onclick="if(event.target === this) cerrarModalZoom()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalZoomTitulo">🔍 Inspección de Fotografía Pericial</h3>
+                <button class="btn btn-secondary btn-sm" onclick="cerrarModalZoom()">Cerrar ✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-img-container">
+                    <img id="modalZoomImg" src="" alt="Fotografía Ampliada">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN NUBE -->
+    <div id="modalConfigNube" class="modal" onclick="if(event.target === this) cerrarConfiguracionNube()">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3>⚙️ Configuración de Base de Datos en la Nube</h3>
+                <button class="btn btn-secondary btn-sm" onclick="cerrarConfiguracionNube()">Cerrar ✕</button>
+            </div>
+            <div class="modal-body" style="gap: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    Ingresa una URL de base de datos en la nube gratuita compatible con REST (ejemplo: <strong>Firebase
+                        Realtime Database</strong> terminada en <code style="color: #38bdf8;">.json</code> o un
+                    <strong>Google Apps Script WebApp</strong>).
+                </p>
+                <div class="form-group" style="text-align: left;">
+                    <label
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">🔗
+                        URL Endpoint de la Nube (REST JSON)</label>
+                    <input type="url" id="cloud_endpoint_input"
+                        placeholder="https://tu-proyecto.firebaseio.com/registros.json"
+                        style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.8); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 0.9rem;">
+                </div>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-primary" onclick="guardarEndpointNube()">
+                        💾 Guardar URL
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="sincronizarSubirNube()">
+                        📤 Subir a Nube
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="sincronizarDescargarNube()">
+                        📥 Descargar de Nube
+                    </button>
+                </div>
+                <div
+                    style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
+                    💡 <em>Si no deseas configurar una base de datos en la nube, puedes usar la <strong>Opción
+                            A</strong>: simplemente presiona <strong>"Descargar Copia de Avance"</strong> y envíala por
+                        WhatsApp para importarla en tu computadora.</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICADOR -->
+    <div id="toast">
+        <span id="toast-icon">ℹ️</span>
+        <span id="toast-msg">Operación completada</span>
+    </div>
+
+    <!-- JAVASCRIPT DE LÓGICA -->
+    <script>
+        const DB_KEY = 'FISCALIZACION_PREDIAL_DATA_V2';
+        let memoriaVolatil = {};
+
+        const SafeStorage = {
+            getItem(key) {
+                try {
+                    return window.localStorage ? window.localStorage.getItem(key) : memoriaVolatil[key];
+                } catch (e) {
+                    return memoriaVolatil[key] || null;
+                }
+            },
+            setItem(key, value) {
+                try {
+                    if (window.localStorage) window.localStorage.setItem(key, value);
+                } catch (e) { }
+                memoriaVolatil[key] = value;
+            },
+            removeItem(key) {
+                try {
+                    if (window.localStorage) window.localStorage.removeItem(key);
+                } catch (e) { }
+                delete memoriaVolatil[key];
+            }
+        };
+
+        // ==========================================
+        // ==========================================
+        // GESTIÓN DEL PADRÓN INSTITUCIONAL (INDEXEDDB)
+        // ==========================================
+        const PADRON_DB_NAME = 'PADRON_MUNICIPAL_FISCALIZACION';
+        const PADRON_DB_VERSION = 2; // Incrementar para forzar reimportación con verificador+medidor
+        let padronDB = null;
+
+        let cacheContribuyentes = [];
+        let cacheElectroMap = new Map();
+        let cacheElectroCompositeMap = new Map();
+        let cacheEmusapMap = new Map();
+
+        async function inicializarPadronDB() {
+            return new Promise((resolve) => {
+                const req = indexedDB.open(PADRON_DB_NAME, PADRON_DB_VERSION);
+                req.onupgradeneeded = function (e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('contribuyentes')) {
+                        db.createObjectStore('contribuyentes', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('electro')) {
+                        db.createObjectStore('electro', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains('emusap')) {
+                        db.createObjectStore('emusap', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = async function (e) {
+                    padronDB = e.target.result;
+                    await cargarOCrearDatosPadron();
+                    resolve();
+                };
+                req.onerror = function () {
+                    console.warn("IndexedDB no disponible, usando memoria volatil.");
+                    cargarDesdeVariableGlobal();
+                    resolve();
+                };
+            });
+        }
+
+        async function cargarOCrearDatosPadron() {
+            const countContrib = await contarRegistrosStore('contribuyentes');
+            // Verificar si los datos existentes tienen verificador (si no, forzar reimportación)
+            let necesitaReimportar = countContrib === 0;
+            if (!necesitaReimportar && countContrib > 0) {
+                const electroCount = await contarRegistrosStore('electro');
+                if (electroCount === 0) {
+                    necesitaReimportar = true;
+                } else {
+                    // VERIFICACIÓN REAL: leer el primer registro electro y comprobar si tiene campo 'verificador'
+                    const primerElectro = await new Promise((resolve) => {
+                        const tx = padronDB.transaction('electro', 'readonly');
+                        const req = tx.objectStore('electro').openCursor();
+                        req.onsuccess = (e) => resolve(e.target.result ? e.target.result.value : null);
+                        req.onerror = () => resolve(null);
+                    });
+                    // Si el registro no tiene 'verificador' son datos de versión anterior → reimportar
+                    if (!primerElectro || primerElectro.verificador === undefined) {
+                        necesitaReimportar = true;
+                        console.warn('Electro sin campo verificador detectado — forzando reimportación del padrón.');
+                    }
+                }
+            }
+            if (necesitaReimportar && window.PADRON_INICIAL) {
+                mostrarToast("Actualizando padrón municipal (verificador+medidor)...", "info");
+                await guardarDatosCompletosEnIndexedDB(
+                    window.PADRON_INICIAL.contribuyentes || [],
+                    window.PADRON_INICIAL.electro || [],
+                    window.PADRON_INICIAL.emusap || []
+                );
+            }
+            await cargarCacheEnMemoria();
+        }
+
+        function contarRegistrosStore(storeName) {
+            return new Promise((resolve) => {
+                if (!padronDB) return resolve(0);
+                const tx = padronDB.transaction(storeName, 'readonly');
+                const req = tx.objectStore(storeName).count();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => resolve(0);
+            });
+        }
+
+        async function guardarDatosCompletosEnIndexedDB(contribuyentes, electro, emusap) {
+            return new Promise((resolve) => {
+                if (!padronDB) return resolve();
+                const tx = padronDB.transaction(['contribuyentes', 'electro', 'emusap'], 'readwrite');
+
+                const storeC = tx.objectStore('contribuyentes');
+                storeC.clear();
+                contribuyentes.forEach(c => {
+                    storeC.add({ dni: String(c[0] || ''), nombre: String(c[1] || '').toUpperCase(), conyugue: String(c[2] || '').toUpperCase() });
+                });
+
+                const storeE = tx.objectStore('electro');
+                storeE.clear();
+                electro.forEach(e => {
+                    storeE.add({
+                        nombre: String(e[0] || '').toUpperCase(),
+                        direccion: String(e[1] || '').toUpperCase(),
+                        lat: String(e[2] || ''),
+                        lng: String(e[3] || ''),
+                        cod_corto: String(e[4] || ''),
+                        cod_largo: String(e[5] || ''),
+                        verificador: String(e[6] || '').trim(),
+                        medidor: String(e[7] || '').trim()
+                    });
+                });
+
+                const storeM = tx.objectStore('emusap');
+                storeM.clear();
+                emusap.forEach(m => {
+                    storeM.add({
+                        nombre: String(m[0] || '').toUpperCase(),
+                        direccion: String(m[1] || '').toUpperCase(),
+                        inscripc: String(m[2] || ''),
+                        medidor: String(m[3] || '').toUpperCase(),
+                        cod: String(m[4] || '')
+                    });
+                });
+
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        }
+
+        async function cargarCacheEnMemoria() {
+            if (!padronDB) {
+                cargarDesdeVariableGlobal();
+                return;
+            }
+
+            // 1. Contribuyentes
+            cacheContribuyentes = await new Promise((resolve) => {
+                const tx = padronDB.transaction('contribuyentes', 'readonly');
+                const req = tx.objectStore('contribuyentes').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+
+            // 2. Electro
+            const electroList = await new Promise((resolve) => {
+                const tx = padronDB.transaction('electro', 'readonly');
+                const req = tx.objectStore('electro').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+            cacheElectroMap.clear();
+            cacheElectroCompositeMap.clear();
+            electroList.forEach(e => {
+                if (e.verificador !== undefined || e.medidor !== undefined) {
+                    const v = normalizarClaveMedidor(e.verificador);
+                    const m = normalizarClaveMedidor(e.medidor);
+                    const v_n = v.replace(/^0+/, '') || '0';
+                    const m_n = m.replace(/^0+/, '') || '0';
+                    // Registrar múltiples variantes de clave
+                    for (const vk of [v, v_n, v.padStart(2, '0')]) {
+                        for (const mk of [m, m_n]) {
+                            if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, e);
+                        }
+                    }
+                    // Fallback por solo medidor
+                    if (m) cacheElectroCompositeMap.set(`|${m}`, e);
+                    if (m_n) cacheElectroCompositeMap.set(`|${m_n}`, e);
+                }
+                if (e.cod_largo) cacheElectroMap.set(String(e.cod_largo).trim(), e);
+                if (e.cod_corto) cacheElectroMap.set(String(e.cod_corto).trim(), e);
+            });
+
+            // 3. Emusap
+            const emusapList = await new Promise((resolve) => {
+                const tx = padronDB.transaction('emusap', 'readonly');
+                const req = tx.objectStore('emusap').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+            cacheEmusapMap.clear();
+            emusapList.forEach(m => {
+                if (m.medidor) {
+                    const med = String(m.medidor).trim().toUpperCase();
+                    cacheEmusapMap.set(med, m);
+                    const digits = med.replace(/[^0-9]/g, '');
+                    if (digits) cacheEmusapMap.set(digits, m);
+                }
+                if (m.inscripc) {
+                    const ins = String(m.inscripc).trim();
+                    cacheEmusapMap.set(ins, m);
+                }
+                if (m.cod) cacheEmusapMap.set(String(m.cod).trim().toUpperCase(), m);
+            });
+
+            actualizarBadgesPadron(cacheContribuyentes.length, electroList.length, emusapList.length);
+        }
+
+        function cargarDesdeVariableGlobal() {
+            if (!window.PADRON_INICIAL) return;
+            const pi = window.PADRON_INICIAL;
+            cacheContribuyentes = (pi.contribuyentes || []).map(c => ({ dni: String(c[0]), nombre: String(c[1]), conyugue: String(c[2]) }));
+
+            cacheElectroMap.clear();
+            cacheElectroCompositeMap.clear();
+            (pi.electro || []).forEach(e => {
+                const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5], verificador: e[6] || '', medidor: e[7] || '' };
+                const v = normalizarClaveMedidor(item.verificador);
+                const m = normalizarClaveMedidor(item.medidor);
+                const v_n = v.replace(/^0+/, '') || '0';
+                const m_n = m.replace(/^0+/, '') || '0';
+                for (const vk of [v, v_n, v.padStart(2, '0')]) {
+                    for (const mk of [m, m_n]) {
+                        if (vk && mk) cacheElectroCompositeMap.set(`${vk}|${mk}`, item);
+                    }
+                }
+                if (m) cacheElectroCompositeMap.set(`|${m}`, item);
+                if (m_n) cacheElectroCompositeMap.set(`|${m_n}`, item);
+                if (e[5]) cacheElectroMap.set(String(e[5]).trim(), item);
+                if (e[4]) cacheElectroMap.set(String(e[4]).trim(), item);
+            });
+
+            cacheEmusapMap.clear();
+            (pi.emusap || []).forEach(m => {
+                const item = { nombre: m[0], direccion: m[1], inscripc: m[2], medidor: m[3], cod: m[4] };
+                if (m[3]) {
+                    const med = String(m[3]).trim().toUpperCase();
+                    cacheEmusapMap.set(med, item);
+                    const digits = med.replace(/[^0-9]/g, '');
+                    if (digits) cacheEmusapMap.set(digits, item);
+                }
+                if (m[2]) cacheEmusapMap.set(String(m[2]).trim(), item);
+                if (m[4]) cacheEmusapMap.set(String(m[4]).trim().toUpperCase(), item);
+            });
+
+            actualizarBadgesPadron(cacheContribuyentes.length, pi.electro ? pi.electro.length : 0, pi.emusap ? pi.emusap.length : 0);
+        }
+
+        function actualizarBadgesPadron(totalC, totalE, totalM) {
+            const elC = document.getElementById('badge_count_contribuyentes');
+            const elE = document.getElementById('badge_count_electro');
+            const elM = document.getElementById('badge_count_emusap');
+            if (elC) elC.innerText = totalC.toLocaleString();
+            if (elE) elE.innerText = totalE.toLocaleString();
+            if (elM) elM.innerText = totalM.toLocaleString();
+        }
+
+        // ==========================================
+        // SUBIDA Y LECTURA DE DATA.xlsx EN CLIENTE
+        // ==========================================
+        async function procesarSubidaExcelData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (typeof XLSX === 'undefined') {
+                mostrarToast("Librería SheetJS cargando... intente en 3 segundos.", "error");
+                return;
+            }
+
+            mostrarToast("Leyendo archivo DATA.xlsx... Un momento por favor.", "info");
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // 1. Contribuyentes
+                    let cList = [];
+                    if (workbook.Sheets['contribuyentes']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['contribuyentes'], { header: 1 });
+                        cList = raw.slice(1).filter(r => r[0] && r[1]).map(r => [
+                            String(r[0]).trim(),
+                            String(r[1]).trim().toUpperCase(),
+                            r[2] ? String(r[2]).trim().toUpperCase() : ''
+                        ]);
+                    }
+
+                    // 2. Electro
+                    let eList = [];
+                    if (workbook.Sheets['electro']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['electro'], { header: 1 });
+                        eList = raw.slice(1).filter(r => r[0]).map(r => [
+                            String(r[0]).trim().toUpperCase(),
+                            r[1] ? String(r[1]).trim().toUpperCase() : '',
+                            r[2] ? String(r[2]).trim() : '',
+                            r[3] ? String(r[3]).trim() : '',
+                            r[5] !== undefined ? String(r[5]).trim() : '',
+                            r[6] !== undefined ? String(r[6]).trim() : '',
+                            r[7] !== undefined ? String(r[7]).trim() : '',
+                            r[8] !== undefined ? String(r[8]).trim() : ''
+                        ]);
+                    }
+
+                    // 3. Emusap
+                    let mList = [];
+                    if (workbook.Sheets['emusap']) {
+                        const raw = XLSX.utils.sheet_to_json(workbook.Sheets['emusap'], { header: 1 });
+                        mList = raw.slice(1).filter(r => r[4]).map(r => [
+                            String(r[4]).trim().toUpperCase(),
+                            r[6] ? String(r[6]).trim().toUpperCase() : '',
+                            r[3] !== undefined ? String(r[3]).trim() : '',
+                            r[7] ? String(r[7]).trim().toUpperCase() : '',
+                            r[0] ? String(r[0]).trim() : ''
+                        ]);
+                    }
+
+                    await guardarDatosCompletosEnIndexedDB(cList, eList, mList);
+                    await cargarCacheEnMemoria();
+
+                    mostrarToast(`✅ DATA.xlsx procesado con éxito: ${cList.length} contribuyentes, ${eList.length} electro, ${mList.length} emusap.`, "success");
+                    event.target.value = '';
+                } catch (err) {
+                    mostrarToast("Error al leer DATA.xlsx: " + err.message, "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ==========================================
+        // CRUCE DE MEDIDORES Y SUGERENCIAS CONTRIBUYENTES
+        // ==========================================
+        function ejecutarCruceMedidores(reg) {
+            const contenedorCruce = document.getElementById('cruce_resultados_medidores');
+            const badgeCruce = document.getElementById('badge_cruce_estado');
+            contenedorCruce.innerHTML = '';
+
+            const luzMedidores = (reg.medidoresLuz || [reg.medidorLuz || '']).filter(Boolean);
+            const aguaMedidores = (reg.medidoresAgua || [reg.medidorAgua || '']).filter(Boolean);
+
+            const titularesEncontrados = new Set();
+            let totalCruces = 0;
+
+            // 1. Cruce Electro por Verificador (2 dígitos) + Medidor
+            luzMedidores.forEach(item => {
+                let verif = '';
+                let med = '';
+                if (typeof item === 'object') {
+                    verif = String(item.verificador || '').trim();
+                    med = String(item.medidor || '').trim();
+                } else if (typeof item === 'string') {
+                    if (item.includes('-')) {
+                        const parts = item.split('-');
+                        verif = parts[0].trim();
+                        med = parts[1].trim();
+                    } else {
+                        med = item.trim();
+                    }
+                }
+
+                let encontrado = null;
+                if (verif && med) {
+                    const v_n = verif.replace(/^0+/, '') || '0';
+                    const m_n = med.replace(/^0+/, '') || '0';
+                    encontrado = cacheElectroCompositeMap.get(`${verif}|${med}`)
+                        || cacheElectroCompositeMap.get(`${v_n}|${m_n}`)
+                        || cacheElectroCompositeMap.get(`${verif}|${m_n}`)
+                        || cacheElectroCompositeMap.get(`${v_n}|${med}`);
+                } else if (med) {
+                    const m_n = med.replace(/^0+/, '') || '0';
+                    encontrado = cacheElectroCompositeMap.get(`|${med}`)
+                        || cacheElectroCompositeMap.get(`|${m_n}`)
+                        || cacheElectroMap.get(med);
+                }
+
+                if (encontrado) {
+                    totalCruces++;
+                    titularesEncontrados.add(encontrado.nombre);
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--warning);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
+                                <strong style="color: #f59e0b;">⚡ Electro Sur Este [Verif: ${encontrado.verificador || verif} | Medidor: ${encontrado.medidor || med}]</strong>
+                                <span class="badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; font-size: 0.7rem;">Coincidencia Verificador + Medidor OK</span>
+                            </div>
+                            <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
+                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Suministro: <code>${encontrado.cod_largo || encontrado.cod_corto}</code></div>
+                            ${encontrado.lat ? `<div style="color: #38bdf8; font-size: 0.75rem; font-family: monospace;">🌐 GPS Empresa: Lat ${encontrado.lat}, Lng ${encontrado.lng}</div>` : ''}
+                        </div>
+                    `;
+                } else {
+                    const desc = verif ? `Verif: ${verif} y Medidor: ${med}` : `Medidor: ${med || 'vacío'}`;
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.85;">
+                            <span style="color: var(--text-muted);">⚡ Electro Sur Este (${desc}): No figura coincidencia en el padrón.</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // 2. Cruce EMUSAP
+            aguaMedidores.forEach(med => {
+                const medUpper = String(med).toUpperCase().trim();
+                const numLimpio = medUpper.replace(/[^0-9]/g, '');
+                let encontrado = cacheEmusapMap.get(medUpper)
+                    || (numLimpio ? cacheEmusapMap.get(numLimpio) : null)
+                    || cacheEmusapMap.get(med.trim());
+
+                if (encontrado) {
+                    totalCruces++;
+                    titularesEncontrados.add(encontrado.nombre);
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--success);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #10b981;">💧 EMUSAP Abancay (Medidor: ${encontrado.medidor || encontrado.inscripc})</strong>
+                                <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-size: 0.7rem;">Coincidencia OK</span>
+                            </div>
+                            <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
+                            <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
+                        </div>
+                    `;
+                } else {
+                    contenedorCruce.innerHTML += `
+                        <div class="cruce-card" style="border-left: 4px solid var(--border-color); opacity: 0.8;">
+                            <span style="color: var(--text-muted);">💧 Medidor Agua <strong>${med}</strong>: No figura en el padrón de EMUSAP.</span>
+                        </div>
+                    `;
+                }
+            });
+
+            badgeCruce.innerText = `${totalCruces} servicio(s) cruzado(s)`;
+            badgeCruce.style.background = totalCruces > 0 ? 'rgba(16,185,129,0.2)' : 'rgba(100,116,139,0.2)';
+            badgeCruce.style.color = totalCruces > 0 ? '#10b981' : '#94a3b8';
+
+            // 3. Precarga automática de similitudes en Contribuyentes
+            precargarSugerenciasContribuyentes(Array.from(titularesEncontrados));
+        }
+
+        function precargarSugerenciasContribuyentes(titulares) {
+            const contenedorSugerencias = document.getElementById('lista_sugerencias_contribuyentes');
+            const badgeTotal = document.getElementById('badge_total_sugerencias');
+            contenedorSugerencias.innerHTML = '';
+
+            if (titulares.length === 0) {
+                contenedorSugerencias.innerHTML = `<span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No se detectaron titulares en los medidores para buscar sugerencias automáticas. Use el buscador manual.</span>`;
+                badgeTotal.innerText = '0 sugerencias';
+                return;
+            }
+
+            const sugerenciasSet = new Map();
+            const stopWords = new Set(['DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y', 'SAN', 'SANTA', 'EL', 'EIRL', 'SAC', 'SRL']);
+
+            titulares.forEach(titular => {
+                const tokens = titular.toUpperCase().split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+                if (tokens.length === 0) return;
+
+                cacheContribuyentes.forEach(c => {
+                    let matches = 0;
+                    tokens.forEach(t => {
+                        if (c.nombre.includes(t)) matches++;
+                    });
+
+                    if (matches >= 2 || (tokens.length === 1 && matches === 1)) {
+                        const score = matches / tokens.length;
+                        if (!sugerenciasSet.has(c.dni) || sugerenciasSet.get(c.dni).score < score) {
+                            sugerenciasSet.set(c.dni, { contribuyente: c, score: score, titularOrigen: titular });
+                        }
+                    }
+                });
+            });
+
+            const listaOrdenada = Array.from(sugerenciasSet.values()).sort((a, b) => b.score - a.score).slice(0, 5);
+
+            if (listaOrdenada.length === 0) {
+                contenedorSugerencias.innerHTML = `<span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No se encontraron contribuyentes que coincidan con los nombres de los medidores (${titulares.join(', ')}).</span>`;
+                badgeTotal.innerText = '0 sugerencias';
+                return;
+            }
+
+            badgeTotal.innerText = `${listaOrdenada.length} sugerencia(s)`;
+
+            listaOrdenada.forEach(item => {
+                const c = item.contribuyente;
+                const div = document.createElement('div');
+                div.className = 'sugerencia-card';
+                div.innerHTML = `
+                    <div style="font-size: 0.83rem;">
+                        <div style="font-weight: 700; color: #f8fafc;">${c.nombre}</div>
+                        <div style="color: var(--text-secondary); font-size: 0.76rem;">
+                            🪪 DNI: <strong style="color: #38bdf8;">${c.dni}</strong> ${c.conyugue ? `| Cónyuge: ${c.conyugue}` : ''}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" onclick="asignarContribuyente('${c.dni}', '${c.nombre.replace(/'/g, "\'")}')" style="white-space: nowrap; padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                        ✔️ Asignar
+                    </button>
+                `;
+                contenedorSugerencias.appendChild(div);
+            });
+        }
+
+        function asignarContribuyente(dni, nombre) {
+            document.getElementById('contraste_propietario_dni').value = dni;
+            document.getElementById('contraste_propietario_nombre').value = nombre;
+            mostrarToast(`✅ Contribuyente asignado: ${nombre}`, "success");
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            if (drop) drop.style.display = 'none';
+        }
+
+        // ==========================================
+        // BUSCADOR PREDICTIVO MANUAL
+        // ==========================================
+        function buscarContribuyentesInput(query) {
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            const q = query.trim().toUpperCase();
+
+            if (q.length < 2) {
+                drop.style.display = 'none';
+                drop.innerHTML = '';
+                return;
+            }
+
+            const tokens = q.split(/\s+/).filter(Boolean);
+            const resultados = [];
+
+            for (let c of cacheContribuyentes) {
+                const matchDNI = c.dni.startsWith(q);
+                const matchNombre = tokens.every(t => c.nombre.includes(t));
+
+                if (matchDNI || matchNombre) {
+                    resultados.push(c);
+                    if (resultados.length >= 8) break;
+                }
+            }
+
+            if (resultados.length === 0) {
+                drop.innerHTML = `<div style="padding: 0.75rem; font-size: 0.8rem; color: var(--text-muted); text-align: center;">No se encontraron contribuyentes con "${query}"</div>`;
+                drop.style.display = 'block';
+                return;
+            }
+
+            drop.innerHTML = resultados.map(c => `
+                <div class="search-item" onclick="asignarContribuyente('${c.dni}', '${c.nombre.replace(/'/g, "\'")}')">
+                    <div>
+                        <strong style="color: #f8fafc; font-size: 0.83rem;">${c.nombre}</strong>
+                        <div style="font-size: 0.74rem; color: var(--text-muted);">
+                            DNI: <span style="color: #38bdf8;">${c.dni}</span> ${c.conyugue ? `| Cónyuge: ${c.conyugue}` : ''}
+                        </div>
+                    </div>
+                    <span style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Elegir ↵</span>
+                </div>
+            `).join('');
+            drop.style.display = 'block';
+        }
+
+        document.addEventListener('click', (e) => {
+            const drop = document.getElementById('dropdown_resultados_contribuyentes');
+            const input = document.getElementById('buscador_contribuyente_input');
+            if (drop && input && !input.contains(e.target) && !drop.contains(e.target)) {
+                drop.style.display = 'none';
+            }
+        });
+
+        // CONTROL DE SESIÓN Y AUTENTICACIÓN
+        // ==========================================
+        const AUTH_KEY = 'FISCALIZACION_AUTH_TOKEN';
+        const AUTH_USER = 'admin';
+        const AUTH_PASS = 'Roman111';
+
+        function verificarSesion() {
+            const token = SafeStorage.getItem(AUTH_KEY);
+            const overlay = document.getElementById('loginOverlay');
+            if (token === 'VALID_SESSION_ADMIN') {
+                if (overlay) overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            } else {
+                if (overlay) overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function validarLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('login_user').value.trim();
+            const pass = document.getElementById('login_pass').value;
+            const errorDiv = document.getElementById('loginErrorMsg');
+
+            if (user === AUTH_USER && pass === AUTH_PASS) {
+                SafeStorage.setItem(AUTH_KEY, 'VALID_SESSION_ADMIN');
+                errorDiv.style.display = 'none';
+                document.getElementById('loginForm').reset();
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                mostrarToast('¡Bienvenido al sistema!', 'success');
+            } else {
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = '⚠️ Usuario o contraseña incorrectos. Verifique sus credenciales.';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('login_pass');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function cerrarSesion() {
+            if (confirm('¿Desea cerrar la sesión actual?')) {
+                SafeStorage.removeItem(AUTH_KEY);
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                document.getElementById('login_user').value = '';
+                document.getElementById('login_pass').value = '';
+                mostrarToast('Sesión finalizada.', 'info');
+            }
+        }
+
+        // ==========================================
+        // SINCRONIZACIÓN EN LA NUBE (MULTI-DISPOSITIVO)
+        // ==========================================
+        const CLOUD_URL_KEY = 'FISCALIZACION_CLOUD_ENDPOINT';
+
+        function abrirConfiguracionNube() {
+            const guardada = SafeStorage.getItem(CLOUD_URL_KEY) || '';
+            document.getElementById('cloud_endpoint_input').value = guardada;
+            document.getElementById('modalConfigNube').classList.add('show');
+        }
+
+        function cerrarConfiguracionNube() {
+            document.getElementById('modalConfigNube').classList.remove('show');
+        }
+
+        function guardarEndpointNube() {
+            const url = document.getElementById('cloud_endpoint_input').value.trim();
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('URL de la nube guardada exitosamente.', 'success');
+        }
+
+        async function sincronizarSubirNube() {
+            const url = SafeStorage.getItem(CLOUD_URL_KEY) || document.getElementById('cloud_endpoint_input').value.trim();
+            if (!url) {
+                abrirConfiguracionNube();
+                mostrarToast('Ingrese primero la URL de la base de datos en la nube.', 'info');
+                return;
+            }
+            if (registros.length === 0) {
+                mostrarToast('No hay registros en este dispositivo para subir.', 'info');
+                return;
+            }
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('📤 Subiendo registros a la nube...', 'info');
+            try {
+                const res = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registros)
+                });
+                if (res.ok) {
+                    mostrarToast('✅ Sincronización exitosa: Registros subidos a la nube.', 'success');
+                    cerrarConfiguracionNube();
+                } else {
+                    mostrarToast('Error del servidor: ' + res.statusText, 'error');
+                }
+            } catch (err) {
+                mostrarToast('Error de conexión: ' + err.message, 'error');
+            }
+        }
+
+        async function sincronizarDescargarNube() {
+            const url = SafeStorage.getItem(CLOUD_URL_KEY) || document.getElementById('cloud_endpoint_input').value.trim();
+            if (!url) {
+                abrirConfiguracionNube();
+                mostrarToast('Ingrese primero la URL de la base de datos en la nube.', 'info');
+                return;
+            }
+            SafeStorage.setItem(CLOUD_URL_KEY, url);
+            mostrarToast('📥 Descargando registros de la nube...', 'info');
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const cloudData = await res.json();
+                if (!cloudData || !Array.isArray(cloudData)) {
+                    mostrarToast('No hay registros válidos en la nube.', 'info');
+                    return;
+                }
+
+                let agregados = 0;
+                cloudData.forEach(nuevo => {
+                    const idxExacto = registros.findIndex(r => r.id === nuevo.id && r.timestamp === nuevo.timestamp);
+                    if (idxExacto >= 0) {
+                        registros[idxExacto] = nuevo;
+                    } else {
+                        if (registros.some(r => r.id === nuevo.id)) {
+                            nuevo.id = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+                        }
+                        registros.push(nuevo);
+                        agregados++;
+                    }
+                });
+
+                guardarRegistrosEnStorage();
+                actualizarMetricas();
+                renderTabla();
+                mostrarToast('✅ Descarga completa. Registros sincronizados: ' + registros.length, 'success');
+                cerrarConfiguracionNube();
+            } catch (err) {
+                mostrarToast('Error al descargar de la nube: ' + err.message, 'error');
+            }
+        }
+
+        let registros = [];
+        let registroSeleccionado = null;
+
+        let fotoPredioBase64 = null;
+        let fotoMedidorBase64 = null;
+        let gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            verificarSesion();
+            await inicializarPadronDB();
+            detectarEntornoWhatsApp();
+            cargarRegistrosDesdeStorage();
+            actualizarMetricas();
+            renderTabla();
+        });
+
+        function detectarEntornoWhatsApp() {
+            const href = window.location.href;
+            if (href.startsWith('content://') || href.includes('whatsapp') || href.includes('provider.media')) {
+                const banner = document.getElementById('whatsapp-warning-banner');
+                if (banner) banner.style.display = 'block';
+            }
+        }
+
+        // ==========================================
+        // GESTIÓN DINÁMICA DE MÚLTIPLES MEDIDORES
+        // ==========================================
+        function agregarMedidorLuz(verif = '', medidor = '') {
+            const contenedor = document.getElementById('lista_medidores_luz');
+            const total = contenedor.querySelectorAll('.meter-item-row').length + 1;
+            const div = document.createElement('div');
+            div.className = 'meter-item-row';
+            div.style.cssText = 'display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; margin-top: 0.4rem;';
+            div.innerHTML = `
+                <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                    <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR #${total}</span>
+                    <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" value="${verif}" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                </div>
+                <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                    <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">N° MEDIDOR LUZ #${total}</span>
+                    <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890" inputmode="numeric" value="${medidor}" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                </div>
+                <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
+            `;
+            contenedor.appendChild(div);
+        }
+
+        function agregarMedidorAgua(valor = '') {
+            const contenedor = document.getElementById('lista_medidores_agua');
+            const total = contenedor.querySelectorAll('.meter-item-row').length + 1;
+            const div = document.createElement('div');
+            div.className = 'meter-item-row';
+            div.innerHTML = `
+                <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #${total} (Opcional)" value="${valor}" oninput="previewCruceMuestreo()">
+                <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Eliminar este medidor">✕</button>
+            `;
+            contenedor.appendChild(div);
+        }
+
+        function eliminarMedidorFila(btn) {
+            const row = btn.parentElement;
+            const contenedor = row.parentElement;
+            if (contenedor.querySelectorAll('.meter-item-row').length > 1) {
+                row.remove();
+            } else {
+                const inp = row.querySelector('input');
+                if (inp) inp.value = '';
+                mostrarToast("Campo de medidor vaciado.", "info");
+            }
+        }
+
+        function obtenerListaMedidoresLuz() {
+            const rows = document.querySelectorAll('#lista_medidores_luz .meter-item-row');
+            const lista = [];
+            rows.forEach(row => {
+                const verifInp = row.querySelector('.input-medidor-luz-verif');
+                const numInp = row.querySelector('.input-medidor-luz-num');
+                const verif = verifInp ? verifInp.value.trim() : '';
+                const num = numInp ? numInp.value.trim() : '';
+                if (verif || num) {
+                    lista.push({
+                        verificador: verif,
+                        medidor: num,
+                        texto: verif ? `${verif}-${num}` : num
+                    });
+                }
+            });
+            return lista;
+        }
+
+        function obtenerListaMedidoresAgua() {
+            const inputs = document.querySelectorAll('.input-medidor-agua');
+            const lista = [];
+            inputs.forEach(inp => {
+                const val = inp.value.trim().toUpperCase();
+                if (val) lista.push(val);
+            });
+            return lista;
+        }
+
+        // ==========================================
+        // PASO 1: FOTO DEL PREDIO (FECHA Y HORA)
+        // ==========================================
+        function procesarFotoPredio(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const ahora = new Date();
+            const fechaStr = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString();
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    const maxW = 1280;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxW) {
+                        h = Math.round((h * maxW) / w);
+                        w = maxW;
+                    }
+
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    // Cintillo con fecha y hora
+                    const bannerH = Math.max(70, Math.round(h * 0.10));
+                    const bannerY = h - bannerH;
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                    ctx.fillRect(0, bannerY, w, bannerH);
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(0, bannerY, w, 4);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${Math.max(14, Math.round(w * 0.022))}px sans-serif`;
+                    ctx.fillText("[FISCALIZACIÓN PREDIAL] FOTOGRAFÍA DE FACHADA", 20, bannerY + (bannerH * 0.42));
+
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = `600 ${Math.max(12, Math.round(w * 0.017))}px monospace`;
+                    ctx.fillText(`FECHA Y HORA: ${fechaStr}`, 20, bannerY + (bannerH * 0.78));
+
+                    const base64Data = canvas.toDataURL('image/jpeg', 0.80);
+                    fotoPredioBase64 = base64Data;
+                    const sizeKB = Math.round((base64Data.length * 3 / 4) / 1024);
+
+                    const imgEl = document.getElementById('img_preview_predio');
+                    imgEl.src = base64Data;
+                    imgEl.style.display = 'block';
+                    document.getElementById('ph_foto_predio').style.display = 'none';
+                    document.getElementById('badge_predio_b64').style.display = 'flex';
+                    document.getElementById('size_predio').innerText = `${sizeKB} KB`;
+
+                    mostrarToast("✅ Foto del predio procesada con fecha y hora.", "success");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ==========================================
+        // PASO 2: FOTO DEL MEDIDOR + GPS AUTOMÁTICO INTERNO
+        // ==========================================
+        function procesarFotoMedidorConGPS(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const ahora = new Date();
+            const fechaStr = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString();
+            document.getElementById('timestamp_captura').value = ahora.toISOString();
+
+            mostrarToast("📡 Obteniendo GPS automático internamente...", "info");
+
+            const procederConEstampado = (lat, lng, acc) => {
+                gpsCapturado = {
+                    lat: lat ? lat.toFixed(6) : 'S/D',
+                    lng: lng ? lng.toFixed(6) : 'S/D',
+                    accuracy: acc ? `+/- ${parseFloat(acc).toFixed(1)}m` : 'Aprox',
+                    fechaHora: fechaStr
+                };
+
+                document.getElementById('geo_lat').value = gpsCapturado.lat;
+                document.getElementById('geo_lng').value = gpsCapturado.lng;
+                document.getElementById('geo_accuracy').value = gpsCapturado.accuracy;
+
+                const ind = document.getElementById('gps_indicator_box');
+                document.getElementById('gps_coords_text').innerText = `Lat ${gpsCapturado.lat}, Lng ${gpsCapturado.lng} (${gpsCapturado.accuracy})`;
+                ind.style.display = 'flex';
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        const maxW = 1280;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxW) {
+                            h = Math.round((h * maxW) / w);
+                            w = maxW;
+                        }
+
+                        canvas.width = w;
+                        canvas.height = h;
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        // Cintillo con fecha, hora y coordenadas GPS
+                        const bannerH = Math.max(80, Math.round(h * 0.12));
+                        const bannerY = h - bannerH;
+
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+                        ctx.fillRect(0, bannerY, w, bannerH);
+                        ctx.fillStyle = '#10b981';
+                        ctx.fillRect(0, bannerY, w, 4);
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = `bold ${Math.max(14, Math.round(w * 0.022))}px sans-serif`;
+                        ctx.fillText("[FISCALIZACIÓN PREDIAL] FOTOGRAFÍA DE MEDIDOR", 20, bannerY + (bannerH * 0.38));
+
+                        ctx.fillStyle = '#94a3b8';
+                        ctx.font = `600 ${Math.max(12, Math.round(w * 0.016))}px monospace`;
+                        const coordsText = `GPS: LAT ${gpsCapturado.lat} | LNG ${gpsCapturado.lng} (${gpsCapturado.accuracy}) | ${fechaStr}`;
+                        ctx.fillText(coordsText, 20, bannerY + (bannerH * 0.74));
+
+                        const base64Data = canvas.toDataURL('image/jpeg', 0.80);
+                        fotoMedidorBase64 = base64Data;
+                        const sizeKB = Math.round((base64Data.length * 3 / 4) / 1024);
+
+                        const imgEl = document.getElementById('img_preview_medidor');
+                        imgEl.src = base64Data;
+                        imgEl.style.display = 'block';
+                        document.getElementById('ph_foto_medidor').style.display = 'none';
+                        document.getElementById('badge_medidor_b64').style.display = 'flex';
+                        document.getElementById('size_medidor').innerText = `${sizeKB} KB`;
+
+                        mostrarToast("✅ Foto del medidor y GPS almacenados internamente.", "success");
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            // Intentar GPS nativo automáticamente
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        procederConEstampado(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+                    },
+                    (err) => {
+                        console.warn("GPS no disponible:", err.message);
+                        // Fallback con marca de tiempo
+                        procederConEstampado(null, null, null);
+                    },
+                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+                );
+            } else {
+                procederConEstampado(null, null, null);
+            }
+        }
+
+        // ==========================================
+        // GUARDAR FICHA DE MUESTREO
+        // ==========================================
+        function guardarMuestreo(event) {
+            event.preventDefault();
+
+            if (!fotoPredioBase64) {
+                mostrarToast("Falta tomar la fotografía del predio (Paso 1).", "error");
+                return;
+            }
+            if (!fotoMedidorBase64) {
+                mostrarToast("Falta tomar la fotografía del medidor (Paso 2).", "error");
+                return;
+            }
+
+            const medidoresLuz = obtenerListaMedidoresLuz();
+            const medidoresAgua = obtenerListaMedidoresAgua();
+
+            // MODO EDICIÓN: actualizar registro existente
+            if (modoEdicionId) {
+                const idx = registros.findIndex(r => r.id === modoEdicionId);
+                if (idx !== -1) {
+                    registros[idx].fotoPredioB64 = fotoPredioBase64;
+                    registros[idx].fotoMedidorB64 = fotoMedidorBase64;
+                    registros[idx].medidoresLuz = medidoresLuz;
+                    registros[idx].medidoresAgua = medidoresAgua;
+                    registros[idx].pisos = document.getElementById('predio_pisos').value;
+                    registros[idx].material = document.getElementById('predio_material').value;
+                    registros[idx].observacionesCampo = document.getElementById('observaciones_campo').value.trim();
+                    registros[idx].latitud = document.getElementById('geo_lat').value || registros[idx].latitud;
+                    registros[idx].longitud = document.getElementById('geo_lng').value || registros[idx].longitud;
+                    registros[idx].precision = document.getElementById('geo_accuracy').value || registros[idx].precision;
+                    guardarRegistrosEnStorage();
+                    actualizarMetricas();
+                    renderTabla();
+                    mostrarToast(`✅ Ficha ${modoEdicionId} actualizada correctamente.`, "success");
+                    limpiarFormularioMuestreo();
+                    setTimeout(() => {
+                        switchTab('contraste');
+                        abrirPanelContraste(registros[idx].id);
+                    }, 600);
+                    return;
+                }
+            }
+
+            // MODO NUEVO REGISTRO
+            const idCorrelativo = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+
+            const nuevoRegistro = {
+                id: idCorrelativo,
+                timestamp: document.getElementById('timestamp_captura').value || new Date().toISOString(),
+                latitud: document.getElementById('geo_lat').value || 'Sin GPS',
+                longitud: document.getElementById('geo_lng').value || 'Sin GPS',
+                precision: document.getElementById('geo_accuracy').value || '',
+                fotoPredioB64: fotoPredioBase64,
+                fotoMedidorB64: fotoMedidorBase64,
+                medidoresLuz: medidoresLuz,
+                medidoresAgua: medidoresAgua,
+                pisos: document.getElementById('predio_pisos').value,
+                material: document.getElementById('predio_material').value,
+                observacionesCampo: document.getElementById('observaciones_campo').value.trim(),
+                codigoPredio: '',
+                estadoFiscal: 'PENDIENTE',
+                propietarioDNI: '',
+                propietarioNombre: '',
+                observacionesGabinete: '',
+                fechaContraste: ''
+            };
+
+            registros.unshift(nuevoRegistro);
+            guardarRegistrosEnStorage();
+            actualizarMetricas();
+            renderTabla();
+
+            mostrarToast(`Ficha ${idCorrelativo} registrada.`, "success");
+            limpiarFormularioMuestreo();
+
+            setTimeout(() => {
+                switchTab('contraste');
+                abrirPanelContraste(nuevoRegistro.id);
+            }, 600);
+        }
+
+        function limpiarFormularioMuestreo() {
+            document.getElementById('muestreoForm').reset();
+            fotoPredioBase64 = null;
+            fotoMedidorBase64 = null;
+            gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
+            modoEdicionId = null;
+
+            document.getElementById('img_preview_predio').style.display = 'none';
+            document.getElementById('ph_foto_predio').style.display = 'flex';
+            document.getElementById('badge_predio_b64').style.display = 'none';
+
+            document.getElementById('img_preview_medidor').style.display = 'none';
+            document.getElementById('ph_foto_medidor').style.display = 'flex';
+            document.getElementById('badge_medidor_b64').style.display = 'none';
+            document.getElementById('gps_indicator_box').style.display = 'none';
+
+            // Reset medidores a 1 solo conjunto con Verificador (2 dígitos) + Número de Medidor
+            document.getElementById('lista_medidores_luz').innerHTML = `
+                <div class="meter-item-row" style="display: flex; gap: 0.65rem; align-items: flex-end; background: rgba(15,23,42,0.45); padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; width: 110px; flex: 0 0 110px;">
+                        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">VERIFICADOR (2 DÍG)</span>
+                        <input type="text" class="input-medidor-luz-verif" placeholder="Ej: 13" maxlength="2" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; text-align: center; font-weight: 800; color: #f59e0b; border: 1px solid rgba(245,158,11,0.5); font-size: 0.95rem; padding: 0.65rem;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; flex: 1; min-width: 160px;">
+                        <span style="font-size: 0.68rem; color: #38bdf8; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.03em;">NÚMERO DE MEDIDOR LUZ</span>
+                        <input type="text" class="input-medidor-luz-num" placeholder="Ej: 890 (o dejar vacío)" inputmode="numeric" oninput="previewCruceMuestreo()" style="width: 100%; font-weight: 600; font-size: 0.95rem; padding: 0.65rem; border: 1px solid rgba(56,189,248,0.5);">
+                    </div>
+                    <button type="button" class="btn-remove-meter" onclick="eliminarMedidorFila(this)" title="Limpiar este medidor" style="height: 40px; margin-bottom: 1px;">✕</button>
+                </div>
+            `;
+            document.getElementById('lista_medidores_agua').innerHTML = `
+                <div class="meter-item-row">
+                    <input type="text" class="input-medidor-agua" placeholder="N° Medidor Agua #1 (Opcional - dejar vacío si no hay)" oninput="previewCruceMuestreo()">
+                </div>
+            `;
+            // Limpiar previews
+            const pl = document.getElementById('preview_cruce_muestreo_luz');
+            const pa = document.getElementById('preview_cruce_muestreo_agua');
+            if (pl) { pl.innerHTML = ''; pl.style.display = 'none'; }
+            if (pa) { pa.innerHTML = ''; pa.style.display = 'none'; }
+            // Restaurar botón
+            const submitBtn = document.querySelector('#muestreoForm button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = '💾 Guardar Ficha de Muestreo';
+        }
+
+        // ==========================================
+        // TABLA Y CONTRASTE
+        // ==========================================
+        function renderTabla() {
+            const tbody = document.getElementById('tabla_registros_body');
+            tbody.innerHTML = '';
+
+            const busqueda = (document.getElementById('filtro_busqueda')?.value || '').toLowerCase();
+            const filtroEst = document.getElementById('filtro_estado')?.value || 'TODOS';
+
+            const filtrados = registros.filter(r => {
+                const luzStr = (r.medidoresLuz || []).join(' ').toLowerCase();
+                const aguaStr = (r.medidoresAgua || []).join(' ').toLowerCase();
+
+                const matchTexto =
+                    r.id.toLowerCase().includes(busqueda) ||
+                    luzStr.includes(busqueda) ||
+                    aguaStr.includes(busqueda) ||
+                    (r.codigoPredio && r.codigoPredio.toLowerCase().includes(busqueda)) ||
+                    (r.propietarioDNI && r.propietarioDNI.toLowerCase().includes(busqueda)) ||
+                    (r.propietarioNombre && r.propietarioNombre.toLowerCase().includes(busqueda));
+
+                const matchEstado = (filtroEst === 'TODOS') || (r.estadoFiscal === filtroEst);
+                return matchTexto && matchEstado;
+            });
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron registros de muestreo</td></tr>`;
+                return;
+            }
+
+            filtrados.forEach(r => {
+                const tr = document.createElement('tr');
+                const badgeClass = r.estadoFiscal.toLowerCase();
+                const propietarioText = r.propietarioNombre ? `${r.propietarioDNI} - ${r.propietarioNombre}` : '<span style="color:var(--text-muted); font-style:italic;">Sin contrastar</span>';
+                const codigoPredioText = r.codigoPredio || '<span style="color:var(--text-muted); font-style:italic;">Pendiente</span>';
+
+                const luzArr = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean);
+                const aguaArr = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean);
+                const medidoresLuzHTML = luzArr.length > 0
+                    ? luzArr.map(m => {
+                        if (typeof m === 'object' && m.verificador) {
+                            return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ [${m.verificador}] ${m.medidor}</span>`;
+                        }
+                        const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
+                        return `<span class="meter-tag">⚡ ${str}</span>`;
+                    }).join('')
+                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
+                const medidoresAguaHTML = aguaArr.length > 0
+                    ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('')
+                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
+
+                tr.innerHTML = `
+                    <td><strong>${r.id}</strong></td>
+                    <td>
+                        <img class="table-thumb" src="${r.fotoPredioB64}" onclick="abrirModalZoom('${r.fotoPredioB64}', 'Foto Predio: ${r.id}')" title="Ver foto">
+                    </td>
+                    <td>
+                        <img class="table-thumb" src="${r.fotoMedidorB64}" onclick="abrirModalZoom('${r.fotoMedidorB64}', 'Foto Medidor: ${r.id}')" title="Ver foto">
+                    </td>
+                    <td>
+                        <div style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: #38bdf8;">
+                            Lat: ${r.latitud}<br>Lng: ${r.longitud}
+                        </div>
+                    </td>
+                    <td>${medidoresLuzHTML}</td>
+                    <td>${medidoresAguaHTML}</td>
+                    <td>${r.pisos} pisos <br><span style="font-size: 0.72rem; color: var(--text-muted);">${r.material}</span></td>
+                    <td><code>${codigoPredioText}</code></td>
+                    <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${propietarioText}</td>
+                    <td><span class="status-badge ${badgeClass}">${r.estadoFiscal}</span></td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn btn-primary btn-sm" onclick="abrirPanelContraste('${r.id}')" style="margin-bottom: 4px;">
+                            ✏️ Contrastar
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarRegistro('${r.id}')" style="margin-bottom: 4px;">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filtrarTabla() { renderTabla(); }
+
+        function abrirPanelContraste(id) {
+            const reg = registros.find(r => r.id === id);
+            if (!reg) return;
+
+            registroSeleccionado = reg;
+            const panel = document.getElementById('panel_contraste_detalle');
+            panel.style.display = 'grid';
+
+            document.getElementById('contraste_badge_id').innerText = `ID: ${reg.id}`;
+            document.getElementById('contraste_img_predio').src = reg.fotoPredioB64;
+            document.getElementById('contraste_img_medidor').src = reg.fotoMedidorB64;
+
+            document.getElementById('c_view_fecha').innerText = reg.timestamp.slice(0, 19).replace('T', ' ');
+            document.getElementById('c_view_gps').innerText = `Lat: ${reg.latitud}, Lng: ${reg.longitud} (${reg.precision || 'GPS'})`;
+
+            const luzList = reg.medidoresLuz || [reg.medidorLuz];
+            const aguaList = reg.medidoresAgua || [reg.medidorAgua];
+
+            document.getElementById('c_view_luz').innerHTML = luzList.filter(Boolean).map(m => {
+                if (typeof m === 'object' && m.verificador) {
+                    return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ Verif: ${m.verificador} | Medidor: ${m.medidor}</span>`;
+                }
+                const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
+                return `<span class="meter-tag">⚡ ${str}</span>`;
+            }).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de luz</span>';
+            document.getElementById('c_view_agua').innerHTML = aguaList.filter(Boolean).map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join(' ') || '<span style="color:var(--text-muted); font-style:italic;">Sin medidor de agua</span>';
+
+            document.getElementById('c_view_caracteristicas').innerText = `${reg.pisos} Pisos | Material: ${reg.material}`;
+            document.getElementById('c_view_obs_campo').innerText = reg.observacionesCampo || 'Ninguna';
+
+            document.getElementById('contraste_codigo_predio').value = reg.codigoPredio || '';
+            document.getElementById('contraste_propietario_dni').value = reg.propietarioDNI || '';
+            document.getElementById('contraste_propietario_nombre').value = reg.propietarioNombre || '';
+            document.getElementById('contraste_observaciones_gabinete').value = reg.observacionesGabinete || '';
+
+            seleccionarEstado(reg.estadoFiscal === 'PENDIENTE' ? 'CORRECTO' : reg.estadoFiscal);
+            ejecutarCruceMedidores(reg);
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function seleccionarEstado(estado) {
+            document.getElementById('contraste_estado').value = estado;
+            ['card_st_correcto', 'card_st_subvaluante', 'card_st_omiso'].forEach(id => {
+                document.getElementById(id).className = 'status-radio-card';
+            });
+            if (estado === 'CORRECTO') document.getElementById('card_st_correcto').className = 'status-radio-card active-correcto';
+            else if (estado === 'SUBVALUANTE') document.getElementById('card_st_subvaluante').className = 'status-radio-card active-subvaluante';
+            else if (estado === 'OMISO') document.getElementById('card_st_omiso').className = 'status-radio-card active-omiso';
+        }
+
+        let modoEdicionId = null;
+
+        function guardarContraste(event) {
+            event.preventDefault();
+            if (!registroSeleccionado) return;
+
+            registroSeleccionado.codigoPredio = document.getElementById('contraste_codigo_predio').value.trim().toUpperCase() || 'S/C';
+            registroSeleccionado.propietarioDNI = document.getElementById('contraste_propietario_dni').value.trim();
+            registroSeleccionado.propietarioNombre = document.getElementById('contraste_propietario_nombre').value.trim().toUpperCase();
+            registroSeleccionado.estadoFiscal = document.getElementById('contraste_estado').value;
+            registroSeleccionado.observacionesGabinete = document.getElementById('contraste_observaciones_gabinete').value.trim();
+            registroSeleccionado.fechaContraste = new Date().toLocaleString();
+
+            guardarRegistrosEnStorage();
+            actualizarMetricas();
+            renderTabla();
+
+            mostrarToast(`Contraste guardado para el predio ${registroSeleccionado.codigoPredio} [${registroSeleccionado.estadoFiscal}]`, "success");
+        }
+
+        // ==========================================
+        // ELIMINAR REGISTRO
+        // ==========================================
+        function eliminarRegistro(id) {
+            const reg = registros.find(r => r.id === id);
+            if (!reg) return;
+            if (!confirm(`¿Está seguro de eliminar la ficha ${id}?\nEsta acción no se puede deshacer.`)) return;
+            registros = registros.filter(r => r.id !== id);
+            // Cerrar panel si es el seleccionado
+            if (registroSeleccionado && registroSeleccionado.id === id) {
+                registroSeleccionado = null;
+                document.getElementById('panel_contraste_detalle').style.display = 'none';
+            }
+            guardarRegistrosEnStorage();
+            actualizarMetricas();
+            renderTabla();
+            mostrarToast(`🗑️ Ficha ${id} eliminada.`, "info");
+        }
+
+        function eliminarRegistroActual() {
+            if (!registroSeleccionado) return;
+            eliminarRegistro(registroSeleccionado.id);
+        }
+
+        // ==========================================
+        // EDITAR MUESTREO (cargar datos en el form)
+        // ==========================================
+        function editarEnMuestreo() {
+            if (!registroSeleccionado) return;
+            const reg = registroSeleccionado;
+            modoEdicionId = reg.id;
+
+            // Cambiar a módulo de muestreo
+            switchTab('muestreo');
+
+            // Restaurar fotos
+            fotoPredioBase64 = reg.fotoPredioB64 || null;
+            fotoMedidorBase64 = reg.fotoMedidorB64 || null;
+
+            if (fotoPredioBase64) {
+                const img = document.getElementById('img_preview_predio');
+                img.src = fotoPredioBase64; img.style.display = 'block';
+                document.getElementById('ph_foto_predio').style.display = 'none';
+                document.getElementById('badge_predio_b64').style.display = 'inline-flex';
+            }
+            if (fotoMedidorBase64) {
+                const img = document.getElementById('img_preview_medidor');
+                img.src = fotoMedidorBase64; img.style.display = 'block';
+                document.getElementById('ph_foto_medidor').style.display = 'none';
+                document.getElementById('badge_medidor_b64').style.display = 'inline-flex';
+            }
+
+            // GPS
+            if (reg.latitud && reg.latitud !== 'Sin GPS') {
+                document.getElementById('geo_lat').value = reg.latitud;
+                document.getElementById('geo_lng').value = reg.longitud;
+                document.getElementById('geo_accuracy').value = reg.precision || '';
+                const box = document.getElementById('gps_indicator_box');
+                if (box) { box.style.display = 'flex'; }
+            }
+            document.getElementById('timestamp_captura').value = reg.timestamp || '';
+
+            // Medidores Luz
+            document.getElementById('lista_medidores_luz').innerHTML = '';
+            const luzArr = reg.medidoresLuz || [];
+            if (luzArr.length === 0) {
+                agregarMedidorLuz('', '');
+            } else {
+                luzArr.forEach(m => {
+                    if (typeof m === 'object') agregarMedidorLuz(m.verificador || '', m.medidor || '');
+                    else {
+                        const parts = String(m).split('-');
+                        agregarMedidorLuz(parts[0] || '', parts[1] || parts[0] || '');
+                    }
+                });
+            }
+
+            // Medidores Agua
+            document.getElementById('lista_medidores_agua').innerHTML = '';
+            const aguaArr = reg.medidoresAgua || [];
+            if (aguaArr.length === 0) {
+                agregarMedidorAgua('');
+            } else {
+                aguaArr.forEach(val => agregarMedidorAgua(val));
+            }
+
+            // Pisos y material
+            document.getElementById('predio_pisos').value = reg.pisos || '2';
+            document.getElementById('predio_material').value = reg.material || '';
+            document.getElementById('observaciones_campo').value = reg.observacionesCampo || '';
+
+            // Actualizar botón submit
+            const submitBtn = document.querySelector('#muestreoForm button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = `🔄 Actualizar Ficha ${reg.id}`;
+
+            mostrarToast(`📝 Cargando ficha ${reg.id} para edición...`, "info");
+            previewCruceMuestreo();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // PREVIEW EN VIVO EN MUESTREO
+        // ==========================================
+        // Normaliza claves de medidor para evitar diferencias entre Excel local y GitHub Pages.
+        function normalizarClaveMedidor(valor) {
+            if (valor === null || valor === undefined) return '';
+            let t = String(valor).trim().replace(/\\u00a0/g, '').replace(/\\s+/g, '');
+            // Excel puede entregar números como "123.0"; conservar códigos alfanuméricos.
+            if (/^\\d+\\.0+$/.test(t)) t = t.replace(/\\.0+$/, '');
+            return t.toUpperCase();
+        }
+        function buscarElectroPorVerificadorMedidor(verif, medidor) {
+            const v = normalizarClaveMedidor(verif), m = normalizarClaveMedidor(medidor);
+            if (!v || !m) return null;
+            const quitarCeros = x => x.replace(/^0+(?=\\d)/, '');
+            const vs = [...new Set([v, quitarCeros(v), v.padStart(2, '0')])];
+            const ms = [...new Set([m, quitarCeros(m)])];
+            for (const vk of vs) for (const mk of ms) {
+                const hit = cacheElectroCompositeMap.get(`${vk}|${mk}`);
+                if (hit) return hit;
+            }
+            // Respaldo lineal: no depende de cómo se construyó la caché/IndexedDB.
+            const all = new Set(cacheElectroCompositeMap.values());
+            return [...all].find(e => normalizarClaveMedidor(e.verificador) === v &&
+                normalizarClaveMedidor(e.medidor) === m) || null;
+        }
+
+        function previewCruceMuestreo() {
+            const previewLuz = document.getElementById('preview_cruce_muestreo_luz');
+            const previewAgua = document.getElementById('preview_cruce_muestreo_agua');
+
+            // === ELECTRO ===
+            if (previewLuz) {
+                const rows = document.querySelectorAll('#lista_medidores_luz .meter-item-row');
+                let htmlLuz = '';
+                rows.forEach(row => {
+                    const verifInp = row.querySelector('.input-medidor-luz-verif');
+                    const numInp = row.querySelector('.input-medidor-luz-num');
+                    const verif = (verifInp ? verifInp.value.trim() : '');
+                    const med = (numInp ? numInp.value.trim() : '');
+                    if (!verif && !med) return;
+
+                    let encontrado = null;
+                    if (verif && med) {
+                        encontrado = buscarElectroPorVerificadorMedidor(verif, med);
+                    } else if (med) {
+                        const m_n = med.replace(/^0+/, '') || '0';
+                        encontrado = cacheElectroCompositeMap.get(`|${med}`)
+                            || cacheElectroCompositeMap.get(`|${m_n}`)
+                            || cacheElectroMap.get(med);
+                    }
+
+                    if (encontrado) {
+                        htmlLuz += `<div style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.4); border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                            <div style="color: #f59e0b; font-weight: 700;">⚡ Electro: Verif ${encontrado.verificador || verif} - Med ${encontrado.medidor || med}</div>
+                            <div style="color: #f8fafc;">👤 ${encontrado.nombre}</div>
+                            <div style="color: #94a3b8; font-size: 0.77rem;">📍 ${encontrado.direccion || 'Sin dirección'} | Suministro: ${encontrado.cod_largo || encontrado.cod_corto || '-'}</div>
+                        </div>`;
+                    } else if (verif || med) {
+                        htmlLuz += `<div style="background: rgba(100,116,139,0.12); border: 1px dashed rgba(100,116,139,0.4); border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.8rem; color: #64748b;">⚡ Verif: ${verif || '?'} / Med: ${med || '?'} — Sin coincidencia en padrón</div>`;
+                    }
+                });
+                if (htmlLuz) {
+                    previewLuz.innerHTML = htmlLuz;
+                    previewLuz.style.display = 'flex';
+                    previewLuz.style.flexDirection = 'column';
+                    previewLuz.style.gap = '0.4rem';
+                } else {
+                    previewLuz.innerHTML = ''; previewLuz.style.display = 'none';
+                }
+            }
+
+            // === EMUSAP ===
+            if (previewAgua) {
+                const inputs = document.querySelectorAll('.input-medidor-agua');
+                let htmlAgua = '';
+                inputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if (!val) return;
+                    const valUp = val.toUpperCase();
+                    const digits = valUp.replace(/[^0-9]/g, '');
+                    const encontrado = cacheEmusapMap.get(valUp)
+                        || (digits ? cacheEmusapMap.get(digits) : null)
+                        || cacheEmusapMap.get(val);
+                    if (encontrado) {
+                        htmlAgua += `<div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                            <div style="color: #10b981; font-weight: 700;">💧 EMUSAP: ${encontrado.medidor || encontrado.inscripc || val}</div>
+                            <div style="color: #f8fafc;">👤 ${encontrado.nombre}</div>
+                            <div style="color: #94a3b8; font-size: 0.77rem;">📍 ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
+                        </div>`;
+                    } else if (val) {
+                        htmlAgua += `<div style="background: rgba(100,116,139,0.12); border: 1px dashed rgba(100,116,139,0.4); border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.8rem; color: #64748b;">💧 Medidor ${val} — Sin coincidencia en padrón EMUSAP</div>`;
+                    }
+                });
+                if (htmlAgua) {
+                    previewAgua.innerHTML = htmlAgua;
+                    previewAgua.style.display = 'flex';
+                    previewAgua.style.flexDirection = 'column';
+                    previewAgua.style.gap = '0.4rem';
+                } else {
+                    previewAgua.innerHTML = ''; previewAgua.style.display = 'none';
+                }
+            }
+        }
+
+        // ==========================================
+        // GUARDAR AVANCE / EXPORTAR / IMPORTAR ACUMULATIVO
+        // ==========================================
+        function guardarAvanceRapido() {
+            if (registros.length === 0) {
+                mostrarToast("No hay registros en el avance para guardar.", "info");
+                return;
+            }
+            const fechaStr = new Date().toISOString().slice(0, 19).replace(/:/g, '-').replace('T', '_');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(registros, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `Avance_Fiscalizacion_${fechaStr}.json`);
+            dlAnchor.click();
+            mostrarToast(`💾 Avance guardado con ${registros.length} registros.`, "success");
+        }
+
+        function importarYAgregarDatos(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const datosImportados = JSON.parse(e.target.result);
+                    if (!Array.isArray(datosImportados)) {
+                        mostrarToast("El archivo JSON no tiene un formato válido de lista.", "error");
+                        return;
+                    }
+
+                    let agregados = 0;
+                    datosImportados.forEach(nuevo => {
+                        // Si ya existe el ID, le generamos uno nuevo para no duplicar
+                        const existeId = registros.some(r => r.id === nuevo.id);
+                        if (existeId) {
+                            nuevo.id = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+                        }
+                        // Compatibilidad si viene de versión con medidor único
+                        if (!nuevo.medidoresLuz && nuevo.medidorLuz) nuevo.medidoresLuz = [nuevo.medidorLuz];
+                        if (!nuevo.medidoresAgua && nuevo.medidorAgua) nuevo.medidoresAgua = [nuevo.medidorAgua];
+
+                        registros.push(nuevo);
+                        agregados++;
+                    });
+
+                    guardarRegistrosEnStorage();
+                    actualizarMetricas();
+                    renderTabla();
+
+                    mostrarToast(`✅ Se agregaron ${agregados} registros. Total acumulado: ${registros.length}`, "success");
+                    // Limpiar input file para permitir volver a cargar
+                    event.target.value = '';
+                } catch (err) {
+                    mostrarToast("Error al leer el archivo JSON: " + err.message, "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportarCSV() {
+            if (registros.length === 0) {
+                mostrarToast("No hay registros para exportar.", "error");
+                return;
+            }
+
+            const headers = ["ID", "Fecha_Levantamiento", "Latitud", "Longitud", "Precision_GPS", "Medidores_Luz", "Medidores_Agua", "Pisos", "Material", "Obs_Campo", "Codigo_Predio", "DNI_Propietario", "Nombre_Propietario", "Estado_Fiscal", "Obs_Gabinete", "Fecha_Contraste"];
+
+            const rows = registros.map(r => [
+                `"${r.id}"`,
+                `"${r.timestamp}"`,
+                `"${r.latitud}"`,
+                `"${r.longitud}"`,
+                `"${r.precision}"`,
+                `"${(r.medidoresLuz || [r.medidorLuz || '']).join('; ')}"`,
+                `"${(r.medidoresAgua || [r.medidorAgua || '']).join('; ')}"`,
+                `"${r.pisos}"`,
+                `"${r.material}"`,
+                `"${(r.observacionesCampo || '').replace(/"/g, '""')}"`,
+                `"${r.codigoPredio || ''}"`,
+                `"${r.propietarioDNI || ''}"`,
+                `"${(r.propietarioNombre || '').replace(/"/g, '""')}"`,
+                `"${r.estadoFiscal}"`,
+                `"${(r.observacionesGabinete || '').replace(/"/g, '""')}"`,
+                `"${r.fechaContraste || ''}"`
+            ]);
+
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Fiscalizacion_Predial_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast("Archivo CSV exportado exitosamente.", "success");
+        }
+
+        function limpiarTodaLaBase() {
+            if (confirm("¿Está seguro de eliminar TODOS los registros de este navegador?")) {
+                registros = [];
+                SafeStorage.removeItem(DB_KEY);
+                actualizarMetricas();
+                renderTabla();
+                document.getElementById('panel_contraste_detalle').style.display = 'none';
+                mostrarToast("Base de datos local reiniciada correctamente.", "info");
+            }
+        }
+
+        // ==========================================
+        // UTILIDADES Y MODAL
+        // ==========================================
+        function abrirModalZoom(srcB64, titulo) {
+            document.getElementById('modalZoomImg').src = srcB64;
+            document.getElementById('modalZoomTitulo').innerText = `🔍 ${titulo}`;
+            document.getElementById('modalZoom').classList.add('active');
+        }
+
+        function cerrarModalZoom() {
+            document.getElementById('modalZoom').classList.remove('active');
+        }
+
+        let cartasPreparadas = [];
+        function actualizarResumenCartas() {
+            const tipo = document.getElementById('cartas_tipo')?.value || 'AMBOS';
+            const elegibles = registros.filter(r => tipo === 'AMBOS'
+                ? ['OMISO','SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
+                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+            const resumen = document.getElementById('cartas_resumen');
+            if (resumen) resumen.textContent = `Registros disponibles para carta: ${elegibles.length}. Omisos: ${elegibles.filter(r=>r.estadoFiscal==='OMISO').length}; subvaluantes: ${elegibles.filter(r=>r.estadoFiscal==='SUBVALUANTE').length}.`;
+        }
+        function escaparHTMLCarta(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function prepararGeneracionCartas() {
+            const tipo = document.getElementById('cartas_tipo').value;
+            const elegibles = registros.filter(r => tipo === 'AMBOS'
+                ? ['OMISO','SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
+                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+            if (!elegibles.length) { mostrarToast('No hay registros con el estado seleccionado.', 'error'); return; }
+            const inicioTxt = prompt(`Se generarán ${elegibles.length} cartas. ¿Desde qué número correlativo desea empezar?`, '1');
+            if (inicioTxt === null) return;
+            const inicio = Number(inicioTxt.trim());
+            if (!Number.isSafeInteger(inicio) || inicio < 1) { mostrarToast('Ingrese un número correlativo entero mayor que cero.', 'error'); return; }
+            let fecha = document.getElementById('cartas_fecha').value.trim();
+            if (!fecha) {
+                const d = new Date();
+                const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+                fecha = `Tamburco, ${d.getDate()} de ${meses[d.getMonth()]} del ${d.getFullYear()}`;
+                document.getElementById('cartas_fecha').value = fecha;
+            }
+            cartasPreparadas = elegibles.map((r,i)=>({r, numero: String(inicio+i).padStart(4,'0'), fecha}));
+            const preview = document.getElementById('cartas_preview');
+            preview.innerHTML = `<p><strong>${cartasPreparadas.length} cartas preparadas</strong>, numeración ${cartasPreparadas[0].numero}–${cartasPreparadas[cartasPreparadas.length-1].numero}. La numeración solo se aplica a esta generación.</p><ol>${cartasPreparadas.slice(0,10).map(c=>`<li>${escaparHTMLCarta(c.numero)} — ${escaparHTMLCarta(c.r.propietarioNombre || 'SIN NOMBRE')} (${escaparHTMLCarta(c.r.estadoFiscal)})</li>`).join('')}${cartasPreparadas.length>10?'<li>… y más cartas</li>':''}</ol>`;
+            document.getElementById('cartas_acciones').style.display = 'flex';
+        }
+        function imprimirCartas() {
+            if (!cartasPreparadas.length) { mostrarToast('Primero prepare las cartas y defina la numeración.', 'error'); return; }
+            const contenido = cartasPreparadas.map(({r,numero,fecha}) => {
+                const omiso = String(r.estadoFiscal).toUpperCase() === 'OMISO';
+                const nombre = r.propietarioNombre || 'CONTRIBUYENTE';
+                const dni = r.propietarioDNI || 'No consignado';
+                const direccion = r.direccion || r.direccionPredio || r.direccionReferencial || 'No consignada';
+                const estado = omiso ? 'OMISO' : 'SUBVALUANTE';
+                return `<article class="carta">
+                <div class="fecha">${escaparHTMLCarta(fecha)}</div>
+                <h3>CARTA INDUCTIVA N° ${escaparHTMLCarta(numero)}-2026-YJRR-FT-SGATR-MDT</h3>
+                <p>Sr(a): <strong>${escaparHTMLCarta(nombre)}</strong><br>DNI: ${escaparHTMLCarta(dni)}<br>Dirección: ${escaparHTMLCarta(direccion)}</p>
+                <p><strong>ASUNTO: SE LE COMUNICA INCONSISTENCIA U OMISIÓN DETECTADA EN LA DECLARACIÓN JURADA DEL IMPUESTO PREDIAL (AUTOEVALUÓ).</strong></p>
+                <p>Por medio de la presente hacemos de su conocimiento que, como parte de nuestra labor de fiscalización y en uso de las facultades establecidas en el primer párrafo del artículo 62° y el artículo 82° del Texto Único Ordenado del Código Tributario, aprobado por D.S. N° 133-2013-EF y normas modificatorias, la oficina de Fiscalización Tributaria viene realizando acciones de control. Según la información de nuestros sistemas y lo verificado en campo, se ha detectado que:</p>
+                <p class="opcion">${omiso?'☐':'☒'} El área construida es mayor a la registrada en sus declaraciones juradas del impuesto predial, por lo cual se encuentra como SUBVALUANTE.</p>
+                <p class="opcion">${omiso?'☒':'☐'} El predio no registra declaración jurada del impuesto predial, por lo cual se encuentra como OMISO.</p>
+                <p>En consecuencia, habría incurrido en la infracción tipificada en el Art. 176° Numeral 1 del Código Tributario: “No presentar las declaraciones que contengan la determinación de la deuda tributaria, dentro de los plazos establecidos”, que establece una sanción de 1 UIT, equivalente en el presente ejercicio a (S/ 5,500.00 soles).</p>
+                <p>A efectos de fomentar el cumplimiento espontáneo y optimizar la carga administrativa, se le invita a realizar la subsanación voluntaria en un plazo de hasta 05 días hábiles, contados a partir de la notificación de la presente. Para tal fin, deberá apersonarse ante la Subgerencia de Administración Tributaria y Rentas, ubicada frente a la Plaza de Armas de Tamburco, en el horario de 8:00 a.m. a 3:00 p.m., para programar la verificación técnica en campo, llenar las declaraciones del impuesto predial y suscribirlas.</p>
+                <p>Bajo el esquema de regularización voluntaria establecido en la Ordenanza Municipal N° 002-2026-MDT, la Administración procederá a actualizar los valores del predio para el ejercicio fiscal, conforme a los beneficios que resulten aplicables.</p>
+                <p>En caso de representación, el representante legal deberá acreditar su representación con carta poder con firma legalizada y/o fedateada.</p>
+                <p><strong>Nota:</strong> El vencimiento del plazo sin regularización dará lugar a la ejecución de las facultades de fiscalización directa y a las actuaciones administrativas que correspondan.</p>
+                <p>Para mayor información podrá comunicarse con el fiscalizador: Cel. 938524967.</p>
+                <p>Sin otro particular, quedo de Ud.</p><p class="atentamente">Atentamente,</p>
+                <div class="firma">____________________________________<br>Yabel J. Roman Roque<br>Fiscalizador Tributario</div>
+                <div class="cargo"><strong>CARGO DE NOTIFICACIÓN</strong><br>FECHA: ……../…………/………… HORA:…… : ……………..<br>NOTIFICADOR: Yabel J. Roman Roque &nbsp; FIRMA: …………………………………<br>RECIBE ( ) BAJO PUERTA ( ) OBSERVACIÓN: ………………………………………<br>NOMBRE DE QUIEN RECIBE: ……………………… DNI: …………………… FIRMA: ……………</div>
+                </article>`;
+            }).join('');
+            const w = window.open('', '_blank');
+            if (!w) { mostrarToast('El navegador bloqueó la ventana. Permita ventanas emergentes para imprimir.', 'error'); return; }
+            w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Cartas inductivas</title><style>
+            @page{size:A4;margin:17mm 19mm}body{font:11pt/1.35 Arial,sans-serif;color:#111}.carta{page-break-after:always;break-after:page;position:relative;min-height:255mm}.carta:last-child{page-break-after:auto;break-after:auto}.fecha{text-align:right;margin-bottom:12px}h3{font-size:12pt;margin:0 0 20px}p{margin:0 0 11px;text-align:justify}.opcion{padding-left:18px}.atentamente{margin-top:18px}.firma{text-align:right;margin-top:24px}.cargo{border-top:1px solid #777;margin-top:25px;padding-top:8px;font-size:9pt;line-height:1.6}
+            </style></head><body>${contenido}<script>window.onload=()=>setTimeout(()=>window.print(),400);<\\/script></body></html>`);
+            w.document.close();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.module-section').forEach(sec => sec.classList.remove('active'));
+
+            if (tabName === 'muestreo') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('mod-muestreo').classList.add('active');
+            } else if (tabName === 'contraste') {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('mod-contraste').classList.add('active');
+                renderTabla();
+            } else if (tabName === 'reportes') {
+                document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+                document.getElementById('mod-reportes').classList.add('active');
+            } else if (tabName === 'cartas') {
+                document.querySelector('.tab-btn:nth-child(4)').classList.add('active');
+                document.getElementById('mod-cartas').classList.add('active');
+                actualizarResumenCartas();
+            }
+        }
+
+        function guardarRegistrosEnStorage() {
+            SafeStorage.setItem(DB_KEY, JSON.stringify(registros));
+        }
+
+        function cargarRegistrosDesdeStorage() {
+            const raw = SafeStorage.getItem(DB_KEY);
+            if (raw) {
+                try { registros = JSON.parse(raw); } catch (e) { registros = []; }
+            } else {
+                registros = [];
+            }
+        }
+
+        function actualizarMetricas() {
+            const total = registros.length;
+            const correcto = registros.filter(r => r.estadoFiscal === 'CORRECTO').length;
+            const subvaluante = registros.filter(r => r.estadoFiscal === 'SUBVALUANTE').length;
+            const omiso = registros.filter(r => r.estadoFiscal === 'OMISO').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-correcto').innerText = correcto;
+            document.getElementById('stat-subvaluante').innerText = subvaluante;
+            document.getElementById('stat-omiso').innerText = omiso;
+            document.getElementById('badge-total-records').innerText = total;
+        }
+
+        function mostrarToast(mensaje, tipo = "info") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = mensaje;
+
+            if (tipo === 'success') {
+                toast.style.borderLeftColor = 'var(--success)';
+                toastIcon.innerText = "✅";
+            } else if (tipo === 'error') {
+                toast.style.borderLeftColor = 'var(--danger)';
+                toastIcon.innerText = "❌";
+            } else {
+                toast.style.borderLeftColor = 'var(--primary)';
+                toastIcon.innerText = "ℹ️";
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
+        }
+    </script>
+</body>
+
+</html>
