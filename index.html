@@ -1539,6 +1539,18 @@
                                     placeholder="Ej: HERRERA TAIPE CIRILO">
                             </div>
 
+                            <div class="form-group">
+                                <label>📍 Dirección del predio <span
+                                        style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(Se
+                                        completa desde el padrón del medidor si existe; también puede ingresarla
+                                        manualmente)</span></label>
+                                <input type="text" id="contraste_direccion_predio"
+                                    placeholder="Ej: JR. LOS ÁLAMOS N.° 123, TAMBURCO" autocomplete="street-address">
+                                <small style="display:block;margin-top:0.35rem;color:var(--text-muted);">Para OMISO,
+                                    revise la dirección del medidor o escriba aquí la dirección verificada del
+                                    predio.</small>
+                            </div>
+
                             <!-- SECCIÓN 5: ESTADO DE FISCALIZACIÓN -->
                             <div class="form-group">
                                 <label>⚖️ Estado de Fiscalización</label>
@@ -2405,6 +2417,13 @@
         // ==========================================
         // CRUCE DE MEDIDORES Y SUGERENCIAS CONTRIBUYENTES
         // ==========================================
+        function usarDireccionPredioDesdeMedidor(direccionCodificada) {
+            const direccion = decodeURIComponent(direccionCodificada || '').trim();
+            if (!direccion) { mostrarToast('El registro del medidor no tiene dirección disponible.', 'error'); return; }
+            document.getElementById('contraste_direccion_predio').value = direccion.toUpperCase();
+            mostrarToast('Dirección del medidor copiada. Revísela y guarde el contraste.', 'success');
+        }
+
         function ejecutarCruceMedidores(reg) {
             const contenedorCruce = document.getElementById('cruce_resultados_medidores');
             const badgeCruce = document.getElementById('badge_cruce_estado');
@@ -2451,6 +2470,11 @@
                 if (encontrado) {
                     totalCruces++;
                     titularesEncontrados.add(encontrado.nombre);
+                    if (encontrado.direccion && !document.getElementById('contraste_direccion_predio').value.trim()) {
+                        document.getElementById('contraste_direccion_predio').value = String(encontrado.direccion).toUpperCase();
+                    }
+                    const direccionElectro = String(encontrado.direccion || '').trim();
+                    const direccionElectroCodificada = encodeURIComponent(direccionElectro);
                     contenedorCruce.innerHTML += `
                         <div class="cruce-card" style="border-left: 4px solid var(--warning);">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
@@ -2459,6 +2483,7 @@
                             </div>
                             <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
                             <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Suministro: <code>${encontrado.cod_largo || encontrado.cod_corto}</code></div>
+                            ${direccionElectro ? `<button type="button" class="btn btn-outline btn-sm" onclick="usarDireccionPredioDesdeMedidor('${direccionElectroCodificada}')" style="margin-top:0.45rem;">📍 Usar esta dirección del medidor</button>` : ''}
                             ${encontrado.lat ? `<div style="color: #38bdf8; font-size: 0.75rem; font-family: monospace;">🌐 GPS Empresa: Lat ${encontrado.lat}, Lng ${encontrado.lng}</div>` : ''}
                         </div>
                     `;
@@ -2483,6 +2508,11 @@
                 if (encontrado) {
                     totalCruces++;
                     titularesEncontrados.add(encontrado.nombre);
+                    if (encontrado.direccion && !document.getElementById('contraste_direccion_predio').value.trim()) {
+                        document.getElementById('contraste_direccion_predio').value = String(encontrado.direccion).toUpperCase();
+                    }
+                    const direccionEmusap = String(encontrado.direccion || '').trim();
+                    const direccionEmusapCodificada = encodeURIComponent(direccionEmusap);
                     contenedorCruce.innerHTML += `
                         <div class="cruce-card" style="border-left: 4px solid var(--success);">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2491,6 +2521,7 @@
                             </div>
                             <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
                             <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
+                            ${direccionEmusap ? `<button type="button" class="btn btn-outline btn-sm" onclick="usarDireccionPredioDesdeMedidor('${direccionEmusapCodificada}')" style="margin-top:0.45rem;">📍 Usar esta dirección del medidor</button>` : ''}
                         </div>
                     `;
                 } else {
@@ -3293,6 +3324,7 @@
             document.getElementById('contraste_codigo_predio').value = reg.codigoPredio || '';
             document.getElementById('contraste_propietario_dni').value = reg.propietarioDNI || '';
             document.getElementById('contraste_propietario_nombre').value = reg.propietarioNombre || '';
+            document.getElementById('contraste_direccion_predio').value = reg.direccionPredio || reg.direccion || reg.direccionReferencial || '';
             document.getElementById('contraste_observaciones_gabinete').value = reg.observacionesGabinete || '';
 
             seleccionarEstado(reg.estadoFiscal === 'PENDIENTE' ? 'CORRECTO' : reg.estadoFiscal);
@@ -3319,6 +3351,9 @@
             registroSeleccionado.codigoPredio = document.getElementById('contraste_codigo_predio').value.trim().toUpperCase() || 'S/C';
             registroSeleccionado.propietarioDNI = document.getElementById('contraste_propietario_dni').value.trim();
             registroSeleccionado.propietarioNombre = document.getElementById('contraste_propietario_nombre').value.trim().toUpperCase();
+            registroSeleccionado.direccionPredio = document.getElementById('contraste_direccion_predio').value.trim().toUpperCase();
+            // Mantener también el campo genérico usado por cartas e informes anteriores.
+            registroSeleccionado.direccion = registroSeleccionado.direccionPredio;
             registroSeleccionado.estadoFiscal = document.getElementById('contraste_estado').value;
             registroSeleccionado.observacionesGabinete = document.getElementById('contraste_observaciones_gabinete').value.trim();
             registroSeleccionado.fechaContraste = new Date().toLocaleString();
