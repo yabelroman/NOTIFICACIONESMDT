@@ -1058,7 +1058,8 @@
     <div id="whatsapp-warning-banner">
         <strong>⚠️ Abierto en el visor de WhatsApp (`content://`)</strong>
         <p>Toca los 3 puntos ⋮ en WhatsApp &gt; Guardar &gt; abre desde "Descargas" con Chrome, o utiliza el botón
-            <strong>"💾 Guardar Avance"</strong> frecuentemente.</p>
+            <strong>"💾 Guardar Avance"</strong> frecuentemente.
+        </p>
     </div>
 
     <!-- HEADER -->
@@ -1087,6 +1088,9 @@
             </button>
             <button class="tab-btn" onclick="switchTab('reportes')">
                 📊 Reportes e Importación
+            </button>
+            <button class="tab-btn" onclick="switchTab('cartas')">
+                ✉️ Generar Cartas
             </button>
         </nav>
         <div class="user-session-bar" id="userSessionBar">
@@ -1588,8 +1592,210 @@
 
         </section>
 
+        <!-- MÓDULO DE GENERACIÓN Y DISEÑO DE CARTAS -->
+        <section id="mod-cartas" class="module-section">
+            <div class="card" style="margin-bottom:1rem;">
+                <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary" onclick="mostrarPanelCartas('generar')">✉️ Generar
+                        cartas</button>
+                    <button type="button" class="btn btn-secondary" onclick="mostrarPanelCartas('diseno')">🎨 Configurar
+                        modelo de carta</button>
+                </div>
+                <p style="color:var(--text-secondary);margin:.8rem 0 0;">Configure el modelo una sola vez. El diseño se
+                    guarda en este navegador; las cartas se imprimirán en dos páginas: carta formal y anexo fotográfico.
+                </p>
+            </div>
+
+            <div id="panel-diseno-cartas" class="card" style="display:none;">
+                <div class="card-header">
+                    <h2>🎨 Diseñador de carta</h2>
+                </div>
+                <p style="color:var(--text-secondary);">Edite el contenido como en un procesador de texto. Puede aplicar
+                    formato, insertar imágenes institucionales y personalizar encabezado y pie de página. Los campos
+                    entre llaves se completan automáticamente para cada contribuyente.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label for="modelo_fuente">Fuente del documento</label>
+                        <select id="modelo_fuente" onchange="aplicarEstiloModelo()">
+                            <option>Arial</option>
+                            <option>Calibri</option>
+                            <option>Times New Roman</option>
+                            <option>Verdana</option>
+                            <option>Georgia</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="modelo_tamano">Tamaño base (pt)</label>
+                        <select id="modelo_tamano" onchange="aplicarEstiloModelo()">
+                            <option value="9">9 pt</option>
+                            <option value="10">10 pt</option>
+                            <option value="11" selected>11 pt</option>
+                            <option value="12">12 pt</option>
+                            <option value="13">13 pt</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="modelo_color">Color del texto</label><input type="color"
+                            id="modelo_color" value="#202124" onchange="aplicarEstiloModelo()"></div>
+                    <div class="form-group"><label for="modelo_margen">Márgenes de impresión</label>
+                        <select id="modelo_margen" onchange="guardarModeloCarta()">
+                            <option value="15">Estrecho (15 mm)</option>
+                            <option value="18" selected>Normal (18 mm)</option>
+                            <option value="22">Amplio (22 mm)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"
+                    style="padding:12px;border:1px solid var(--border-color);border-radius:8px;background:#f8fafc;">
+                    <strong>📐 Ajustar espacios de la hoja e insertar fondo</strong>
+                    <p style="font-size:12px;color:#64748b;margin:5px 0 10px;">Modifique los espacios superior e
+                        inferior para aprovechar mejor la hoja. El fondo puede ser una imagen institucional o una marca
+                        de agua.</p>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="modelo_margen_superior">Margen superior (mm)</label><input
+                                id="modelo_margen_superior" type="number" min="0" max="40" value="12"
+                                onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_margen_inferior">Margen inferior (mm)</label><input
+                                id="modelo_margen_inferior" type="number" min="0" max="40" value="12"
+                                onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_sep_encabezado">Espacio bajo encabezado
+                                (mm)</label><input id="modelo_sep_encabezado" type="number" min="0" max="40" value="5"
+                                onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_sep_pie">Espacio entre pie y borde inferior
+                                (mm)</label><input id="modelo_sep_pie" type="number" min="0" max="40" value="5"
+                                onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_fondo_color">Color de fondo de hoja</label><input
+                                id="modelo_fondo_color" type="color" value="#ffffff" onchange="guardarModeloCarta()">
+                        </div>
+                        <div class="form-group"><label for="modelo_fondo_opacidad">Opacidad de imagen de fondo
+                                (%)</label><input id="modelo_fondo_opacidad" type="number" min="5" max="100" value="15"
+                                onchange="guardarModeloCarta()"></div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer;">🖼️ Elegir imagen de fondo
+                            <input id="modelo_fondo_archivo" type="file" accept="image/*"
+                                onchange="cargarFondoModelo(this)" style="display:none;"></label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarFondoModelo()">✖ Quitar
+                            fondo de imagen</button>
+                        <span id="modelo_fondo_estado" style="font-size:12px;color:#475569;">Sin imagen de fondo.</span>
+                    </div>
+                </div>
+                <div class="form-group"><label>Encabezado (puede contener texto, logotipo e imágenes)</label>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="insertarImagenEnZona('modelo_encabezado')">🖼️ Insertar imagen en
+                            encabezado</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖
+                            Quitar imagen seleccionada</button>
+                    </div>
+                    <div id="modelo_encabezado" class="editor-imagenes" contenteditable="true"
+                        style="min-height:65px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">
+                        MUNICIPALIDAD DISTRITAL DE TAMBURCO<br><strong>SUBGERENCIA DE ADMINISTRACIÓN TRIBUTARIA Y
+                            RENTAS</strong></div>
+                </div>
+                <div class="form-group"><label>Contenido principal de la carta — editor de estilo Word</label>
+                    <div class="editor-toolbar"
+                        style="display:flex;gap:5px;flex-wrap:wrap;padding:8px;background:#eef2f7;border:1px solid #cbd5e1;border-radius:8px 8px 0 0;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="formatearModelo('bold')"
+                            title="Negrita"><b>B</b></button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="formatearModelo('italic')"
+                            title="Cursiva"><i>I</i></button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="formatearModelo('underline')"
+                            title="Subrayado"><u>U</u></button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearModelo('justifyLeft')">⇤</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearModelo('justifyCenter')">≡ Centro</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearModelo('justifyRight')">⇥</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearModelo('justifyFull')">Justificar</button>
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer;">🎨 Color <input type="color"
+                                onchange="colorTextoModelo(this.value)"
+                                style="width:22px;height:18px;vertical-align:middle;"></label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="insertarImagenModelo()">🖼️
+                            Insertar imagen</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖
+                            Quitar imagen</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="insertarCampoModelo()">＋ Campo
+                            automático</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="restaurarModeloPredeterminado()">↺ Restaurar modelo</button>
+                    </div>
+                    <div id="modelo_contenido" class="editor-imagenes" contenteditable="true" spellcheck="true"
+                        style="min-height:550px;max-width:850px;margin:0 auto;border:1px solid #cbd5e1;border-top:0;background:#fff;color:#202124;padding:42px 48px;line-height:1.45;box-shadow:0 4px 16px #0001;outline:none;">
+                    </div>
+                    <div
+                        style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;background:#f8fafc;border:1px solid #cbd5e1;border-top:0;">
+                        <strong>Redimensionar imagen seleccionada:</strong>
+                        <label>Ancho (px) <input id="modelo_img_ancho" type="number" min="20" max="1600" value="300"
+                                style="width:82px;padding:5px;"></label>
+                        <label>Alto (px) <input id="modelo_img_alto" type="number" min="20" max="1600"
+                                placeholder="Auto" style="width:82px;padding:5px;"></label>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="aplicarTamanoImagen()">Aplicar
+                            tamaño</button>
+                        <span id="modelo_img_estado" style="font-size:12px;color:#475569;">Seleccione una imagen
+                            haciendo clic sobre ella.</span>
+                    </div>
+                </div>
+                <div class="form-group"><label>Pie de página (puede contener texto, logotipo e imágenes)</label>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="insertarImagenEnZona('modelo_pie')">🖼️ Insertar imagen en pie de página</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖
+                            Quitar imagen seleccionada</button>
+                    </div>
+                    <div id="modelo_pie" class="editor-imagenes" contenteditable="true"
+                        style="min-height:50px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">
+                        Plaza de Armas de Tamburco · Horario de atención: 8:00 a. m. a 3:00 p. m.</div>
+                </div>
+                <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-success" onclick="guardarModeloCarta(true)">💾 Guardar modelo
+                        para futuras cartas</button>
+                    <button type="button" class="btn btn-primary" onclick="exportarModeloCarta()">⬇️ Exportar
+                        configuración (.json)</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="document.getElementById('importar_modelo_carta').click()">⬆️ Importar
+                        configuración</button>
+                    <input type="file" id="importar_modelo_carta" accept=".json,application/json" style="display:none"
+                        onchange="importarModeloCartaArchivo(this)">
+                    <button type="button" class="btn btn-secondary" onclick="previsualizarModeloCarta()">👁️ Vista
+                        previa</button>
+                </div>
+                <p id="modelo_estado" style="color:var(--text-secondary);margin-top:.7rem;"></p>
+            </div>
+            <div id="panel-generar-cartas" class="card">
+                <div class="card-header">
+                    <h2>✉️ Generar cartas inductivas</h2>
+                </div>
+                <p style="color:var(--text-secondary); margin-bottom:1rem;">Se utilizarán los registros clasificados
+                    como OMISO o SUBVALUANTE en el módulo Contraste. Revise que los datos del contribuyente y la
+                    dirección estén completos antes de imprimir.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cartas_tipo">Contribuyentes a incluir</label>
+                        <select id="cartas_tipo" onchange="actualizarResumenCartas()">
+                            <option value="AMBOS">Omiso y subvaluante</option>
+                            <option value="OMISO">Solo omisos</option>
+                            <option value="SUBVALUANTE">Solo subvaluantes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cartas_fecha">Fecha de la carta</label>
+                        <input type="text" id="cartas_fecha" placeholder="Tamburco, 21 de octubre del 2026">
+                    </div>
+                </div>
+                <div id="cartas_resumen" style="margin:1rem 0;color:var(--text-secondary);"></div>
+                <button class="btn btn-primary" onclick="prepararGeneracionCartas()">🔢 Definir numeración y preparar
+                    cartas</button>
+                <div id="cartas_acciones" style="display:none; margin-top:1rem; gap:.75rem; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="imprimirCartas()">🖨️ Imprimir / Guardar como PDF</button>
+                    <button class="btn btn-secondary" onclick="prepararGeneracionCartas()">↻ Cambiar numeración o
+                        selección</button>
+                </div>
+                <div id="cartas_preview" style="margin-top:1rem;"></div>
+            </div>
+        </section>
+
         <!-- ========================================== -->
-        <!-- 3. MÓDULO DE REPORTES, IMPORTACIÓN Y AVANCE -->
+        <!-- 4. MÓDULO DE REPORTES, IMPORTACIÓN Y AVANCE -->
         <!-- ========================================== -->
         <section id="mod-reportes" class="module-section">
             <div class="card">
@@ -1925,12 +2131,26 @@
             // Verificar si los datos existentes tienen verificador (si no, forzar reimportación)
             let necesitaReimportar = countContrib === 0;
             if (!necesitaReimportar && countContrib > 0) {
-                // Muestra de comprobación: si el primer registro electro no tiene verificador, reimportar
                 const electroCount = await contarRegistrosStore('electro');
-                if (electroCount === 0) necesitaReimportar = true;
+                if (electroCount === 0) {
+                    necesitaReimportar = true;
+                } else {
+                    // VERIFICACIÓN REAL: leer el primer registro electro y comprobar si tiene campo 'verificador'
+                    const primerElectro = await new Promise((resolve) => {
+                        const tx = padronDB.transaction('electro', 'readonly');
+                        const req = tx.objectStore('electro').openCursor();
+                        req.onsuccess = (e) => resolve(e.target.result ? e.target.result.value : null);
+                        req.onerror = () => resolve(null);
+                    });
+                    // Si el registro no tiene 'verificador' son datos de versión anterior → reimportar
+                    if (!primerElectro || primerElectro.verificador === undefined) {
+                        necesitaReimportar = true;
+                        console.warn('Electro sin campo verificador detectado — forzando reimportación del padrón.');
+                    }
+                }
             }
             if (necesitaReimportar && window.PADRON_INICIAL) {
-                mostrarToast("Inicializando padrón municipal (v2) en la base de datos local...", "info");
+                mostrarToast("Actualizando padrón municipal (verificador+medidor)...", "info");
                 await guardarDatosCompletosEnIndexedDB(
                     window.PADRON_INICIAL.contribuyentes || [],
                     window.PADRON_INICIAL.electro || [],
@@ -2018,8 +2238,8 @@
             cacheElectroCompositeMap.clear();
             electroList.forEach(e => {
                 if (e.verificador !== undefined || e.medidor !== undefined) {
-                    const v = String(e.verificador || '').trim();
-                    const m = String(e.medidor || '').trim();
+                    const v = normalizarClaveMedidor(e.verificador);
+                    const m = normalizarClaveMedidor(e.medidor);
                     const v_n = v.replace(/^0+/, '') || '0';
                     const m_n = m.replace(/^0+/, '') || '0';
                     // Registrar múltiples variantes de clave
@@ -2070,8 +2290,8 @@
             cacheElectroCompositeMap.clear();
             (pi.electro || []).forEach(e => {
                 const item = { nombre: e[0], direccion: e[1], lat: e[2], lng: e[3], cod_corto: e[4], cod_largo: e[5], verificador: e[6] || '', medidor: e[7] || '' };
-                const v = String(item.verificador || '').trim();
-                const m = String(item.medidor || '').trim();
+                const v = normalizarClaveMedidor(item.verificador);
+                const m = normalizarClaveMedidor(item.medidor);
                 const v_n = v.replace(/^0+/, '') || '0';
                 const m_n = m.replace(/^0+/, '') || '0';
                 for (const vk of [v, v_n, v.padStart(2, '0')]) {
@@ -3213,6 +3433,30 @@
         // ==========================================
         // PREVIEW EN VIVO EN MUESTREO
         // ==========================================
+        // Normaliza claves de medidor para evitar diferencias entre Excel local y GitHub Pages.
+        function normalizarClaveMedidor(valor) {
+            if (valor === null || valor === undefined) return '';
+            let t = String(valor).trim().replace(/\\u00a0/g, '').replace(/\\s+/g, '');
+            // Excel puede entregar números como "123.0"; conservar códigos alfanuméricos.
+            if (/^\\d+\\.0+$/.test(t)) t = t.replace(/\\.0+$/, '');
+            return t.toUpperCase();
+        }
+        function buscarElectroPorVerificadorMedidor(verif, medidor) {
+            const v = normalizarClaveMedidor(verif), m = normalizarClaveMedidor(medidor);
+            if (!v || !m) return null;
+            const quitarCeros = x => x.replace(/^0+(?=\\d)/, '');
+            const vs = [...new Set([v, quitarCeros(v), v.padStart(2, '0')])];
+            const ms = [...new Set([m, quitarCeros(m)])];
+            for (const vk of vs) for (const mk of ms) {
+                const hit = cacheElectroCompositeMap.get(`${vk}|${mk}`);
+                if (hit) return hit;
+            }
+            // Respaldo lineal: no depende de cómo se construyó la caché/IndexedDB.
+            const all = new Set(cacheElectroCompositeMap.values());
+            return [...all].find(e => normalizarClaveMedidor(e.verificador) === v &&
+                normalizarClaveMedidor(e.medidor) === m) || null;
+        }
+
         function previewCruceMuestreo() {
             const previewLuz = document.getElementById('preview_cruce_muestreo_luz');
             const previewAgua = document.getElementById('preview_cruce_muestreo_agua');
@@ -3230,12 +3474,7 @@
 
                     let encontrado = null;
                     if (verif && med) {
-                        const v_n = verif.replace(/^0+/, '') || '0';
-                        const m_n = med.replace(/^0+/, '') || '0';
-                        encontrado = cacheElectroCompositeMap.get(`${verif}|${med}`)
-                            || cacheElectroCompositeMap.get(`${v_n}|${m_n}`)
-                            || cacheElectroCompositeMap.get(`${verif}|${m_n}`)
-                            || cacheElectroCompositeMap.get(`${v_n}|${med}`);
+                        encontrado = buscarElectroPorVerificadorMedidor(verif, med);
                     } else if (med) {
                         const m_n = med.replace(/^0+/, '') || '0';
                         encontrado = cacheElectroCompositeMap.get(`|${med}`)
@@ -3417,6 +3656,422 @@
             document.getElementById('modalZoom').classList.remove('active');
         }
 
+        let cartasPreparadas = [];
+        const MODELO_CARTA_KEY = 'fiscalizacion_modelo_carta_v1';
+        const MODELO_CARTA_DEFAULT = {
+            fuente: 'Arial', tamano: '11', color: '#202124', margen: '18', margenSuperior: '12', margenInferior: '12', separacionEncabezado: '5', separacionPie: '5', fondoColor: '#ffffff', fondoImagen: '', fondoOpacidad: '15',
+            encabezado: 'MUNICIPALIDAD DISTRITAL DE TAMBURCO<br><strong>SUBGERENCIA DE ADMINISTRACIÓN TRIBUTARIA Y RENTAS</strong>',
+            pie: 'Plaza de Armas de Tamburco · Horario de atención: 8:00 a. m. a 3:00 p. m.',
+            contenido: `<div style="text-align:right">{{FECHA}}</div>
+<h2 style="text-align:center;font-size:14pt;margin:18px 0;">CARTA INDUCTIVA N.° {{NUMERO}}-2026-YJRR-FT-SGATR-MDT</h2>
+<p><strong>Señor(a):</strong> {{NOMBRE}}<br><strong>DNI:</strong> {{DNI}}<br><strong>Domicilio fiscal:</strong> {{DIRECCION}}</p>
+<p><strong>ASUNTO:</strong> Comunicación de inconsistencia u omisión detectada en la declaración jurada del Impuesto Predial (autoevalúo).</p>
+<p>De nuestra consideración:</p>
+<p>Por medio de la presente hacemos de su conocimiento que, como parte de las labores de fiscalización y en uso de las facultades establecidas en el Código Tributario, la Subgerencia de Administración Tributaria y Rentas viene realizando acciones de control. De acuerdo con la información disponible y lo verificado en campo, se ha identificado la siguiente situación:</p>
+<p>☐ El área construida sería mayor a la registrada en la declaración jurada del Impuesto Predial; condición clasificada para efectos de esta comunicación como <strong>SUBVALUANTE</strong>.</p>
+<p>☐ El predio no registra declaración jurada del Impuesto Predial; condición clasificada para efectos de esta comunicación como <strong>OMISO</strong>.</p>
+<p>En ese sentido, se le invita a revisar y, de corresponder, regularizar voluntariamente su situación tributaria dentro del plazo de cinco (05) días hábiles contado desde la notificación de la presente. Para ello, deberá acercarse a la Subgerencia de Administración Tributaria y Rentas de la Municipalidad Distrital de Tamburco, a fin de coordinar la verificación técnica y la presentación o actualización de la declaración jurada que corresponda.</p>
+<p>En caso de actuar mediante representante, deberá acreditar debidamente su representación. La presente comunicación tiene carácter inductivo y no sustituye los actos administrativos que correspondan conforme a ley.</p>
+<p>Para mayor información, puede comunicarse con el fiscalizador tributario al celular 938 524 967.</p>
+<p>Sin otro particular, quedamos de usted.</p>
+<p style="margin-top:24px;">Atentamente,</p>
+<p style="text-align:right;margin-top:34px;">____________________________________<br><strong>Yabel J. Roman Roque</strong><br>Fiscalizador Tributario</p>
+<hr>
+<p style="font-size:9pt;"><strong>CARGO DE NOTIFICACIÓN</strong><br>Fecha: ____/____/________ &nbsp; Hora: __________<br>Notificador: __________________________ &nbsp; Firma: __________________<br>Recibe ( ) &nbsp; Bajo puerta ( ) &nbsp; Observaciones: ______________________________<br>Nombre de quien recibe: __________________ DNI: ______________ Firma: ______________</p>`
+        };
+        function actualizarResumenCartas() {
+            const tipo = document.getElementById('cartas_tipo')?.value || 'AMBOS';
+            const elegibles = registros.filter(r => tipo === 'AMBOS'
+                ? ['OMISO', 'SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
+                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+            const resumen = document.getElementById('cartas_resumen');
+            if (resumen) resumen.textContent = `Registros disponibles para carta: ${elegibles.length}. Omisos: ${elegibles.filter(r => String(r.estadoFiscal || '').toUpperCase() === 'OMISO').length}; subvaluantes: ${elegibles.filter(r => String(r.estadoFiscal || '').toUpperCase() === 'SUBVALUANTE').length}.`;
+        }
+        function escaparHTMLCarta(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function mostrarPanelCartas(panel) {
+            document.getElementById('panel-generar-cartas').style.display = panel === 'generar' ? '' : 'none';
+            document.getElementById('panel-diseno-cartas').style.display = panel === 'diseno' ? '' : 'none';
+            if (panel === 'diseno') cargarModeloCartaEnEditor();
+        }
+        function cargarModeloCartaEnEditor() {
+            let m = null;
+            try { m = JSON.parse(localStorage.getItem(MODELO_CARTA_KEY) || 'null'); } catch (e) { }
+            m = m || MODELO_CARTA_DEFAULT;
+            document.getElementById('modelo_fuente').value = m.fuente || 'Arial';
+            document.getElementById('modelo_tamano').value = m.tamano || '11';
+            document.getElementById('modelo_color').value = m.color || '#202124';
+            document.getElementById('modelo_margen').value = m.margen || '18';
+            document.getElementById('modelo_margen_superior').value = m.margenSuperior ?? '12';
+            document.getElementById('modelo_margen_inferior').value = m.margenInferior ?? '12';
+            document.getElementById('modelo_sep_encabezado').value = m.separacionEncabezado ?? '5';
+            document.getElementById('modelo_sep_pie').value = m.separacionPie ?? '5';
+            document.getElementById('modelo_fondo_color').value = m.fondoColor || '#ffffff';
+            document.getElementById('modelo_fondo_opacidad').value = m.fondoOpacidad ?? '15';
+            window.fondoImagenModeloActual = m.fondoImagen || '';
+            const fondoEstado = document.getElementById('modelo_fondo_estado');
+            if (fondoEstado) fondoEstado.textContent = m.fondoImagen ? 'Imagen de fondo cargada.' : 'Sin imagen de fondo.';
+            document.getElementById('modelo_encabezado').innerHTML = m.encabezado ?? MODELO_CARTA_DEFAULT.encabezado;
+            document.getElementById('modelo_pie').innerHTML = m.pie ?? MODELO_CARTA_DEFAULT.pie;
+            document.getElementById('modelo_contenido').innerHTML = m.contenido ?? MODELO_CARTA_DEFAULT.contenido;
+            aplicarEstiloModelo();
+            const estado = document.getElementById('modelo_estado');
+            if (estado) estado.textContent = localStorage.getItem(MODELO_CARTA_KEY) ? 'Modelo guardado en este navegador.' : 'Modelo predeterminado cargado. Guárdelo al terminar de personalizarlo.';
+        }
+        function obtenerModeloCarta() {
+            return {
+                fuente: document.getElementById('modelo_fuente').value,
+                tamano: document.getElementById('modelo_tamano').value,
+                color: document.getElementById('modelo_color').value,
+                margen: document.getElementById('modelo_margen').value,
+                margenSuperior: document.getElementById('modelo_margen_superior').value || '12',
+                margenInferior: document.getElementById('modelo_margen_inferior').value || '12',
+                separacionEncabezado: document.getElementById('modelo_sep_encabezado').value || '5',
+                separacionPie: document.getElementById('modelo_sep_pie').value || '5',
+                fondoColor: document.getElementById('modelo_fondo_color').value || '#ffffff',
+                fondoImagen: window.fondoImagenModeloActual ?? '',
+                fondoOpacidad: document.getElementById('modelo_fondo_opacidad').value || '15',
+                encabezado: document.getElementById('modelo_encabezado').innerHTML,
+                pie: document.getElementById('modelo_pie').innerHTML,
+                contenido: document.getElementById('modelo_contenido').innerHTML
+            };
+        }
+        window.fondoImagenModeloActual = '';
+        function cargarFondoModelo(input) {
+            const archivo = input.files && input.files[0];
+            if (!archivo) return;
+            if (!archivo.type.startsWith('image/')) { alert('Seleccione un archivo de imagen.'); input.value = ''; return; }
+            if (archivo.size > 2 * 1024 * 1024) { alert('La imagen de fondo debe pesar como máximo 2 MB.'); input.value = ''; return; }
+            const lector = new FileReader();
+            lector.onload = () => {
+                window.fondoImagenModeloActual = String(lector.result || '');
+                const estado = document.getElementById('modelo_fondo_estado');
+                if (estado) estado.textContent = `Fondo cargado: ${archivo.name}`;
+                guardarModeloCarta(false);
+                input.value = '';
+            };
+            lector.readAsDataURL(archivo);
+        }
+        function quitarFondoModelo() {
+            window.fondoImagenModeloActual = '';
+            const estado = document.getElementById('modelo_fondo_estado');
+            if (estado) estado.textContent = 'Sin imagen de fondo.';
+            guardarModeloCarta(false);
+        }
+        function guardarModeloCarta(notificar = false) {
+            try {
+                localStorage.setItem(MODELO_CARTA_KEY, JSON.stringify(obtenerModeloCarta()));
+                const estado = document.getElementById('modelo_estado');
+                if (estado) estado.textContent = '✓ Modelo guardado en este navegador. Se reutilizará en las próximas generaciones en este dispositivo y navegador.';
+                if (notificar && typeof mostrarToast === 'function') mostrarToast('Modelo de carta guardado correctamente en este navegador.', 'success');
+            } catch (e) {
+                if (typeof mostrarToast === 'function') mostrarToast('No se pudo guardar el modelo. Pruebe con imágenes de menor tamaño.', 'error');
+            }
+        }
+        function exportarModeloCarta() {
+            try {
+                const modelo = obtenerModeloCarta();
+                const archivo = {
+                    aplicacion: 'Sistema de Fiscalización Predial',
+                    tipo: 'modelo-carta-inductiva',
+                    version: 1,
+                    exportadoEn: new Date().toISOString(),
+                    modelo
+                };
+                const blob = new Blob([JSON.stringify(archivo, null, 2)], { type: 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `modelo_carta_fiscalizacion_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                const estado = document.getElementById('modelo_estado');
+                if (estado) estado.textContent = '✓ Configuración exportada. Guarde el archivo .json en una carpeta segura para importarlo cuando lo necesite.';
+            } catch (e) {
+                alert('No se pudo exportar la configuración. Intente nuevamente.');
+            }
+        }
+        function importarModeloCartaArchivo(input) {
+            const archivo = input.files && input.files[0];
+            if (!archivo) return;
+            const lector = new FileReader();
+            lector.onload = () => {
+                try {
+                    const data = JSON.parse(String(lector.result || ''));
+                    const m = data && data.modelo ? data.modelo : data;
+                    const requeridos = ['fuente', 'tamano', 'color', 'margen', 'encabezado', 'pie', 'contenido'];
+                    if (!m || !requeridos.every(k => Object.prototype.hasOwnProperty.call(m, k)) ||
+                        !['Arial', 'Calibri', 'Times New Roman', 'Verdana', 'Georgia'].includes(m.fuente) ||
+                        !['9', '10', '11', '12', '13'].includes(String(m.tamano)) ||
+                        !['15', '18', '22'].includes(String(m.margen)) ||
+                        !/^#[0-9a-fA-F]{6}$/.test(String(m.color))) {
+                        throw new Error('El archivo no tiene un modelo de carta compatible.');
+                    }
+                    if (!confirm('Se importará este modelo y reemplazará la configuración actual del editor. ¿Desea continuar?')) return;
+                    document.getElementById('modelo_fuente').value = m.fuente;
+                    document.getElementById('modelo_tamano').value = String(m.tamano);
+                    document.getElementById('modelo_color').value = m.color;
+                    document.getElementById('modelo_margen').value = String(m.margen);
+                    document.getElementById('modelo_margen_superior').value = String(m.margenSuperior ?? '12');
+                    document.getElementById('modelo_margen_inferior').value = String(m.margenInferior ?? '12');
+                    document.getElementById('modelo_sep_encabezado').value = String(m.separacionEncabezado ?? '5');
+                    document.getElementById('modelo_sep_pie').value = String(m.separacionPie ?? '5');
+                    document.getElementById('modelo_fondo_color').value = /^#[0-9a-fA-F]{6}$/.test(String(m.fondoColor || '')) ? m.fondoColor : '#ffffff';
+                    document.getElementById('modelo_fondo_opacidad').value = String(m.fondoOpacidad ?? '15');
+                    window.fondoImagenModeloActual = m.fondoImagen || '';
+                    const fondoEstadoImport = document.getElementById('modelo_fondo_estado');
+                    if (fondoEstadoImport) fondoEstadoImport.textContent = window.fondoImagenModeloActual ? 'Imagen de fondo cargada.' : 'Sin imagen de fondo.';
+                    document.getElementById('modelo_encabezado').innerHTML = String(m.encabezado);
+                    document.getElementById('modelo_pie').innerHTML = String(m.pie);
+                    document.getElementById('modelo_contenido').innerHTML = String(m.contenido);
+                    aplicarEstiloModelo();
+                    guardarModeloCarta(false);
+                    const estado = document.getElementById('modelo_estado');
+                    if (estado) estado.textContent = '✓ Configuración importada y guardada en este navegador. Revise la vista previa antes de imprimir.';
+                    if (typeof mostrarToast === 'function') mostrarToast('Modelo importado correctamente.', 'success');
+                } catch (e) {
+                    alert('No se pudo importar el archivo. Seleccione un .json exportado desde este sistema y compruebe que no esté dañado.');
+                } finally {
+                    input.value = '';
+                }
+            };
+            lector.readAsText(archivo, 'UTF-8');
+        }
+        function aplicarEstiloModelo() {
+            const editor = document.getElementById('modelo_contenido');
+            if (!editor) return;
+            editor.style.fontFamily = document.getElementById('modelo_fuente').value;
+            editor.style.fontSize = document.getElementById('modelo_tamano').value + 'pt';
+            editor.style.color = document.getElementById('modelo_color').value;
+        }
+        function formatearModelo(cmd) {
+            document.getElementById('modelo_contenido').focus();
+            document.execCommand(cmd, false, null);
+        }
+        function colorTextoModelo(color) {
+            document.getElementById('modelo_contenido').focus();
+            document.execCommand('foreColor', false, color);
+        }
+        let imagenModeloSeleccionada = null;
+        let rangoImagenModelo = null;
+        let zonaImagenModelo = 'modelo_contenido';
+        function seleccionarImagenModelo(img) {
+            if (imagenModeloSeleccionada) imagenModeloSeleccionada.classList.remove('imagen-modelo-seleccionada');
+            imagenModeloSeleccionada = img;
+            if (img) {
+                img.classList.add('imagen-modelo-seleccionada');
+                document.getElementById('modelo_img_ancho').value = Math.round(img.getBoundingClientRect().width || parseFloat(img.style.width) || 300);
+                document.getElementById('modelo_img_alto').value = img.style.height && img.style.height !== 'auto' ? parseInt(img.style.height, 10) : '';
+                document.getElementById('modelo_img_estado').textContent = 'Imagen seleccionada. Ajuste ancho y/o alto y pulse Aplicar tamaño.';
+            } else {
+                document.getElementById('modelo_img_estado').textContent = 'Seleccione una imagen haciendo clic sobre ella.';
+            }
+        }
+        function inicializarEventosImagenesModelo() {
+            ['modelo_encabezado', 'modelo_contenido', 'modelo_pie'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el || el.dataset.eventosImagen === '1') return;
+                el.dataset.eventosImagen = '1';
+                el.addEventListener('click', ev => { if (ev.target && ev.target.tagName === 'IMG') seleccionarImagenModelo(ev.target); });
+                el.addEventListener('keydown', ev => { if (ev.key === 'Delete' && imagenModeloSeleccionada && el.contains(imagenModeloSeleccionada)) { imagenModeloSeleccionada.remove(); seleccionarImagenModelo(null); } });
+            });
+        }
+        function aplicarTamanoImagen() {
+            if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected) { alert('Primero haga clic en la imagen que desea redimensionar.'); return; }
+            const ancho = Number(document.getElementById('modelo_img_ancho').value);
+            const altoTxt = document.getElementById('modelo_img_alto').value;
+            const alto = altoTxt === '' ? null : Number(altoTxt);
+            if (!Number.isFinite(ancho) || ancho < 20 || ancho > 1600 || (alto !== null && (!Number.isFinite(alto) || alto < 20 || alto > 1600))) { alert('Ingrese un ancho y alto entre 20 y 1600 píxeles. Deje el alto vacío para mantener la proporción.'); return; }
+            imagenModeloSeleccionada.style.width = ancho + 'px';
+            imagenModeloSeleccionada.style.maxWidth = '100%';
+            imagenModeloSeleccionada.style.height = alto === null ? 'auto' : alto + 'px';
+            imagenModeloSeleccionada.style.objectFit = 'contain';
+            guardarModeloCarta(false);
+        }
+        function quitarImagenSeleccionada() {
+            if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected) { alert('Primero haga clic en la imagen que desea quitar.'); return; }
+            imagenModeloSeleccionada.remove(); seleccionarImagenModelo(null); guardarModeloCarta(false);
+        }
+        function insertarImagenModelo() { insertarImagenEnZona('modelo_contenido'); }
+        function insertarImagenEnZona(zonaId) {
+            const zona = document.getElementById(zonaId);
+            if (!zona) return;
+            zonaImagenModelo = zonaId;
+            zona.focus();
+            const sel = window.getSelection();
+            rangoImagenModelo = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+            const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+            input.onchange = () => {
+                const file = input.files && input.files[0]; if (!file) return;
+                if (file.size > 2 * 1024 * 1024) { alert('Use una imagen de máximo 2 MB para facilitar el guardado y la exportación del modelo.'); return; }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = document.createElement('img'); img.src = reader.result; img.alt = 'Imagen del modelo de carta';
+                    img.style.width = zonaId === 'modelo_contenido' ? '300px' : '150px'; img.style.maxWidth = '100%'; img.style.height = 'auto'; img.style.objectFit = 'contain'; img.style.verticalAlign = 'middle';
+                    zona.focus();
+                    const selection = window.getSelection();
+                    if (rangoImagenModelo && zona.contains(rangoImagenModelo.commonAncestorContainer)) {
+                        selection.removeAllRanges(); selection.addRange(rangoImagenModelo);
+                        rangoImagenModelo.deleteContents(); rangoImagenModelo.insertNode(img);
+                    } else { zona.appendChild(img); }
+                    seleccionarImagenModelo(img); guardarModeloCarta(false);
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+        function insertarCampoModelo() {
+            const campos = ['{{FECHA}}', '{{NUMERO}}', '{{NOMBRE}}', '{{DNI}}', '{{DIRECCION}}', '{{ESTADO}}', '{{VERIFICADOR}}', '{{MEDIDOR}}'];
+            const elegido = prompt('Escriba el número del campo que desea insertar:\\n' + campos.map((x, i) => `${i + 1}. ${x}`).join('\\n'), '1');
+            if (elegido === null) return;
+            const campo = campos[Number(elegido) - 1];
+            if (!campo) { alert('Seleccione un número de campo válido.'); return; }
+            document.getElementById('modelo_contenido').focus();
+            document.execCommand('insertText', false, campo);
+        }
+        function restaurarModeloPredeterminado() {
+            if (!confirm('¿Restaurar el modelo de carta predeterminado? Se reemplazará el contenido actual del editor.')) return;
+            document.getElementById('modelo_encabezado').innerHTML = MODELO_CARTA_DEFAULT.encabezado;
+            document.getElementById('modelo_pie').innerHTML = MODELO_CARTA_DEFAULT.pie;
+            document.getElementById('modelo_contenido').innerHTML = MODELO_CARTA_DEFAULT.contenido;
+            document.getElementById('modelo_fuente').value = MODELO_CARTA_DEFAULT.fuente;
+            document.getElementById('modelo_tamano').value = MODELO_CARTA_DEFAULT.tamano;
+            document.getElementById('modelo_color').value = MODELO_CARTA_DEFAULT.color;
+            document.getElementById('modelo_margen').value = MODELO_CARTA_DEFAULT.margen;
+            aplicarEstiloModelo();
+        }
+        function previsualizarModeloCarta() {
+            guardarModeloCarta(false);
+            const m = obtenerModeloCarta();
+            const w = window.open('', '_blank');
+            if (!w) { mostrarToast('Permita ventanas emergentes para ver la vista previa.', 'error'); return; }
+            w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Vista previa del modelo</title><style>@page{size:A4;margin:${Number(m.margenSuperior ?? 12)}mm ${m.margen}mm ${Number(m.margenInferior ?? 12)}mm}*{box-sizing:border-box}body{font-family:${m.fuente};font-size:${m.tamano}pt;color:${m.color};line-height:1.4;margin:0}.hoja{position:relative;isolation:isolate;min-height:260mm;display:flex;flex-direction:column;overflow:hidden;background:${m.fondoColor || '#ffffff'}}.fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${Math.max(0.05, Math.min(1, Number(m.fondoOpacidad ?? 15) / 100))};z-index:-1}.head,.foot,.contenido{position:relative;z-index:1}.head{font-size:9pt;text-align:center;border-bottom:1px solid #aaa;padding-bottom:4px;margin-bottom:${Number(m.separacionEncabezado ?? 5)}mm}.contenido{flex:1}.foot{font-size:8.5pt;text-align:center;border-top:1px solid #aaa;padding-top:3px;margin-top:auto;margin-bottom:${Number(m.separacionPie ?? 5)}mm}img{max-width:100%;height:auto}</style></head><body><section class="hoja">${m.fondoImagen ? `<img class="fondo" src="${m.fondoImagen}" alt="">` : ''}<header class="head">${m.encabezado}</header><main class="contenido">${m.contenido.replaceAll('{{FECHA}}', '[FECHA]').replaceAll('{{NUMERO}}', '[NÚMERO]').replaceAll('{{NOMBRE}}', '[NOMBRE DEL CONTRIBUYENTE]').replaceAll('{{DNI}}', '[DNI]').replaceAll('{{DIRECCION}}', '[DIRECCIÓN]').replaceAll('{{ESTADO}}', '[ESTADO]')}</main><footer class="foot">${m.pie}</footer></section></body></html>`);
+            w.document.close();
+        }
+        function prepararGeneracionCartas() {
+            const tipo = document.getElementById('cartas_tipo').value;
+            const elegibles = registros.filter(r => tipo === 'AMBOS'
+                ? ['OMISO', 'SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
+                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+            if (!elegibles.length) { mostrarToast('No hay registros con el estado seleccionado.', 'error'); return; }
+
+            // Validar coherencia entre el estado fiscal y el DNI antes de numerar/imprimir.
+            // OMISO: no debe tener DNI/RUC registrado. SUBVALUANTE: debe tener DNI/RUC.
+            const inconsistencias = elegibles.filter(r => {
+                const estado = String(r.estadoFiscal || '').trim().toUpperCase();
+                const documento = String(r.propietarioDNI ?? '').trim();
+                if (estado === 'OMISO') return documento !== '';
+                if (estado === 'SUBVALUANTE') return documento === '';
+                return false;
+            });
+            if (inconsistencias.length) {
+                const detalle = inconsistencias.slice(0, 15).map(r => {
+                    const estado = String(r.estadoFiscal || '').trim().toUpperCase();
+                    const documento = String(r.propietarioDNI ?? '').trim();
+                    const nombre = String(r.propietarioNombre || 'SIN NOMBRE').trim();
+                    const motivo = estado === 'OMISO'
+                        ? `OMISO pero tiene DNI/RUC (${documento})`
+                        : 'SUBVALUANTE pero no tiene DNI/RUC';
+                    return `• ${nombre}: ${motivo}`;
+                }).join('\n');
+                const restantes = inconsistencias.length > 15 ? `\n… y ${inconsistencias.length - 15} registro(s) más.` : '';
+                alert(`No se pueden generar las cartas porque hay ${inconsistencias.length} registro(s) que no cumplen la validación de DNI/RUC.\n\nReglas: OMISO no debe tener DNI/RUC; SUBVALUANTE sí debe tener DNI/RUC.\n\n${detalle}${restantes}\n\nCorrija los datos en el módulo Contraste y vuelva a intentarlo.`);
+                mostrarToast('Validación de DNI/RUC: corrija los registros señalados.', 'error');
+                document.getElementById('cartas_acciones').style.display = 'none';
+                document.getElementById('cartas_preview').innerHTML = '';
+                cartasPreparadas = [];
+                return;
+            }
+
+            const inicioTxt = prompt(`Se generarán ${elegibles.length} cartas. ¿Desde qué número correlativo desea empezar?`, '1');
+            if (inicioTxt === null) return;
+            const inicio = Number(inicioTxt.trim());
+            if (!Number.isSafeInteger(inicio) || inicio < 1) { mostrarToast('Ingrese un número correlativo entero mayor que cero.', 'error'); return; }
+            let fecha = document.getElementById('cartas_fecha').value.trim();
+            if (!fecha) {
+                const d = new Date();
+                const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                fecha = `Tamburco, ${d.getDate()} de ${meses[d.getMonth()]} del ${d.getFullYear()}`;
+                document.getElementById('cartas_fecha').value = fecha;
+            }
+            cartasPreparadas = elegibles.map((r, i) => ({ r, numero: String(inicio + i).padStart(4, '0'), fecha }));
+            const preview = document.getElementById('cartas_preview');
+            preview.innerHTML = `<p><strong>${cartasPreparadas.length} cartas preparadas</strong>, numeración ${cartasPreparadas[0].numero}–${cartasPreparadas[cartasPreparadas.length - 1].numero}. Cada carta incluirá una segunda hoja con las fotografías disponibles del predio y del medidor.</p><ol>${cartasPreparadas.slice(0, 10).map(c => `<li>${escaparHTMLCarta(c.numero)} — ${escaparHTMLCarta(c.r.propietarioNombre || 'SIN NOMBRE')} (${escaparHTMLCarta(c.r.estadoFiscal)})</li>`).join('')}${cartasPreparadas.length > 10 ? '<li>… y más cartas</li>' : ''}</ol>`;
+            document.getElementById('cartas_acciones').style.display = 'flex';
+        }
+        function reemplazarCamposCarta(html, r, numero, fecha) {
+            const direccion = r.direccion || r.direccionPredio || r.direccionReferencial || 'No consignada';
+            const valores = {
+                '{{FECHA}}': fecha, '{{NUMERO}}': `${numero}-2026-YJRR-FT-SGATR-MDT`,
+                '{{NOMBRE}}': r.propietarioNombre || 'CONTRIBUYENTE',
+                '{{DNI}}': r.propietarioDNI || 'No consignado',
+                '{{DIRECCION}}': direccion,
+                '{{ESTADO}}': String(r.estadoFiscal || ''),
+                '{{VERIFICADOR}}': r.verificador || r.nroVerificador || '',
+                '{{MEDIDOR}}': r.medidor || r.nroMedidor || ''
+            };
+            for (const [k, v] of Object.entries(valores)) html = html.split(k).join(escaparHTMLCarta(v));
+            const estado = String(r.estadoFiscal || '').toUpperCase();
+            if (estado === 'OMISO') html = html.replace('☐ El área construida', '☐ El área construida').replace('☐ El predio no registra', '☒ El predio no registra');
+            else if (estado === 'SUBVALUANTE') html = html.replace('☐ El área construida', '☒ El área construida');
+            return html;
+        }
+        function imprimirCartas() {
+            if (!cartasPreparadas.length) { mostrarToast('Primero prepare las cartas y defina la numeración.', 'error'); return; }
+            let m = null;
+            try { m = JSON.parse(localStorage.getItem(MODELO_CARTA_KEY) || 'null'); } catch (e) { }
+            m = m || MODELO_CARTA_DEFAULT;
+            const contenido = cartasPreparadas.map(({ r, numero, fecha }) => {
+                const cartaHTML = reemplazarCamposCarta(m.contenido, r, numero, fecha);
+                const nombre = r.propietarioNombre || 'CONTRIBUYENTE';
+                const direccion = r.direccion || r.direccionPredio || r.direccionReferencial || 'No consignada';
+                const predio = r.fotoPredioB64 ? `<img src="${r.fotoPredioB64}" alt="Fotografía del predio">` : '<div class="sin-foto">Fotografía del predio no disponible</div>';
+                const medidor = r.fotoMedidorB64 ? `<img src="${r.fotoMedidorB64}" alt="Fotografía del medidor">` : '<div class="sin-foto">Fotografía del medidor no disponible</div>';
+                return `<section class="hoja carta-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor || '') ? m.fondoColor : '#ffffff'}">
+                    ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
+                    <header class="encabezado">${m.encabezado || ''}</header>
+                    <main class="contenido">${cartaHTML}</main>
+                    <footer class="pie">${m.pie || ''}</footer>
+                </section>
+                <section class="hoja anexo-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor || '') ? m.fondoColor : '#ffffff'}">
+                    ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
+                    <header class="encabezado">${m.encabezado || ''}</header>
+                    <h2>ANEXO FOTOGRÁFICO</h2>
+                    <p class="anexo-subtitulo">CARTA INDUCTIVA N.° ${escaparHTMLCarta(numero)}-2026-YJRR-FT-SGATR-MDT</p>
+                    <div class="datos"><strong>Contribuyente:</strong> ${escaparHTMLCarta(nombre)}<br><strong>Domicilio del predio:</strong> ${escaparHTMLCarta(direccion)}</div>
+                    <div class="fotos-grid">
+                        <figure><figcaption>FOTOGRAFÍA DEL PREDIO</figcaption>${predio}</figure>
+                        <figure><figcaption>FOTOGRAFÍA DEL MEDIDOR</figcaption>${medidor}</figure>
+                    </div>
+                    <p class="anexo-nota">Registro fotográfico de apoyo a la verificación de campo.</p>
+                    <footer class="pie">${m.pie || ''}</footer>
+                </section>`;
+            }).join('');
+            const w = window.open('', '_blank');
+            if (!w) { mostrarToast('El navegador bloqueó la ventana. Permita ventanas emergentes para imprimir.', 'error'); return; }
+            w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Cartas inductivas y anexos fotográficos</title><style>
+            @page{size:A4;margin:0}
+            *{box-sizing:border-box}body{margin:0;font-family:${m.fuente || 'Arial'},sans-serif;font-size:${Number(m.tamano) || 11}pt;color:${m.color || '#202124'};line-height:1.4}
+            .hoja{position:relative;isolation:isolate;width:210mm;height:297mm;min-height:297mm;page-break-after:always;break-after:page;display:flex;flex-direction:column;overflow:hidden;padding:${Math.max(0, Math.min(40, Number(m.margenSuperior ?? 12) || 0))}mm ${Number(m.margen) || 18}mm ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm}.hoja:last-child{page-break-after:auto;break-after:auto}
+            .fondo-hoja{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${Math.max(0.05, Math.min(1, Number(m.fondoOpacidad ?? 15) / 100))};z-index:-1;pointer-events:none}
+            .encabezado,.contenido,.pie,.anexo-hoja h2,.anexo-subtitulo,.datos,.fotos-grid,.anexo-nota{position:relative;z-index:1}
+            .encabezado{font-size:9pt;text-align:center;border-bottom:1px solid #b7bec8;padding:0 0 4px;margin-bottom:${Math.max(0, Math.min(40, Number(m.separacionEncabezado ?? 5) || 0))}mm}.contenido{flex:1}.contenido p{margin:0 0 10px;text-align:justify}.contenido h2,.contenido h3{text-align:center}.contenido img{max-width:100%;height:auto}
+            .pie{font-size:8.5pt;text-align:center;border-top:1px solid #b7bec8;padding-top:3px;margin-top:auto;margin-bottom:0;flex-shrink:0}.pie img{vertical-align:bottom;display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}.pie img:last-child{margin-bottom:calc(-1 * ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm)}
+            .anexo-hoja h2{text-align:center;font-size:15pt;margin:16px 0 5px;letter-spacing:.5px}.anexo-subtitulo{text-align:center;font-size:10pt;margin:0 0 18px}.datos{font-size:10pt;padding:10px 12px;background:#f2f5f8;border-left:3px solid #536b85;margin-bottom:18px}
+            .fotos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:10px}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:8px;border-radius:5px;break-inside:avoid}.fotos-grid figcaption{font-size:9pt;font-weight:bold;text-align:center;margin-bottom:8px;letter-spacing:.3px}.fotos-grid img{display:block;width:100%;height:105mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:105mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}.anexo-nota{margin-top:18px;font-size:9pt;font-style:italic;text-align:center}
+            @media screen{body{background:#e5e7eb}.hoja{background:#fff;width:210mm;height:297mm;min-height:297mm;margin:12px auto;padding:${Math.max(0, Math.min(40, Number(m.margenSuperior ?? 12) || 0))}mm ${Number(m.margen) || 18}mm ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm;box-shadow:0 2px 12px #0002}}
+            </style></head><body>${contenido}<script>window.onload=()=>setTimeout(()=>window.print(),700);<\\/script></body></html>`);
+            w.document.close();
+        }
+        function inicializarModeloCartas() {
+            cargarModeloCartaEnEditor();
+            inicializarEventosImagenesModelo();
+            actualizarResumenCartas();
+        }
+        const estiloImagenesModelo = document.createElement('style');
+        estiloImagenesModelo.textContent = `.editor-imagenes img{max-width:100%;height:auto;cursor:pointer;vertical-align:middle}.editor-imagenes img.imagen-modelo-seleccionada{outline:2px solid #2563eb;outline-offset:2px;}`;
+        document.head.appendChild(estiloImagenesModelo);
+
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.module-section').forEach(sec => sec.classList.remove('active'));
@@ -3431,6 +4086,11 @@
             } else if (tabName === 'reportes') {
                 document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
                 document.getElementById('mod-reportes').classList.add('active');
+            } else if (tabName === 'cartas') {
+                document.querySelector('.tab-btn:nth-child(4)').classList.add('active');
+                document.getElementById('mod-cartas').classList.add('active');
+                inicializarModeloCartas();
+                actualizarResumenCartas();
             }
         }
 
@@ -3481,6 +4141,12 @@
             toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            try { inicializarModeloCartas(); } catch (e) { console.warn('No se pudo inicializar el editor de cartas', e); }
+        });
     </script>
 </body>
 
