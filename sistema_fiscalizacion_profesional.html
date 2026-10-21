@@ -1616,8 +1616,29 @@
                         <select id="modelo_margen" onchange="guardarModeloCarta()"><option value="15">Estrecho (15 mm)</option><option value="18" selected>Normal (18 mm)</option><option value="22">Amplio (22 mm)</option></select>
                     </div>
                 </div>
-                <div class="form-group"><label>Encabezado (logo, nombre de la municipalidad, unidad orgánica)</label>
-                    <div id="modelo_encabezado" contenteditable="true" style="min-height:65px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">MUNICIPALIDAD DISTRITAL DE TAMBURCO<br><strong>SUBGERENCIA DE ADMINISTRACIÓN TRIBUTARIA Y RENTAS</strong></div>
+                <div class="form-group" style="padding:12px;border:1px solid var(--border-color);border-radius:8px;background:#f8fafc;">
+                    <strong>📐 Ajustar espacios de la hoja e insertar fondo</strong>
+                    <p style="font-size:12px;color:#64748b;margin:5px 0 10px;">Modifique los espacios superior e inferior para aprovechar mejor la hoja. El fondo puede ser una imagen institucional o una marca de agua.</p>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="modelo_margen_superior">Margen superior (mm)</label><input id="modelo_margen_superior" type="number" min="0" max="40" value="12" onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_margen_inferior">Margen inferior (mm)</label><input id="modelo_margen_inferior" type="number" min="0" max="40" value="12" onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_sep_encabezado">Espacio bajo encabezado (mm)</label><input id="modelo_sep_encabezado" type="number" min="0" max="40" value="5" onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_sep_pie">Espacio entre pie y borde inferior (mm)</label><input id="modelo_sep_pie" type="number" min="0" max="40" value="5" onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_fondo_color">Color de fondo de hoja</label><input id="modelo_fondo_color" type="color" value="#ffffff" onchange="guardarModeloCarta()"></div>
+                        <div class="form-group"><label for="modelo_fondo_opacidad">Opacidad de imagen de fondo (%)</label><input id="modelo_fondo_opacidad" type="number" min="5" max="100" value="15" onchange="guardarModeloCarta()"></div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer;">🖼️ Elegir imagen de fondo <input id="modelo_fondo_archivo" type="file" accept="image/*" onchange="cargarFondoModelo(this)" style="display:none;"></label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarFondoModelo()">✖ Quitar fondo de imagen</button>
+                        <span id="modelo_fondo_estado" style="font-size:12px;color:#475569;">Sin imagen de fondo.</span>
+                    </div>
+                </div>
+                <div class="form-group"><label>Encabezado (puede contener texto, logotipo e imágenes)</label>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="insertarImagenEnZona('modelo_encabezado')">🖼️ Insertar imagen en encabezado</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖ Quitar imagen seleccionada</button>
+                    </div>
+                    <div id="modelo_encabezado" class="editor-imagenes" contenteditable="true" style="min-height:65px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">MUNICIPALIDAD DISTRITAL DE TAMBURCO<br><strong>SUBGERENCIA DE ADMINISTRACIÓN TRIBUTARIA Y RENTAS</strong></div>
                 </div>
                 <div class="form-group"><label>Contenido principal de la carta — editor de estilo Word</label>
                     <div class="editor-toolbar" style="display:flex;gap:5px;flex-wrap:wrap;padding:8px;background:#eef2f7;border:1px solid #cbd5e1;border-radius:8px 8px 0 0;">
@@ -1630,13 +1651,25 @@
                         <button type="button" class="btn btn-secondary btn-sm" onclick="formatearModelo('justifyFull')">Justificar</button>
                         <label class="btn btn-secondary btn-sm" style="cursor:pointer;">🎨 Color <input type="color" onchange="colorTextoModelo(this.value)" style="width:22px;height:18px;vertical-align:middle;"></label>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="insertarImagenModelo()">🖼️ Insertar imagen</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖ Quitar imagen</button>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="insertarCampoModelo()">＋ Campo automático</button>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="restaurarModeloPredeterminado()">↺ Restaurar modelo</button>
                     </div>
-                    <div id="modelo_contenido" contenteditable="true" spellcheck="true" style="min-height:550px;max-width:850px;margin:0 auto;border:1px solid #cbd5e1;border-top:0;background:#fff;color:#202124;padding:42px 48px;line-height:1.45;box-shadow:0 4px 16px #0001;outline:none;"></div>
+                    <div id="modelo_contenido" class="editor-imagenes" contenteditable="true" spellcheck="true" style="min-height:550px;max-width:850px;margin:0 auto;border:1px solid #cbd5e1;border-top:0;background:#fff;color:#202124;padding:42px 48px;line-height:1.45;box-shadow:0 4px 16px #0001;outline:none;"></div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;background:#f8fafc;border:1px solid #cbd5e1;border-top:0;">
+                        <strong>Redimensionar imagen seleccionada:</strong>
+                        <label>Ancho (px) <input id="modelo_img_ancho" type="number" min="20" max="1600" value="300" style="width:82px;padding:5px;"></label>
+                        <label>Alto (px) <input id="modelo_img_alto" type="number" min="20" max="1600" placeholder="Auto" style="width:82px;padding:5px;"></label>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="aplicarTamanoImagen()">Aplicar tamaño</button>
+                        <span id="modelo_img_estado" style="font-size:12px;color:#475569;">Seleccione una imagen haciendo clic sobre ella.</span>
+                    </div>
                 </div>
-                <div class="form-group"><label>Pie de página (teléfono, dirección, lema, etc.)</label>
-                    <div id="modelo_pie" contenteditable="true" style="min-height:50px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">Plaza de Armas de Tamburco · Horario de atención: 8:00 a. m. a 3:00 p. m.</div>
+                <div class="form-group"><label>Pie de página (puede contener texto, logotipo e imágenes)</label>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="insertarImagenEnZona('modelo_pie')">🖼️ Insertar imagen en pie de página</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖ Quitar imagen seleccionada</button>
+                    </div>
+                    <div id="modelo_pie" class="editor-imagenes" contenteditable="true" style="min-height:50px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:#202124;padding:12px;">Plaza de Armas de Tamburco · Horario de atención: 8:00 a. m. a 3:00 p. m.</div>
                 </div>
                 <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
                     <button type="button" class="btn btn-success" onclick="guardarModeloCarta(true)">💾 Guardar modelo para futuras cartas</button>
@@ -3539,7 +3572,7 @@
         let cartasPreparadas = [];
         const MODELO_CARTA_KEY = 'fiscalizacion_modelo_carta_v1';
         const MODELO_CARTA_DEFAULT = {
-            fuente: 'Arial', tamano: '11', color: '#202124', margen: '18',
+            fuente: 'Arial', tamano: '11', color: '#202124', margen: '18', margenSuperior: '12', margenInferior: '12', separacionEncabezado: '5', separacionPie: '5', fondoColor: '#ffffff', fondoImagen: '', fondoOpacidad: '15',
             encabezado: 'MUNICIPALIDAD DISTRITAL DE TAMBURCO<br><strong>SUBGERENCIA DE ADMINISTRACIÓN TRIBUTARIA Y RENTAS</strong>',
             pie: 'Plaza de Armas de Tamburco · Horario de atención: 8:00 a. m. a 3:00 p. m.',
             contenido: `<div style="text-align:right">{{FECHA}}</div>
@@ -3583,6 +3616,15 @@
             document.getElementById('modelo_tamano').value = m.tamano || '11';
             document.getElementById('modelo_color').value = m.color || '#202124';
             document.getElementById('modelo_margen').value = m.margen || '18';
+            document.getElementById('modelo_margen_superior').value = m.margenSuperior ?? '12';
+            document.getElementById('modelo_margen_inferior').value = m.margenInferior ?? '12';
+            document.getElementById('modelo_sep_encabezado').value = m.separacionEncabezado ?? '5';
+            document.getElementById('modelo_sep_pie').value = m.separacionPie ?? '5';
+            document.getElementById('modelo_fondo_color').value = m.fondoColor || '#ffffff';
+            document.getElementById('modelo_fondo_opacidad').value = m.fondoOpacidad ?? '15';
+            window.fondoImagenModeloActual = m.fondoImagen || '';
+            const fondoEstado = document.getElementById('modelo_fondo_estado');
+            if (fondoEstado) fondoEstado.textContent = m.fondoImagen ? 'Imagen de fondo cargada.' : 'Sin imagen de fondo.';
             document.getElementById('modelo_encabezado').innerHTML = m.encabezado ?? MODELO_CARTA_DEFAULT.encabezado;
             document.getElementById('modelo_pie').innerHTML = m.pie ?? MODELO_CARTA_DEFAULT.pie;
             document.getElementById('modelo_contenido').innerHTML = m.contenido ?? MODELO_CARTA_DEFAULT.contenido;
@@ -3596,10 +3638,39 @@
                 tamano: document.getElementById('modelo_tamano').value,
                 color: document.getElementById('modelo_color').value,
                 margen: document.getElementById('modelo_margen').value,
+                margenSuperior: document.getElementById('modelo_margen_superior').value || '12',
+                margenInferior: document.getElementById('modelo_margen_inferior').value || '12',
+                separacionEncabezado: document.getElementById('modelo_sep_encabezado').value || '5',
+                separacionPie: document.getElementById('modelo_sep_pie').value || '5',
+                fondoColor: document.getElementById('modelo_fondo_color').value || '#ffffff',
+                fondoImagen: window.fondoImagenModeloActual ?? '',
+                fondoOpacidad: document.getElementById('modelo_fondo_opacidad').value || '15',
                 encabezado: document.getElementById('modelo_encabezado').innerHTML,
                 pie: document.getElementById('modelo_pie').innerHTML,
                 contenido: document.getElementById('modelo_contenido').innerHTML
             };
+        }
+        window.fondoImagenModeloActual = '';
+        function cargarFondoModelo(input) {
+            const archivo = input.files && input.files[0];
+            if (!archivo) return;
+            if (!archivo.type.startsWith('image/')) { alert('Seleccione un archivo de imagen.'); input.value=''; return; }
+            if (archivo.size > 2 * 1024 * 1024) { alert('La imagen de fondo debe pesar como máximo 2 MB.'); input.value=''; return; }
+            const lector = new FileReader();
+            lector.onload = () => {
+                window.fondoImagenModeloActual = String(lector.result || '');
+                const estado = document.getElementById('modelo_fondo_estado');
+                if (estado) estado.textContent = `Fondo cargado: ${archivo.name}`;
+                guardarModeloCarta(false);
+                input.value = '';
+            };
+            lector.readAsDataURL(archivo);
+        }
+        function quitarFondoModelo() {
+            window.fondoImagenModeloActual = '';
+            const estado = document.getElementById('modelo_fondo_estado');
+            if (estado) estado.textContent = 'Sin imagen de fondo.';
+            guardarModeloCarta(false);
         }
         function guardarModeloCarta(notificar=false) {
             try {
@@ -3654,6 +3725,15 @@
                     document.getElementById('modelo_tamano').value = String(m.tamano);
                     document.getElementById('modelo_color').value = m.color;
                     document.getElementById('modelo_margen').value = String(m.margen);
+                    document.getElementById('modelo_margen_superior').value = String(m.margenSuperior ?? '12');
+                    document.getElementById('modelo_margen_inferior').value = String(m.margenInferior ?? '12');
+                    document.getElementById('modelo_sep_encabezado').value = String(m.separacionEncabezado ?? '5');
+                    document.getElementById('modelo_sep_pie').value = String(m.separacionPie ?? '5');
+                    document.getElementById('modelo_fondo_color').value = /^#[0-9a-fA-F]{6}$/.test(String(m.fondoColor || '')) ? m.fondoColor : '#ffffff';
+                    document.getElementById('modelo_fondo_opacidad').value = String(m.fondoOpacidad ?? '15');
+                    window.fondoImagenModeloActual = m.fondoImagen || '';
+                    const fondoEstadoImport = document.getElementById('modelo_fondo_estado');
+                    if (fondoEstadoImport) fondoEstadoImport.textContent = window.fondoImagenModeloActual ? 'Imagen de fondo cargada.' : 'Sin imagen de fondo.';
                     document.getElementById('modelo_encabezado').innerHTML = String(m.encabezado);
                     document.getElementById('modelo_pie').innerHTML = String(m.pie);
                     document.getElementById('modelo_contenido').innerHTML = String(m.contenido);
@@ -3685,18 +3765,69 @@
             document.getElementById('modelo_contenido').focus();
             document.execCommand('foreColor', false, color);
         }
-        function insertarImagenModelo() {
-            const input = document.createElement('input');
-            input.type = 'file'; input.accept = 'image/*';
+        let imagenModeloSeleccionada = null;
+        let rangoImagenModelo = null;
+        let zonaImagenModelo = 'modelo_contenido';
+        function seleccionarImagenModelo(img) {
+            if (imagenModeloSeleccionada) imagenModeloSeleccionada.classList.remove('imagen-modelo-seleccionada');
+            imagenModeloSeleccionada = img;
+            if (img) {
+                img.classList.add('imagen-modelo-seleccionada');
+                document.getElementById('modelo_img_ancho').value = Math.round(img.getBoundingClientRect().width || parseFloat(img.style.width) || 300);
+                document.getElementById('modelo_img_alto').value = img.style.height && img.style.height !== 'auto' ? parseInt(img.style.height,10) : '';
+                document.getElementById('modelo_img_estado').textContent = 'Imagen seleccionada. Ajuste ancho y/o alto y pulse Aplicar tamaño.';
+            } else {
+                document.getElementById('modelo_img_estado').textContent = 'Seleccione una imagen haciendo clic sobre ella.';
+            }
+        }
+        function inicializarEventosImagenesModelo() {
+            ['modelo_encabezado','modelo_contenido','modelo_pie'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el || el.dataset.eventosImagen === '1') return;
+                el.dataset.eventosImagen = '1';
+                el.addEventListener('click', ev => { if (ev.target && ev.target.tagName === 'IMG') seleccionarImagenModelo(ev.target); });
+                el.addEventListener('keydown', ev => { if (ev.key === 'Delete' && imagenModeloSeleccionada && el.contains(imagenModeloSeleccionada)) { imagenModeloSeleccionada.remove(); seleccionarImagenModelo(null); } });
+            });
+        }
+        function aplicarTamanoImagen() {
+            if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected) { alert('Primero haga clic en la imagen que desea redimensionar.'); return; }
+            const ancho = Number(document.getElementById('modelo_img_ancho').value);
+            const altoTxt = document.getElementById('modelo_img_alto').value;
+            const alto = altoTxt === '' ? null : Number(altoTxt);
+            if (!Number.isFinite(ancho) || ancho < 20 || ancho > 1600 || (alto !== null && (!Number.isFinite(alto) || alto < 20 || alto > 1600))) { alert('Ingrese un ancho y alto entre 20 y 1600 píxeles. Deje el alto vacío para mantener la proporción.'); return; }
+            imagenModeloSeleccionada.style.width = ancho + 'px';
+            imagenModeloSeleccionada.style.maxWidth = '100%';
+            imagenModeloSeleccionada.style.height = alto === null ? 'auto' : alto + 'px';
+            imagenModeloSeleccionada.style.objectFit = 'contain';
+            guardarModeloCarta(false);
+        }
+        function quitarImagenSeleccionada() {
+            if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected) { alert('Primero haga clic en la imagen que desea quitar.'); return; }
+            imagenModeloSeleccionada.remove(); seleccionarImagenModelo(null); guardarModeloCarta(false);
+        }
+        function insertarImagenModelo() { insertarImagenEnZona('modelo_contenido'); }
+        function insertarImagenEnZona(zonaId) {
+            const zona = document.getElementById(zonaId);
+            if (!zona) return;
+            zonaImagenModelo = zonaId;
+            zona.focus();
+            const sel = window.getSelection();
+            rangoImagenModelo = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+            const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
             input.onchange = () => {
                 const file = input.files && input.files[0]; if (!file) return;
-                if (file.size > 2 * 1024 * 1024) { alert('Para que la configuración se guarde correctamente, use una imagen de máximo 2 MB.'); return; }
+                if (file.size > 2 * 1024 * 1024) { alert('Use una imagen de máximo 2 MB para facilitar el guardado y la exportación del modelo.'); return; }
                 const reader = new FileReader();
                 reader.onload = () => {
-                    document.getElementById('modelo_contenido').focus();
-                    document.execCommand('insertImage', false, reader.result);
-                    const imgs = document.querySelectorAll('#modelo_contenido img');
-                    if (imgs.length) { const img = imgs[imgs.length-1]; img.style.maxWidth='100%'; img.style.height='auto'; }
+                    const img = document.createElement('img'); img.src = reader.result; img.alt = 'Imagen del modelo de carta';
+                    img.style.width = zonaId === 'modelo_contenido' ? '300px' : '150px'; img.style.maxWidth = '100%'; img.style.height = 'auto'; img.style.objectFit = 'contain'; img.style.verticalAlign = 'middle';
+                    zona.focus();
+                    const selection = window.getSelection();
+                    if (rangoImagenModelo && zona.contains(rangoImagenModelo.commonAncestorContainer)) {
+                        selection.removeAllRanges(); selection.addRange(rangoImagenModelo);
+                        rangoImagenModelo.deleteContents(); rangoImagenModelo.insertNode(img);
+                    } else { zona.appendChild(img); }
+                    seleccionarImagenModelo(img); guardarModeloCarta(false);
                 };
                 reader.readAsDataURL(file);
             };
@@ -3727,7 +3858,7 @@
             const m = obtenerModeloCarta();
             const w = window.open('', '_blank');
             if (!w) { mostrarToast('Permita ventanas emergentes para ver la vista previa.', 'error'); return; }
-            w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Vista previa del modelo</title><style>@page{size:A4;margin:${m.margen}mm}body{font-family:${m.fuente};font-size:${m.tamano}pt;color:${m.color};line-height:1.4}.head,.foot{font-size:9pt;border-bottom:1px solid #aaa;padding-bottom:8px}.foot{border-bottom:0;border-top:1px solid #aaa;padding-top:8px;margin-top:20px}img{max-width:100%;height:auto}</style></head><body><header class="head">${m.encabezado}</header>${m.contenido.replaceAll('{{FECHA}}','[FECHA]').replaceAll('{{NUMERO}}','[NÚMERO]').replaceAll('{{NOMBRE}}','[NOMBRE DEL CONTRIBUYENTE]').replaceAll('{{DNI}}','[DNI]').replaceAll('{{DIRECCION}}','[DIRECCIÓN]').replaceAll('{{ESTADO}}','[ESTADO]')}<footer class="foot">${m.pie}</footer></body></html>`);
+            w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Vista previa del modelo</title><style>@page{size:A4;margin:${Number(m.margenSuperior ?? 12)}mm ${m.margen}mm ${Number(m.margenInferior ?? 12)}mm}*{box-sizing:border-box}body{font-family:${m.fuente};font-size:${m.tamano}pt;color:${m.color};line-height:1.4;margin:0}.hoja{position:relative;isolation:isolate;min-height:260mm;display:flex;flex-direction:column;overflow:hidden;background:${m.fondoColor||'#ffffff'}}.fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${Math.max(0.05,Math.min(1,Number(m.fondoOpacidad ?? 15)/100))};z-index:-1}.head,.foot,.contenido{position:relative;z-index:1}.head{font-size:9pt;text-align:center;border-bottom:1px solid #aaa;padding-bottom:4px;margin-bottom:${Number(m.separacionEncabezado ?? 5)}mm}.contenido{flex:1}.foot{font-size:8.5pt;text-align:center;border-top:1px solid #aaa;padding-top:3px;margin-top:auto;margin-bottom:${Number(m.separacionPie ?? 5)}mm}img{max-width:100%;height:auto}</style></head><body><section class="hoja">${m.fondoImagen ? `<img class="fondo" src="${m.fondoImagen}" alt="">` : ''}<header class="head">${m.encabezado}</header><main class="contenido">${m.contenido.replaceAll('{{FECHA}}','[FECHA]').replaceAll('{{NUMERO}}','[NÚMERO]').replaceAll('{{NOMBRE}}','[NOMBRE DEL CONTRIBUYENTE]').replaceAll('{{DNI}}','[DNI]').replaceAll('{{DIRECCION}}','[DIRECCIÓN]').replaceAll('{{ESTADO}}','[ESTADO]')}</main><footer class="foot">${m.pie}</footer></section></body></html>`);
             w.document.close();
         }
         function prepararGeneracionCartas() {
@@ -3736,6 +3867,35 @@
                 ? ['OMISO','SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
                 : String(r.estadoFiscal || '').toUpperCase() === tipo);
             if (!elegibles.length) { mostrarToast('No hay registros con el estado seleccionado.', 'error'); return; }
+
+            // Validar coherencia entre el estado fiscal y el DNI antes de numerar/imprimir.
+            // OMISO: no debe tener DNI/RUC registrado. SUBVALUANTE: debe tener DNI/RUC.
+            const inconsistencias = elegibles.filter(r => {
+                const estado = String(r.estadoFiscal || '').trim().toUpperCase();
+                const documento = String(r.propietarioDNI ?? '').trim();
+                if (estado === 'OMISO') return documento !== '';
+                if (estado === 'SUBVALUANTE') return documento === '';
+                return false;
+            });
+            if (inconsistencias.length) {
+                const detalle = inconsistencias.slice(0, 15).map(r => {
+                    const estado = String(r.estadoFiscal || '').trim().toUpperCase();
+                    const documento = String(r.propietarioDNI ?? '').trim();
+                    const nombre = String(r.propietarioNombre || 'SIN NOMBRE').trim();
+                    const motivo = estado === 'OMISO'
+                        ? `OMISO pero tiene DNI/RUC (${documento})`
+                        : 'SUBVALUANTE pero no tiene DNI/RUC';
+                    return `• ${nombre}: ${motivo}`;
+                }).join('\n');
+                const restantes = inconsistencias.length > 15 ? `\n… y ${inconsistencias.length - 15} registro(s) más.` : '';
+                alert(`No se pueden generar las cartas porque hay ${inconsistencias.length} registro(s) que no cumplen la validación de DNI/RUC.\n\nReglas: OMISO no debe tener DNI/RUC; SUBVALUANTE sí debe tener DNI/RUC.\n\n${detalle}${restantes}\n\nCorrija los datos en el módulo Contraste y vuelva a intentarlo.`);
+                mostrarToast('Validación de DNI/RUC: corrija los registros señalados.', 'error');
+                document.getElementById('cartas_acciones').style.display = 'none';
+                document.getElementById('cartas_preview').innerHTML = '';
+                cartasPreparadas = [];
+                return;
+            }
+
             const inicioTxt = prompt(`Se generarán ${elegibles.length} cartas. ¿Desde qué número correlativo desea empezar?`, '1');
             if (inicioTxt === null) return;
             const inicio = Number(inicioTxt.trim());
@@ -3780,12 +3940,14 @@
                 const direccion = r.direccion || r.direccionPredio || r.direccionReferencial || 'No consignada';
                 const predio = r.fotoPredioB64 ? `<img src="${r.fotoPredioB64}" alt="Fotografía del predio">` : '<div class="sin-foto">Fotografía del predio no disponible</div>';
                 const medidor = r.fotoMedidorB64 ? `<img src="${r.fotoMedidorB64}" alt="Fotografía del medidor">` : '<div class="sin-foto">Fotografía del medidor no disponible</div>';
-                return `<section class="hoja carta-hoja">
+                return `<section class="hoja carta-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor||'') ? m.fondoColor : '#ffffff'}">
+                    ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
                     <header class="encabezado">${m.encabezado || ''}</header>
                     <main class="contenido">${cartaHTML}</main>
                     <footer class="pie">${m.pie || ''}</footer>
                 </section>
-                <section class="hoja anexo-hoja">
+                <section class="hoja anexo-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor||'') ? m.fondoColor : '#ffffff'}">
+                    ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
                     <header class="encabezado">${m.encabezado || ''}</header>
                     <h2>ANEXO FOTOGRÁFICO</h2>
                     <p class="anexo-subtitulo">CARTA INDUCTIVA N.° ${escaparHTMLCarta(numero)}-2026-YJRR-FT-SGATR-MDT</p>
@@ -3801,21 +3963,27 @@
             const w = window.open('', '_blank');
             if (!w) { mostrarToast('El navegador bloqueó la ventana. Permita ventanas emergentes para imprimir.', 'error'); return; }
             w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Cartas inductivas y anexos fotográficos</title><style>
-            @page{size:A4;margin:${Number(m.margen)||18}mm}
+            @page{size:A4;margin:0}
             *{box-sizing:border-box}body{margin:0;font-family:${m.fuente||'Arial'},sans-serif;font-size:${Number(m.tamano)||11}pt;color:${m.color||'#202124'};line-height:1.4}
-            .hoja{position:relative;min-height:260mm;page-break-after:always;break-after:page;display:flex;flex-direction:column}.hoja:last-child{page-break-after:auto;break-after:auto}
-            .encabezado{font-size:9pt;text-align:center;border-bottom:1px solid #b7bec8;padding:0 0 7px;margin-bottom:12px}.contenido{flex:1}.contenido p{margin:0 0 10px;text-align:justify}.contenido h2,.contenido h3{text-align:center}.contenido img{max-width:100%;height:auto}
-            .pie{font-size:8.5pt;text-align:center;border-top:1px solid #b7bec8;padding-top:6px;margin-top:12px}
+            .hoja{position:relative;isolation:isolate;width:210mm;height:297mm;min-height:297mm;page-break-after:always;break-after:page;display:flex;flex-direction:column;overflow:hidden;padding:${Math.max(0,Math.min(40,Number(m.margenSuperior ?? 12)||0))}mm ${Number(m.margen)||18}mm ${Math.max(0,Math.min(40,Number(m.margenInferior ?? 12)||0))}mm}.hoja:last-child{page-break-after:auto;break-after:auto}
+            .fondo-hoja{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${Math.max(0.05,Math.min(1,Number(m.fondoOpacidad ?? 15)/100))};z-index:-1;pointer-events:none}
+            .encabezado,.contenido,.pie,.anexo-hoja h2,.anexo-subtitulo,.datos,.fotos-grid,.anexo-nota{position:relative;z-index:1}
+            .encabezado{font-size:9pt;text-align:center;border-bottom:1px solid #b7bec8;padding:0 0 4px;margin-bottom:${Math.max(0,Math.min(40,Number(m.separacionEncabezado ?? 5)||0))}mm}.contenido{flex:1}.contenido p{margin:0 0 10px;text-align:justify}.contenido h2,.contenido h3{text-align:center}.contenido img{max-width:100%;height:auto}
+            .pie{font-size:8.5pt;text-align:center;border-top:1px solid #b7bec8;padding-top:3px;margin-top:auto;margin-bottom:0;flex-shrink:0}.pie img{vertical-align:bottom;display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}.pie img:last-child{margin-bottom:calc(-1 * ${Math.max(0,Math.min(40,Number(m.margenInferior ?? 12)||0))}mm)}
             .anexo-hoja h2{text-align:center;font-size:15pt;margin:16px 0 5px;letter-spacing:.5px}.anexo-subtitulo{text-align:center;font-size:10pt;margin:0 0 18px}.datos{font-size:10pt;padding:10px 12px;background:#f2f5f8;border-left:3px solid #536b85;margin-bottom:18px}
             .fotos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:10px}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:8px;border-radius:5px;break-inside:avoid}.fotos-grid figcaption{font-size:9pt;font-weight:bold;text-align:center;margin-bottom:8px;letter-spacing:.3px}.fotos-grid img{display:block;width:100%;height:105mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:105mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}.anexo-nota{margin-top:18px;font-size:9pt;font-style:italic;text-align:center}
-            @media screen{body{background:#e5e7eb}.hoja{background:#fff;width:210mm;margin:12px auto;padding:0;box-shadow:0 2px 12px #0002}}
+            @media screen{body{background:#e5e7eb}.hoja{background:#fff;width:210mm;height:297mm;min-height:297mm;margin:12px auto;padding:${Math.max(0,Math.min(40,Number(m.margenSuperior ?? 12)||0))}mm ${Number(m.margen)||18}mm ${Math.max(0,Math.min(40,Number(m.margenInferior ?? 12)||0))}mm;box-shadow:0 2px 12px #0002}}
             </style></head><body>${contenido}<script>window.onload=()=>setTimeout(()=>window.print(),700);<\\/script></body></html>`);
             w.document.close();
         }
         function inicializarModeloCartas() {
             cargarModeloCartaEnEditor();
+            inicializarEventosImagenesModelo();
             actualizarResumenCartas();
         }
+        const estiloImagenesModelo = document.createElement('style');
+        estiloImagenesModelo.textContent = `.editor-imagenes img{max-width:100%;height:auto;cursor:pointer;vertical-align:middle}.editor-imagenes img.imagen-modelo-seleccionada{outline:2px solid #2563eb;outline-offset:2px;}`;
+        document.head.appendChild(estiloImagenesModelo);
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
