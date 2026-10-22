@@ -309,6 +309,33 @@
             grid-column: 1 / -1;
         }
 
+        /* Distribución compacta del formulario de contraste */
+        .contrast-form-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            align-items: start;
+            gap: 0.9rem;
+        }
+
+        .contrast-form-grid>.contrast-full-row {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1050px) {
+            .contrast-form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .contrast-form-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+
+            .contrast-form-grid>.contrast-full-row {
+                grid-column: auto;
+            }
+        }
+
         label {
             font-size: 0.82rem;
             font-weight: 600;
@@ -1484,10 +1511,10 @@
                     </div>
 
                     <form id="formContraste" onsubmit="guardarContraste(event)">
-                        <div class="form-grid" style="grid-template-columns: 1fr;">
+                        <div class="form-grid contrast-form-grid" style="grid-template-columns: 1fr;">
 
                             <!-- SECCIÓN 1: CRUCE AUTOMÁTICO DE MEDIDORES (ELECTRO & EMUSAP) -->
-                            <div
+                            <div class="contrast-full-row"
                                 style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
                                 <div
                                     style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
@@ -1505,7 +1532,7 @@
                             </div>
 
                             <!-- SECCIÓN 2: PRECARGA AUTOMÁTICA DE SIMILITUDES EN CONTRIBUYENTES -->
-                            <div
+                            <div class="contrast-full-row"
                                 style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
                                 <div
                                     style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
@@ -1525,7 +1552,7 @@
                             </div>
 
                             <!-- SECCIÓN 3: BUSCADOR MANUAL PREDICTIVO DE CONTRIBUYENTES -->
-                            <div class="form-group" style="position: relative;">
+                            <div class="form-group contrast-full-row" style="position: relative;">
                                 <label style="display: flex; justify-content: space-between; align-items: center;">
                                     <span>🔍 Buscador Manual en Padrón de Contribuyentes (DNI o Nombre)</span>
                                     <span style="font-size: 0.75rem; color: var(--text-muted);">Mínimo 2 letras</span>
@@ -1560,7 +1587,7 @@
                                     placeholder="Ej: HERRERA TAIPE CIRILO">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group contrast-full-row">
                                 <label>📍 Dirección del predio <span
                                         style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(Se
                                         completa desde el padrón del medidor si existe; también puede ingresarla
@@ -1573,7 +1600,7 @@
                             </div>
 
                             <!-- SECCIÓN 5: ESTADO DE FISCALIZACIÓN -->
-                            <div class="form-group">
+                            <div class="form-group contrast-full-row">
                                 <label>⚖️ Estado de Fiscalización</label>
                                 <input type="hidden" id="contraste_estado" value="CORRECTO">
                                 <div class="status-radio-group">
@@ -1603,7 +1630,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group contrast-full-row">
                                 <label>📋 Dictamen y Observaciones de Gabinete</label>
                                 <textarea id="contraste_observaciones_gabinete"
                                     placeholder="Conclusiones periciales y fundamentación..."></textarea>
@@ -3139,17 +3166,19 @@
             const medidoresLuz = obtenerListaMedidoresLuz();
             const medidoresAgua = obtenerListaMedidoresAgua();
             const idSolicitado = normalizarIdMuestreo(document.getElementById('muestreo_numero').value);
-            if (!modoEdicionId) {
-                if (!idSolicitado) { mostrarToast('Ingrese un número de muestreo válido.', 'error'); return; }
-                if (registros.some(r => r.id === idSolicitado)) {
-                    mostrarToast(`El número ${idSolicitado} ya existe. Elija otro correlativo.`, 'error'); return;
-                }
+            if (!idSolicitado) { mostrarToast('Ingrese un número de muestreo válido.', 'error'); return; }
+            if (registros.some(r => r.id === idSolicitado && r.id !== modoEdicionId)) {
+                mostrarToast(`El número ${idSolicitado} ya existe. Elija otro correlativo.`, 'error'); return;
             }
 
-            // MODO EDICIÓN: actualizar registro existente
+            // MODO EDICIÓN: actualizar ficha y guardar también el nuevo número de muestreo.
             if (modoEdicionId) {
                 const idx = registros.findIndex(r => r.id === modoEdicionId);
                 if (idx !== -1) {
+                    const idAnterior = registros[idx].id;
+                    registros[idx].id = idSolicitado;
+                    if (registroSeleccionado && registroSeleccionado.id === idAnterior) registroSeleccionado = registros[idx];
+                    modoEdicionId = idSolicitado;
                     registros[idx].fotoPredioB64 = fotoPredioBase64;
                     registros[idx].fotoMedidorB64 = fotoMedidorBase64;
                     registros[idx].medidoresLuz = medidoresLuz;
@@ -3163,7 +3192,7 @@
                     guardarRegistrosEnStorage();
                     actualizarMetricas();
                     renderTabla();
-                    mostrarToast(`✅ Ficha ${modoEdicionId} actualizada correctamente.`, "success");
+                    mostrarToast(`✅ Ficha actualizada. Número de muestreo: ${idSolicitado}.`, "success");
                     limpiarFormularioMuestreo();
                     switchTab('muestreo');
                     actualizarSiguienteNumeroMuestreo();
@@ -3277,6 +3306,14 @@
             }
             pagina.forEach(r => {
                 const tr = document.createElement('tr');
+                tr.draggable = true;
+                tr.dataset.registroId = String(r.id);
+                tr.title = 'Arrastre esta fila hacia arriba o abajo para cambiar el orden y la numeración';
+                tr.style.cursor = 'grab';
+                tr.addEventListener('dragstart', iniciarArrastreFila);
+                tr.addEventListener('dragover', permitirSoltarFila);
+                tr.addEventListener('drop', soltarFilaRegistro);
+                tr.addEventListener('dragend', finalizarArrastreFila);
                 const badgeClass = String(r.estadoFiscal || 'PENDIENTE').toLowerCase();
                 const propietarioText = r.propietarioNombre ? `${r.propietarioDNI || ''} - ${r.propietarioNombre}` : '<span style="color:var(--text-muted);font-style:italic;">Sin contrastar</span>';
                 const codigoPredioText = r.codigoPredio || '<span style="color:var(--text-muted);font-style:italic;">Pendiente</span>';
@@ -3309,6 +3346,48 @@
             if (ant) ant.disabled = paginaActualTabla <= 1;
             if (sig) sig.disabled = paginaActualTabla >= totalPaginas;
         }
+        let idFilaArrastrada = null;
+        function iniciarArrastreFila(event) {
+            idFilaArrastrada = event.currentTarget?.dataset?.registroId || null;
+            if (event.dataTransfer) {
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', idFilaArrastrada || '');
+            }
+            event.currentTarget.style.opacity = '0.45';
+        }
+        function permitirSoltarFila(event) {
+            event.preventDefault();
+            if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+        }
+        function finalizarArrastreFila(event) {
+            event.currentTarget.style.opacity = '';
+            idFilaArrastrada = null;
+        }
+        function soltarFilaRegistro(event) {
+            event.preventDefault();
+            const destinoId = event.currentTarget?.dataset?.registroId;
+            const origenId = idFilaArrastrada || event.dataTransfer?.getData('text/plain');
+            if (!origenId || !destinoId || origenId === destinoId) return;
+            const origen = registros.findIndex(r => String(r.id) === String(origenId));
+            const destino = registros.findIndex(r => String(r.id) === String(destinoId));
+            if (origen < 0 || destino < 0) return;
+            const [movido] = registros.splice(origen, 1);
+            registros.splice(destino, 0, movido);
+            // Renumerar las fichas según el orden visible: MUE-0001, MUE-0002, ...
+            registros.forEach((r, i) => { r.id = 'MUE-' + String(i + 1).padStart(4, '0'); });
+            if (registroSeleccionado) {
+                const seleccionado = registros.find(r => r === registroSeleccionado || r.id === registroSeleccionado.id);
+                if (seleccionado) registroSeleccionado = seleccionado;
+            }
+            modoEdicionId = null;
+            guardarRegistrosEnStorage();
+            actualizarMetricas();
+            actualizarSiguienteNumeroMuestreo();
+            renderTabla();
+            actualizarResumenCartas();
+            mostrarToast('Orden actualizado y fichas renumeradas según la posición del listado. Las cartas respetarán este orden.', 'success');
+        }
+
         function cambiarPaginaTabla(delta) { paginaActualTabla += delta; renderTabla(); }
         function filtrarTabla() { paginaActualTabla = 1; renderTabla(); }
 
@@ -3733,7 +3812,8 @@
             const tipo = document.getElementById('cartas_tipo')?.value || 'AMBOS';
             const elegibles = registros.filter(r => tipo === 'AMBOS'
                 ? ['OMISO', 'SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
-                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+                : String(r.estadoFiscal || '').toUpperCase() === tipo)
+                .sort((a, b) => registros.indexOf(a) - registros.indexOf(b));
             const resumen = document.getElementById('cartas_resumen');
             if (resumen) resumen.textContent = `Registros disponibles para carta: ${elegibles.length}. Omisos: ${elegibles.filter(r => String(r.estadoFiscal || '').toUpperCase() === 'OMISO').length}; subvaluantes: ${elegibles.filter(r => String(r.estadoFiscal || '').toUpperCase() === 'SUBVALUANTE').length}.`;
         }
@@ -4002,7 +4082,8 @@
             const tipo = document.getElementById('cartas_tipo').value;
             const elegibles = registros.filter(r => tipo === 'AMBOS'
                 ? ['OMISO', 'SUBVALUANTE'].includes(String(r.estadoFiscal || '').toUpperCase())
-                : String(r.estadoFiscal || '').toUpperCase() === tipo);
+                : String(r.estadoFiscal || '').toUpperCase() === tipo)
+                .sort((a, b) => registros.indexOf(a) - registros.indexOf(b));
             if (!elegibles.length) { mostrarToast('No hay registros con el estado seleccionado.', 'error'); return; }
 
             // Validar coherencia entre el estado fiscal y el DNI antes de numerar/imprimir.
