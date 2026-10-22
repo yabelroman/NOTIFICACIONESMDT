@@ -1569,13 +1569,72 @@
                                     style="display: none;"></div>
                             </div>
 
+                            <!-- COMPARATIVO DE DATOS DE CAMPO VS SIAF -->
+                            <div class="contrast-full-row"
+                                style="border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.06);border-radius:10px;padding:1rem;">
+                                <h3 style="margin:0 0 .75rem;color:#f59e0b;font-size:.95rem;">📊 Cuadro comparativo:
+                                    Muestreo vs. SIAF</h3>
+                                <div style="overflow-x:auto;">
+                                    <table style="width:100%;min-width:480px;border-collapse:collapse;">
+                                        <thead>
+                                            <tr>
+                                                <th
+                                                    style="text-align:left;padding:.55rem;border-bottom:1px solid var(--border-color);">
+                                                    Dato</th>
+                                                <th
+                                                    style="text-align:left;padding:.55rem;border-bottom:1px solid var(--border-color);">
+                                                    Registrado en muestreo</th>
+                                                <th
+                                                    style="text-align:left;padding:.55rem;border-bottom:1px solid var(--border-color);">
+                                                    Dato SIAF</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding:.45rem;">Código de predio</td>
+                                                <td id="comp_muestreo_codigo" style="padding:.45rem;">—</td>
+                                                <td style="padding:.35rem;"><input id="siaf_codigo_predio" type="text"
+                                                        placeholder="Código en SIAF"
+                                                        oninput="buscarPredioSIAF(this.value)" style="width:100%;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:.45rem;">Cantidad de pisos</td>
+                                                <td id="comp_muestreo_pisos" style="padding:.45rem;">—</td>
+                                                <td style="padding:.35rem;"><input id="siaf_pisos" type="number" min="0"
+                                                        step="1" placeholder="Pisos declarados" style="width:100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:.45rem;">Material de construcción</td>
+                                                <td id="comp_muestreo_material" style="padding:.45rem;">—</td>
+                                                <td style="padding:.35rem;"><input id="siaf_material" type="text"
+                                                        placeholder="Material declarado en SIAF" style="width:100%;">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div
+                                    style="display:flex;gap:.5rem;align-items:center;margin-top:.75rem;flex-wrap:wrap;">
+                                    <label
+                                        style="display:flex;align-items:center;gap:.5rem;font-weight:700;color:#f87171;"><input
+                                            type="checkbox" id="siaf_no_registrado"
+                                            onchange="cambiarNoRegistradoSIAF(this.checked)" style="width:auto;"> No
+                                        registrado en SIAF (clasificar automáticamente como OMISO)</label>
+                                </div>
+                                <small id="siaf_estado_mensaje"
+                                    style="display:block;margin-top:.4rem;color:var(--text-secondary);">Ingrese el
+                                    código de predio para buscarlo en el padrón importado.</small>
+                            </div>
+
                             <!-- SECCIÓN 4: DATOS DEL PROPIETARIO (OPCIONALES PARA OMISOS) -->
                             <div class="form-group">
                                 <label>🏷️ Código de Predio <span
                                         style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Opcional
                                         si es Omiso / Pendiente)</span></label>
                                 <input type="text" id="contraste_codigo_predio"
-                                    placeholder="Ej: PR-2026-004589 (o dejar vacío)">
+                                    placeholder="Ej: PR-2026-004589 (o dejar vacío)"
+                                    oninput="document.getElementById('siaf_codigo_predio').value=this.value; buscarPredioSIAF(this.value, false)">
                             </div>
 
                             <div class="form-group">
@@ -2013,6 +2072,24 @@
                         </button>
                     </div>
 
+                    <!-- IMPORTAR PADRÓN DE PREDIOS SIAF -->
+                    <div
+                        style="background:rgba(16,185,129,.07);padding:1.25rem;border-radius:12px;border:1px solid rgba(16,185,129,.3);display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem;">
+                        <h3>🏘️ Importar padrón de predios SIAF</h3>
+                        <p style="color:var(--text-secondary);font-size:.85rem;">Importe un archivo Excel (.xlsx/.xls),
+                            CSV o JSON con las columnas: código de predio, dirección de predio, DNI y nombres y
+                            apellidos. Al ingresar un código en el contraste, se completará la dirección y, si existen,
+                            los datos del titular.</p>
+                        <input type="file" id="input_importar_predios_siaf"
+                            accept=".xlsx,.xls,.csv,.json,application/json,text/csv" style="display:none"
+                            onchange="importarPadronPrediosSIAF(event)">
+                        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;"><button
+                                class="btn btn-success" type="button"
+                                onclick="document.getElementById('input_importar_predios_siaf').click()">📂 Seleccionar
+                                padrón de predios</button><span id="badge_count_predios_siaf"
+                                style="font-size:.82rem;color:var(--text-secondary);">0 predios cargados</span></div>
+                    </div>
+
                     <!-- IMPORTAR DATOS (AGREGAR A LOS EXISTENTES) -->
                     <div
                         style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
@@ -2166,6 +2243,8 @@
         let padronDB = null;
 
         let cacheContribuyentes = [];
+        let cachePrediosSIAF = (() => { try { return JSON.parse(SafeStorage.getItem('FISCALIZACION_PADRON_PREDIOS_SIAF') || '[]'); } catch (_) { return []; } })();
+        document.addEventListener('DOMContentLoaded', () => { const b = document.getElementById('badge_count_predios_siaf'); if (b) b.textContent = `${cachePrediosSIAF.length} predios cargados`; });
         let cacheElectroMap = new Map();
         let cacheElectroCompositeMap = new Map();
         let cacheEmusapMap = new Map();
@@ -2688,12 +2767,12 @@
             const resultados = [];
 
             for (let c of cacheContribuyentes) {
-                const matchDNI = c.dni.startsWith(q);
-                const matchNombre = tokens.every(t => c.nombre.includes(t));
-
-                if (matchDNI || matchNombre) {
-                    resultados.push(c);
-                    if (resultados.length >= 8) break;
+                const matchDNI = String(c.dni || '').startsWith(q);
+                const matchNombre = tokens.every(t => String(c.nombre || '').toUpperCase().includes(t));
+                const matchConyuge = String(c.conyugue || '').toUpperCase().includes(q) || tokens.every(t => String(c.conyugue || '').toUpperCase().includes(t));
+                if (matchDNI || matchNombre || matchConyuge) {
+                    resultados.push({ ...c, coincidenciaConyuge: !matchDNI && !matchNombre && matchConyuge });
+                    if (resultados.length >= 10) break;
                 }
             }
 
@@ -2703,17 +2782,16 @@
                 return;
             }
 
-            drop.innerHTML = resultados.map(c => `
-                <div class="search-item" onclick="asignarContribuyente('${c.dni}', '${c.nombre.replace(/'/g, "\'")}')">
-                    <div>
-                        <strong style="color: #f8fafc; font-size: 0.83rem;">${c.nombre}</strong>
-                        <div style="font-size: 0.74rem; color: var(--text-muted);">
-                            DNI: <span style="color: #38bdf8;">${c.dni}</span> ${c.conyugue ? `| Cónyuge: ${c.conyugue}` : ''}
-                        </div>
-                    </div>
-                    <span style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Elegir ↵</span>
-                </div>
-            `).join('');
+            drop.innerHTML = resultados.map(c => {
+                const nombreTitular = String(c.nombre || '').replace(/'/g, "\'");
+                const nombreConyuge = String(c.conyugue || '').replace(/'/g, "\'");
+                return `<div class="search-item" style="display:block;">
+                    <div><strong style="color:#f8fafc;font-size:.83rem;">${c.nombre || ''}</strong><div style="font-size:.74rem;color:var(--text-muted);">DNI: <span style="color:#38bdf8;">${c.dni || 'No consignado'}</span>${c.conyugue ? ` | Cónyuge: ${c.conyugue}` : ''}</div></div>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem;">
+                        <button type="button" class="btn btn-success btn-sm" onclick="asignarContribuyente('${c.dni || ''}','${nombreTitular}')">Elegir titular</button>
+                        ${c.conyugue ? `<button type="button" class="btn btn-secondary btn-sm" onclick="asignarContribuyente('','${nombreConyuge}')">Elegir cónyuge</button>` : ''}
+                    </div></div>`;
+            }).join('');
             drop.style.display = 'block';
         }
 
@@ -3461,10 +3539,91 @@
             document.getElementById('contraste_propietario_nombre').value = reg.propietarioNombre || '';
             document.getElementById('contraste_direccion_predio').value = reg.direccionPredio || reg.direccion || reg.direccionReferencial || '';
             document.getElementById('contraste_observaciones_gabinete').value = reg.observacionesGabinete || '';
+            document.getElementById('comp_muestreo_codigo').textContent = reg.codigoPredio || 'Sin código';
+            document.getElementById('comp_muestreo_pisos').textContent = String(reg.pisos ?? 0);
+            document.getElementById('comp_muestreo_material').textContent = reg.material || 'No consignado';
+            document.getElementById('siaf_codigo_predio').value = reg.codigoPredio || '';
+            document.getElementById('siaf_pisos').value = reg.siafPisos ?? '';
+            document.getElementById('siaf_material').value = reg.siafMaterial || '';
+            document.getElementById('siaf_no_registrado').checked = !!reg.noRegistradoSIAF;
+            if (reg.noRegistradoSIAF) cambiarNoRegistradoSIAF(true); else buscarPredioSIAF(reg.codigoPredio || '', false);
 
             seleccionarEstado(reg.estadoFiscal === 'PENDIENTE' ? 'CORRECTO' : reg.estadoFiscal);
             ejecutarCruceMedidores(reg);
             panel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function normalizarClavePredio(v) { return String(v ?? '').trim().toUpperCase().replace(/\s+/g, '').replace(/[–—]/g, '-'); }
+
+        function buscarPredioSIAF(codigo, avisar = true) {
+            const key = normalizarClavePredio(codigo);
+            if (!key) return;
+            const predio = cachePrediosSIAF.find(p => normalizarClavePredio(p.codigoPredio) === key);
+            const msg = document.getElementById('siaf_estado_mensaje');
+            if (predio) {
+                document.getElementById('contraste_codigo_predio').value = predio.codigoPredio || codigo;
+                document.getElementById('contraste_direccion_predio').value = predio.direccion || document.getElementById('contraste_direccion_predio').value;
+                if (predio.dni) document.getElementById('contraste_propietario_dni').value = predio.dni;
+                if (predio.nombre) document.getElementById('contraste_propietario_nombre').value = predio.nombre;
+                msg.textContent = 'Predio encontrado en padrón importado. Dirección y datos disponibles precargados.';
+                msg.style.color = '#10b981';
+                if (avisar) mostrarToast('Predio encontrado en el padrón: dirección y titular precargados.', 'success');
+            } else {
+                msg.textContent = cachePrediosSIAF.length ? 'Código no encontrado en el padrón importado; puede completar los datos manualmente.' : 'Aún no se ha importado un padrón de predios SIAF.';
+                msg.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        function cambiarNoRegistradoSIAF(checked) {
+            if (checked) {
+                seleccionarEstado('OMISO');
+                document.getElementById('siaf_estado_mensaje').textContent = 'Marcado como no registrado en SIAF. El dictamen se guardará automáticamente como OMISO.';
+                document.getElementById('siaf_estado_mensaje').style.color = '#f87171';
+            } else {
+                document.getElementById('siaf_estado_mensaje').textContent = 'Se quitó la marca de no registrado. Revise y seleccione el dictamen que corresponda.';
+            }
+        }
+
+        async function importarPadronPrediosSIAF(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            try {
+                let filas = [];
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext === 'json') {
+                    const parsed = JSON.parse(await file.text());
+                    filas = Array.isArray(parsed) ? parsed : (parsed.predios || parsed.data || []);
+                } else if (ext === 'csv') {
+                    const textCsv = await file.text();
+                    filas = textCsv.replace(/^\uFEFF/, '').split(/\r?\n/).filter(x => x.trim()).map(line => {
+                        const out = []; let cur = '', quoted = false;
+                        for (let i = 0; i < line.length; i++) { const ch = line[i]; if (ch === '"' && line[i + 1] === '"' && quoted) { cur += '"'; i++; } else if (ch === '"') { quoted = !quoted; } else if (ch === ',' && !quoted) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out;
+                    });
+                } else {
+                    if (!window.XLSX) throw new Error('No está disponible el lector Excel. Use CSV o JSON.');
+                    const buf = await file.arrayBuffer(); const wb = XLSX.read(buf, { type: 'array' }); filas = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
+                }
+                if (!filas.length) throw new Error('El archivo no contiene filas.');
+                const norm = v => String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+                const first = filas[0];
+                let data;
+                if (Array.isArray(first)) {
+                    const headers = first.map(norm);
+                    const findCol = patterns => headers.findIndex(h => patterns.some(p => h.includes(p)));
+                    const ix = { codigo: findCol(['codigopredio', 'codigodepredio', 'codpredio', 'codigo']), direccion: findCol(['direccionpredio', 'direcciondepredio', 'direccion']), dni: findCol(['dni', 'documento']), nombre: findCol(['nombresyapellidos', 'apellidosynombres', 'nombre', 'titular', 'propietario']) };
+                    if (ix.codigo < 0 || ix.direccion < 0) throw new Error('No se identifican las columnas de código de predio y dirección. Revise los encabezados.');
+                    data = filas.slice(1).map(r => ({ codigoPredio: String(r[ix.codigo] ?? '').trim(), direccion: String(r[ix.direccion] ?? '').trim().toUpperCase(), dni: ix.dni >= 0 ? String(r[ix.dni] ?? '').trim() : '', nombre: ix.nombre >= 0 ? String(r[ix.nombre] ?? '').trim().toUpperCase() : '' }));
+                } else {
+                    data = filas.map(r => ({ codigoPredio: String(r.codigoPredio ?? r.codigo_predio ?? r.codigo ?? r['Código de predio'] ?? '').trim(), direccion: String(r.direccion ?? r.direccionPredio ?? r.direccion_predio ?? r['Dirección de predio'] ?? '').trim().toUpperCase(), dni: String(r.dni ?? r.DNI ?? '').trim(), nombre: String(r.nombre ?? r.nombresApellidos ?? r.nombres_y_apellidos ?? r.propietario ?? '').trim().toUpperCase() }));
+                }
+                const map = new Map(cachePrediosSIAF.map(p => [normalizarClavePredio(p.codigoPredio), p]));
+                data.filter(p => p.codigoPredio).forEach(p => map.set(normalizarClavePredio(p.codigoPredio), p));
+                cachePrediosSIAF = Array.from(map.values());
+                SafeStorage.setItem('FISCALIZACION_PADRON_PREDIOS_SIAF', JSON.stringify(cachePrediosSIAF));
+                document.getElementById('badge_count_predios_siaf').textContent = `${cachePrediosSIAF.length} predios cargados`;
+                mostrarToast(`Padrón de predios importado: ${data.filter(p => p.codigoPredio).length} registros procesados.`, 'success');
+            } catch (err) { mostrarToast('No se pudo importar el padrón: ' + err.message, 'error'); }
+            finally { event.target.value = ''; }
         }
 
         function seleccionarEstado(estado) {
@@ -3489,7 +3648,11 @@
             registroSeleccionado.direccionPredio = document.getElementById('contraste_direccion_predio').value.trim().toUpperCase();
             // Mantener también el campo genérico usado por cartas e informes anteriores.
             registroSeleccionado.direccion = registroSeleccionado.direccionPredio;
-            registroSeleccionado.estadoFiscal = document.getElementById('contraste_estado').value;
+            registroSeleccionado.siafCodigoPredio = document.getElementById('siaf_codigo_predio').value.trim().toUpperCase();
+            registroSeleccionado.siafPisos = document.getElementById('siaf_pisos').value === '' ? '' : Number(document.getElementById('siaf_pisos').value);
+            registroSeleccionado.siafMaterial = document.getElementById('siaf_material').value.trim().toUpperCase();
+            registroSeleccionado.noRegistradoSIAF = document.getElementById('siaf_no_registrado').checked;
+            registroSeleccionado.estadoFiscal = registroSeleccionado.noRegistradoSIAF ? 'OMISO' : document.getElementById('contraste_estado').value;
             registroSeleccionado.observacionesGabinete = document.getElementById('contraste_observaciones_gabinete').value.trim();
             registroSeleccionado.fechaContraste = new Date().toLocaleString();
 
