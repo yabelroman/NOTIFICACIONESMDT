@@ -631,7 +631,7 @@
 
         @media (min-width: 1024px) {
             .contrast-layout {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
         }
 
@@ -1141,6 +1141,15 @@
         <!-- ========================================== -->
         <section id="mod-muestreo" class="module-section active">
             <form id="muestreoForm" onsubmit="guardarMuestreo(event)">
+                <div class="card" style="margin-bottom:1rem;">
+                    <div class="form-group" style="max-width:420px;margin:0;">
+                        <label for="muestreo_numero">🔢 Número de muestreo / correlativo (editable)</label>
+                        <input type="text" id="muestreo_numero" inputmode="numeric" placeholder="Ej.: 1 o MUE-0001"
+                            required>
+                        <small style="color:var(--text-muted);">Puede cambiarlo al trabajar con varios archivos. El
+                            sistema advertirá si el código ya existe.</small>
+                    </div>
+                </div>
 
                 <!-- PASO 1: FOTO DEL PREDIO -->
                 <div class="card">
@@ -1307,7 +1316,7 @@
                         <!-- PISOS Y MATERIAL (SIN USO, SIN CONSERVACIÓN, SIN DIRECCIÓN REFERENCIAL) -->
                         <div class="form-group">
                             <label>🏢 Número de Pisos / Niveles</label>
-                            <input type="number" id="predio_pisos" min="1" max="50" value="2" required>
+                            <input type="number" id="predio_pisos" min="0" max="50" value="2" required>
                         </div>
 
                         <div class="form-group">
@@ -1365,6 +1374,18 @@
                     </div>
                 </div>
 
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;margin:.75rem 0;">
+                    <span id="tabla_paginacion_info" style="font-size:.82rem;color:var(--text-secondary);">Mostrando 0
+                        de 0 fichas</span>
+                    <div style="display:flex;gap:.5rem;align-items:center;">
+                        <button type="button" class="btn btn-secondary btn-sm" id="tabla_pagina_anterior"
+                            onclick="cambiarPaginaTabla(-1)">◀ Anterior</button>
+                        <span id="tabla_pagina_actual" style="font-size:.82rem;">Página 1 de 1</span>
+                        <button type="button" class="btn btn-secondary btn-sm" id="tabla_pagina_siguiente"
+                            onclick="cambiarPaginaTabla(1)">Siguiente ▶</button>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -1393,7 +1414,7 @@
             <div id="panel_contraste_detalle" class="contrast-layout" style="display: none;">
 
                 <!-- COLUMNA IZQUIERDA: FOTOS Y MUESTREO DECODIFICADO -->
-                <div class="contrast-panel">
+                <div class="contrast-panel" id="panel_evidencia_decodificada" style="display:none !important;">
                     <div class="card-header">
                         <h2>👁️ Evidencia Decodificada de Base64</h2>
                         <span id="contraste_badge_id" class="status-badge pendiente">ID: #000</span>
@@ -1591,7 +1612,7 @@
 
                         <div
                             style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
-                            <button type="button" class="btn btn-outline" onclick="window.print()">
+                            <button type="button" class="btn btn-outline" onclick="imprimirFichaSeleccionada()">
                                 🖨️ Imprimir Ficha
                             </button>
                             <button type="submit" class="btn btn-success" style="padding: 0.85rem 1.8rem;">
@@ -1981,7 +2002,8 @@
                         style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>📗 Exportar a Excel (CSV)</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Descarga una tabla completa con todos los medidores, coordenadas GPS, características y
+                            Descarga una tabla completa con medidores, coordenadas GPS, características y las
+                            fotografías codificadas en Base64 (puede generar un archivo grande),
                             dictámenes para abrir en Microsoft Excel o Google Sheets.
                         </p>
                         <button class="btn btn-secondary" onclick="exportarCSV()" style="align-self: flex-start;">
@@ -2794,7 +2816,7 @@
                         registros[idxExacto] = nuevo;
                     } else {
                         if (registros.some(r => r.id === nuevo.id)) {
-                            nuevo.id = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+                            nuevo.id = 'MUE-' + String(siguienteNumeroMuestreo()).padStart(4, '0');
                         }
                         registros.push(nuevo);
                         agregados++;
@@ -2813,6 +2835,8 @@
 
         let registros = [];
         let registroSeleccionado = null;
+        let paginaActualTabla = 1;
+        const FILAS_POR_PAGINA = 10;
 
         let fotoPredioBase64 = null;
         let fotoMedidorBase64 = null;
@@ -3077,6 +3101,26 @@
             }
         }
 
+        // Devuelve el siguiente correlativo numérico disponible, incluso si se importaron varios archivos.
+        function siguienteNumeroMuestreo() {
+            let maximo = 0;
+            registros.forEach(r => {
+                const m = String(r.id || '').match(/(\d+)\s*$/);
+                if (m) maximo = Math.max(maximo, parseInt(m[1], 10) || 0);
+            });
+            return maximo + 1;
+        }
+        function normalizarIdMuestreo(valor) {
+            const v = String(valor || '').trim().toUpperCase();
+            if (/^MUE-\d+$/.test(v)) return 'MUE-' + v.slice(4).padStart(4, '0');
+            const n = v.match(/\d+/);
+            return n ? 'MUE-' + String(parseInt(n[0], 10)).padStart(4, '0') : '';
+        }
+        function actualizarSiguienteNumeroMuestreo() {
+            const input = document.getElementById('muestreo_numero');
+            if (input && !modoEdicionId) input.value = siguienteNumeroMuestreo();
+        }
+
         // ==========================================
         // GUARDAR FICHA DE MUESTREO
         // ==========================================
@@ -3094,6 +3138,13 @@
 
             const medidoresLuz = obtenerListaMedidoresLuz();
             const medidoresAgua = obtenerListaMedidoresAgua();
+            const idSolicitado = normalizarIdMuestreo(document.getElementById('muestreo_numero').value);
+            if (!modoEdicionId) {
+                if (!idSolicitado) { mostrarToast('Ingrese un número de muestreo válido.', 'error'); return; }
+                if (registros.some(r => r.id === idSolicitado)) {
+                    mostrarToast(`El número ${idSolicitado} ya existe. Elija otro correlativo.`, 'error'); return;
+                }
+            }
 
             // MODO EDICIÓN: actualizar registro existente
             if (modoEdicionId) {
@@ -3114,16 +3165,14 @@
                     renderTabla();
                     mostrarToast(`✅ Ficha ${modoEdicionId} actualizada correctamente.`, "success");
                     limpiarFormularioMuestreo();
-                    setTimeout(() => {
-                        switchTab('contraste');
-                        abrirPanelContraste(registros[idx].id);
-                    }, 600);
+                    switchTab('muestreo');
+                    actualizarSiguienteNumeroMuestreo();
                     return;
                 }
             }
 
             // MODO NUEVO REGISTRO
-            const idCorrelativo = 'MUE-' + String(registros.length + 1).padStart(4, '0');
+            const idCorrelativo = idSolicitado;
 
             const nuevoRegistro = {
                 id: idCorrelativo,
@@ -3151,13 +3200,10 @@
             actualizarMetricas();
             renderTabla();
 
-            mostrarToast(`Ficha ${idCorrelativo} registrada.`, "success");
+            mostrarToast(`Ficha ${idCorrelativo} registrada. Puede continuar con el siguiente muestreo.`, "success");
             limpiarFormularioMuestreo();
-
-            setTimeout(() => {
-                switchTab('contraste');
-                abrirPanelContraste(nuevoRegistro.id);
-            }, 600);
+            switchTab('muestreo');
+            actualizarSiguienteNumeroMuestreo();
         }
 
         function limpiarFormularioMuestreo() {
@@ -3166,6 +3212,7 @@
             fotoMedidorBase64 = null;
             gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
             modoEdicionId = null;
+            actualizarSiguienteNumeroMuestreo();
 
             document.getElementById('img_preview_predio').style.display = 'none';
             document.getElementById('ph_foto_predio').style.display = 'flex';
@@ -3211,86 +3258,75 @@
         function renderTabla() {
             const tbody = document.getElementById('tabla_registros_body');
             tbody.innerHTML = '';
-
             const busqueda = (document.getElementById('filtro_busqueda')?.value || '').toLowerCase();
             const filtroEst = document.getElementById('filtro_estado')?.value || 'TODOS';
-
             const filtrados = registros.filter(r => {
-                const luzStr = (r.medidoresLuz || []).join(' ').toLowerCase();
-                const aguaStr = (r.medidoresAgua || []).join(' ').toLowerCase();
-
-                const matchTexto =
-                    r.id.toLowerCase().includes(busqueda) ||
-                    luzStr.includes(busqueda) ||
-                    aguaStr.includes(busqueda) ||
-                    (r.codigoPredio && r.codigoPredio.toLowerCase().includes(busqueda)) ||
-                    (r.propietarioDNI && r.propietarioDNI.toLowerCase().includes(busqueda)) ||
-                    (r.propietarioNombre && r.propietarioNombre.toLowerCase().includes(busqueda));
-
-                const matchEstado = (filtroEst === 'TODOS') || (r.estadoFiscal === filtroEst);
-                return matchTexto && matchEstado;
+                const luzStr = (r.medidoresLuz || [r.medidorLuz || '']).map(m => typeof m === 'object' ? `${m.verificador || ''} ${m.medidor || m.texto || ''}` : String(m || '')).join(' ').toLowerCase();
+                const aguaStr = (r.medidoresAgua || [r.medidorAgua || '']).map(m => typeof m === 'object' ? (m.medidor || m.texto || '') : String(m || '')).join(' ').toLowerCase();
+                const matchTexto = String(r.id || '').toLowerCase().includes(busqueda) || luzStr.includes(busqueda) || aguaStr.includes(busqueda) ||
+                    String(r.codigoPredio || '').toLowerCase().includes(busqueda) || String(r.propietarioDNI || '').toLowerCase().includes(busqueda) ||
+                    String(r.propietarioNombre || '').toLowerCase().includes(busqueda) || String(r.direccionPredio || r.direccion || '').toLowerCase().includes(busqueda);
+                return matchTexto && (filtroEst === 'TODOS' || r.estadoFiscal === filtroEst);
             });
-
-            if (filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron registros de muestreo</td></tr>`;
-                return;
+            const totalPaginas = Math.max(1, Math.ceil(filtrados.length / FILAS_POR_PAGINA));
+            paginaActualTabla = Math.min(Math.max(1, paginaActualTabla), totalPaginas);
+            const inicio = (paginaActualTabla - 1) * FILAS_POR_PAGINA;
+            const pagina = filtrados.slice(inicio, inicio + FILAS_POR_PAGINA);
+            if (!pagina.length) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:2rem;">No se encontraron registros de muestreo</td></tr>`;
             }
-
-            filtrados.forEach(r => {
+            pagina.forEach(r => {
                 const tr = document.createElement('tr');
-                const badgeClass = r.estadoFiscal.toLowerCase();
-                const propietarioText = r.propietarioNombre ? `${r.propietarioDNI} - ${r.propietarioNombre}` : '<span style="color:var(--text-muted); font-style:italic;">Sin contrastar</span>';
-                const codigoPredioText = r.codigoPredio || '<span style="color:var(--text-muted); font-style:italic;">Pendiente</span>';
-
+                const badgeClass = String(r.estadoFiscal || 'PENDIENTE').toLowerCase();
+                const propietarioText = r.propietarioNombre ? `${r.propietarioDNI || ''} - ${r.propietarioNombre}` : '<span style="color:var(--text-muted);font-style:italic;">Sin contrastar</span>';
+                const codigoPredioText = r.codigoPredio || '<span style="color:var(--text-muted);font-style:italic;">Pendiente</span>';
                 const luzArr = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean);
                 const aguaArr = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean);
-                const medidoresLuzHTML = luzArr.length > 0
-                    ? luzArr.map(m => {
-                        if (typeof m === 'object' && m.verificador) {
-                            return `<span class="meter-tag" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.15);">⚡ [${m.verificador}] ${m.medidor}</span>`;
-                        }
-                        const str = typeof m === 'object' ? (m.texto || m.medidor || '') : String(m);
-                        return `<span class="meter-tag">⚡ ${str}</span>`;
-                    }).join('')
-                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
-                const medidoresAguaHTML = aguaArr.length > 0
-                    ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.15);">💧 ${m}</span>`).join('')
-                    : '<span style="color:var(--text-muted); font-style:italic; font-size:0.75rem;">Sin medidor</span>';
-
+                const medidoresLuzHTML = luzArr.length ? luzArr.map(m => {
+                    if (typeof m === 'object') return `<span class="meter-tag">⚡ ${m.verificador ? '[' + m.verificador + '] ' : ''}${m.medidor || m.texto || ''}</span>`;
+                    return `<span class="meter-tag">⚡ ${String(m)}</span>`;
+                }).join('') : '<span style="color:var(--text-muted);font-style:italic;font-size:.75rem;">Sin medidor</span>';
+                const medidoresAguaHTML = aguaArr.length ? aguaArr.map(m => `<span class="meter-tag" style="color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.15);">💧 ${typeof m === 'object' ? (m.medidor || m.texto || '') : String(m)}</span>`).join('') : '<span style="color:var(--text-muted);font-style:italic;font-size:.75rem;">Sin medidor</span>';
+                const safeId = String(r.id).replace(/'/g, "\\'");
                 tr.innerHTML = `
                     <td><strong>${r.id}</strong></td>
-                    <td>
-                        <img class="table-thumb" src="${r.fotoPredioB64}" onclick="abrirModalZoom('${r.fotoPredioB64}', 'Foto Predio: ${r.id}')" title="Ver foto">
-                    </td>
-                    <td>
-                        <img class="table-thumb" src="${r.fotoMedidorB64}" onclick="abrirModalZoom('${r.fotoMedidorB64}', 'Foto Medidor: ${r.id}')" title="Ver foto">
-                    </td>
-                    <td>
-                        <div style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: #38bdf8;">
-                            Lat: ${r.latitud}<br>Lng: ${r.longitud}
-                        </div>
-                    </td>
-                    <td>${medidoresLuzHTML}</td>
-                    <td>${medidoresAguaHTML}</td>
-                    <td>${r.pisos} pisos <br><span style="font-size: 0.72rem; color: var(--text-muted);">${r.material}</span></td>
+                    <td>${r.fotoPredioB64 ? `<img class="table-thumb" src="${r.fotoPredioB64}" onclick="abrirModalZoom(this.src, 'Foto Predio: ${safeId}')" title="Ver foto del predio">` : '—'}</td>
+                    <td>${r.fotoMedidorB64 ? `<img class="table-thumb" src="${r.fotoMedidorB64}" onclick="abrirModalZoom(this.src, 'Foto Medidor: ${safeId}')" title="Ver foto del medidor">` : '—'}</td>
+                    <td><div style="font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#38bdf8;">Lat: ${r.latitud || '—'}<br>Lng: ${r.longitud || '—'}</div></td>
+                    <td>${medidoresLuzHTML}</td><td>${medidoresAguaHTML}</td>
+                    <td>${r.pisos ?? 0} pisos<br><span style="font-size:.72rem;color:var(--text-muted);">${r.material || ''}</span></td>
                     <td><code>${codigoPredioText}</code></td>
-                    <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${propietarioText}</td>
-                    <td><span class="status-badge ${badgeClass}">${r.estadoFiscal}</span></td>
-                    <td style="white-space: nowrap;">
-                        <button class="btn btn-primary btn-sm" onclick="abrirPanelContraste('${r.id}')" style="margin-bottom: 4px;">
-                            ✏️ Contrastar
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="eliminarRegistro('${r.id}')" style="margin-bottom: 4px;">
-                            🗑️
-                        </button>
-                    </td>
-                `;
+                    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${propietarioText}</td>
+                    <td><span class="status-badge ${badgeClass}">${r.estadoFiscal || 'PENDIENTE'}</span></td>
+                    <td style="white-space:nowrap;"><button class="btn btn-primary btn-sm" onclick="abrirPanelContraste('${safeId}')" style="margin-bottom:4px;">✏️ Contrastar</button><button class="btn btn-danger btn-sm" onclick="eliminarRegistro('${safeId}')" style="margin-bottom:4px;">🗑️</button><button class="btn btn-secondary btn-sm" onclick="imprimirFicha('${safeId}')">🖨️ Ficha</button></td>`;
                 tbody.appendChild(tr);
             });
+            const info = document.getElementById('tabla_paginacion_info');
+            if (info) info.textContent = filtrados.length ? `Mostrando ${inicio + 1}–${Math.min(inicio + pagina.length, filtrados.length)} de ${filtrados.length} fichas` : 'Mostrando 0 de 0 fichas';
+            const actual = document.getElementById('tabla_pagina_actual');
+            if (actual) actual.textContent = `Página ${paginaActualTabla} de ${totalPaginas}`;
+            const ant = document.getElementById('tabla_pagina_anterior'), sig = document.getElementById('tabla_pagina_siguiente');
+            if (ant) ant.disabled = paginaActualTabla <= 1;
+            if (sig) sig.disabled = paginaActualTabla >= totalPaginas;
         }
+        function cambiarPaginaTabla(delta) { paginaActualTabla += delta; renderTabla(); }
+        function filtrarTabla() { paginaActualTabla = 1; renderTabla(); }
 
-        function filtrarTabla() { renderTabla(); }
-
+        function imprimirFichaSeleccionada() {
+            if (!registroSeleccionado) { mostrarToast('Primero seleccione una ficha con el botón Contrastar.', 'error'); return; }
+            imprimirFicha(registroSeleccionado.id);
+        }
+        function imprimirFicha(id) {
+            const r = registros.find(x => x.id === id);
+            if (!r) { mostrarToast('No se encontró la ficha para imprimir.', 'error'); return; }
+            const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            const medLuz = (r.medidoresLuz || [r.medidorLuz || '']).filter(Boolean).map(m => typeof m === 'object' ? `${m.verificador ? 'Verificador: ' + m.verificador + ' | ' : ''}${m.medidor || m.texto || ''}` : String(m)).join('; ') || 'Sin medidor';
+            const medAgua = (r.medidoresAgua || [r.medidorAgua || '']).filter(Boolean).map(m => typeof m === 'object' ? (m.medidor || m.texto || '') : String(m)).join('; ') || 'Sin medidor';
+            const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ficha ${esc(r.id)}</title><style>@page{size:A4;margin:14mm}body{font:11pt Arial,sans-serif;color:#111}h1{text-align:center;font-size:16pt}h2{font-size:12pt;border-bottom:1px solid #999;padding-bottom:4px}.datos{display:grid;grid-template-columns:1fr 1fr;gap:8px}.campo{padding:6px;border:1px solid #ddd;overflow-wrap:anywhere}.fotos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.fotos img{width:100%;height:90mm;object-fit:contain;border:1px solid #ccc}.fotos p{text-align:center;font-weight:bold}.pie{margin-top:15px;font-size:9pt;color:#555}@media print{button{display:none}}</style></head><body><h1>FICHA DE MUESTREO Y FISCALIZACIÓN PREDIAL</h1><p><b>Número de muestreo:</b> ${esc(r.id)} &nbsp; <b>Fecha:</b> ${esc(r.timestamp || '')}</p><h2>Datos de campo</h2><div class="datos"><div class="campo"><b>Latitud:</b> ${esc(r.latitud || 'Sin GPS')}</div><div class="campo"><b>Longitud:</b> ${esc(r.longitud || 'Sin GPS')}</div><div class="campo"><b>Medidor(es) de luz:</b> ${esc(medLuz)}</div><div class="campo"><b>Medidor(es) de agua:</b> ${esc(medAgua)}</div><div class="campo"><b>Pisos:</b> ${esc(r.pisos ?? 0)}</div><div class="campo"><b>Material:</b> ${esc(r.material || '')}</div><div class="campo"><b>Código de predio:</b> ${esc(r.codigoPredio || '')}</div><div class="campo"><b>Estado:</b> ${esc(r.estadoFiscal || 'PENDIENTE')}</div><div class="campo"><b>DNI/RUC:</b> ${esc(r.propietarioDNI || '')}</div><div class="campo"><b>Propietario:</b> ${esc(r.propietarioNombre || '')}</div><div class="campo" style="grid-column:1/-1"><b>Dirección del predio:</b> ${esc(r.direccionPredio || r.direccion || '')}</div><div class="campo" style="grid-column:1/-1"><b>Observaciones de campo:</b> ${esc(r.observacionesCampo || '')}</div><div class="campo" style="grid-column:1/-1"><b>Dictamen/observaciones de gabinete:</b> ${esc(r.observacionesGabinete || '')}</div></div><h2>Registro fotográfico</h2><div class="fotos"><div><p>Fotografía del predio</p>${r.fotoPredioB64 ? `<img src="${r.fotoPredioB64}">` : '<p>Sin fotografía</p>'}</div><div><p>Fotografía del medidor</p>${r.fotoMedidorB64 ? `<img src="${r.fotoMedidorB64}">` : '<p>Sin fotografía</p>'}</div></div><p class="pie">Documento generado desde el Sistema de Fiscalización Predial.</p><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`;
+            const w = window.open('', '_blank');
+            if (!w) { mostrarToast('El navegador bloqueó la ventana de impresión. Permita ventanas emergentes para este archivo.', 'error'); return; }
+            w.document.open(); w.document.write(html); w.document.close();
+        }
         function abrirPanelContraste(id) {
             const reg = registros.find(r => r.id === id);
             if (!reg) return;
@@ -3396,6 +3432,7 @@
             if (!registroSeleccionado) return;
             const reg = registroSeleccionado;
             modoEdicionId = reg.id;
+            document.getElementById('muestreo_numero').value = reg.id;
 
             // Cambiar a módulo de muestreo
             switchTab('muestreo');
@@ -3618,6 +3655,7 @@
                     guardarRegistrosEnStorage();
                     actualizarMetricas();
                     renderTabla();
+                    actualizarSiguienteNumeroMuestreo();
 
                     mostrarToast(`✅ Se agregaron ${agregados} registros. Total acumulado: ${registros.length}`, "success");
                     // Limpiar input file para permitir volver a cargar
@@ -3630,41 +3668,18 @@
         }
 
         function exportarCSV() {
-            if (registros.length === 0) {
-                mostrarToast("No hay registros para exportar.", "error");
-                return;
-            }
-
-            const headers = ["ID", "Fecha_Levantamiento", "Latitud", "Longitud", "Precision_GPS", "Medidores_Luz", "Medidores_Agua", "Pisos", "Material", "Obs_Campo", "Codigo_Predio", "DNI_Propietario", "Nombre_Propietario", "Estado_Fiscal", "Obs_Gabinete", "Fecha_Contraste"];
-
-            const rows = registros.map(r => [
-                `"${r.id}"`,
-                `"${r.timestamp}"`,
-                `"${r.latitud}"`,
-                `"${r.longitud}"`,
-                `"${r.precision}"`,
-                `"${(r.medidoresLuz || [r.medidorLuz || '']).join('; ')}"`,
-                `"${(r.medidoresAgua || [r.medidorAgua || '']).join('; ')}"`,
-                `"${r.pisos}"`,
-                `"${r.material}"`,
-                `"${(r.observacionesCampo || '').replace(/"/g, '""')}"`,
-                `"${r.codigoPredio || ''}"`,
-                `"${r.propietarioDNI || ''}"`,
-                `"${(r.propietarioNombre || '').replace(/"/g, '""')}"`,
-                `"${r.estadoFiscal}"`,
-                `"${(r.observacionesGabinete || '').replace(/"/g, '""')}"`,
-                `"${r.fechaContraste || ''}"`
-            ]);
-
-            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
+            if (!registros.length) { mostrarToast('No hay registros para exportar.', 'error'); return; }
+            // Incluye medidores estructurados y las imágenes completas codificadas en Base64.
+            const headers = ['ID', 'Fecha_Levantamiento', 'Latitud', 'Longitud', 'Precision_GPS', 'Medidores_Luz', 'Medidores_Agua', 'Pisos', 'Material', 'Obs_Campo', 'Codigo_Predio', 'DNI_Propietario', 'Nombre_Propietario', 'Direccion_Predio', 'Estado_Fiscal', 'Obs_Gabinete', 'Fecha_Contraste', 'Foto_Predio_Base64', 'Foto_Medidor_Base64'];
+            const cell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+            const medidoresTexto = arr => (arr || []).map(m => typeof m === 'object' ? [m.verificador ? `Verificador ${m.verificador}` : '', m.medidor || m.texto || ''].filter(Boolean).join(': ') : String(m || '')).filter(Boolean).join('; ');
+            const rows = registros.map(r => [r.id, r.timestamp, r.latitud, r.longitud, r.precision, medidoresTexto(r.medidoresLuz || [r.medidorLuz]), medidoresTexto(r.medidoresAgua || [r.medidorAgua]), r.pisos ?? 0, r.material, r.observacionesCampo, r.codigoPredio, r.propietarioDNI, r.propietarioNombre, r.direccionPredio || r.direccion, r.estadoFiscal, r.observacionesGabinete, r.fechaContraste, r.fotoPredioB64 || '', r.fotoMedidorB64 || ''].map(cell));
+            const csvContent = '\uFEFF' + [headers.map(cell).join(','), ...rows.map(row => row.join(','))].join('\r\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Fiscalizacion_Predial_${new Date().toISOString().slice(0, 10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast("Archivo CSV exportado exitosamente.", "success");
+            const url = URL.createObjectURL(blob); const a = document.createElement('a');
+            a.href = url; a.download = `Fiscalizacion_Predial_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            mostrarToast('CSV exportado con datos de medidores e imágenes Base64. Si hay muchas fotos, el archivo puede ser grande.', 'success');
         }
 
         function limpiarTodaLaBase() {
@@ -4137,9 +4152,9 @@
             const raw = SafeStorage.getItem(DB_KEY);
             if (raw) {
                 try { registros = JSON.parse(raw); } catch (e) { registros = []; }
-            } else {
-                registros = [];
-            }
+            } else { registros = []; }
+            const input = document.getElementById('muestreo_numero');
+            if (input && !modoEdicionId) input.value = siguienteNumeroMuestreo();
         }
 
         function actualizarMetricas() {
