@@ -3534,12 +3534,14 @@
                 } else {
                     data = filas.map(r => ({codigoPredio:String(r.codigoPredio ?? r.codigo_predio ?? r.codigo ?? r['Código de predio'] ?? '').trim(),direccion:String(r.direccion ?? r.direccionPredio ?? r.direccion_predio ?? r['Dirección de predio'] ?? '').trim().toUpperCase(),dni:String(r.dni ?? r.DNI ?? '').trim(),nombre:String(r.nombre ?? r.nombresApellidos ?? r.nombres_y_apellidos ?? r.propietario ?? '').trim().toUpperCase()}));
                 }
-                const map = new Map(cachePrediosSIAF.map(p => [normalizarClavePredio(p.codigoPredio), p]));
-                data.filter(p => p.codigoPredio).forEach(p => map.set(normalizarClavePredio(p.codigoPredio), p));
-                cachePrediosSIAF = Array.from(map.values());
+                // Conservar todos los registros importados, incluso si comparten el mismo código de predio.
+                // No usar Map por código: un mismo código puede tener varias filas/titulares/direcciones.
+                const registrosImportados = data.filter(p => p && (p.codigoPredio || p.direccion || p.dni || p.nombre));
+                cachePrediosSIAF = cachePrediosSIAF.concat(registrosImportados);
                 SafeStorage.setItem('FISCALIZACION_PADRON_PREDIOS_SIAF', JSON.stringify(cachePrediosSIAF));
-                document.getElementById('badge_count_predios_siaf').textContent = `${cachePrediosSIAF.length} predios cargados`;
-                mostrarToast(`Padrón de predios importado: ${data.filter(p=>p.codigoPredio).length} registros procesados.`, 'success');
+                document.getElementById('badge_count_predios_siaf').textContent = `${cachePrediosSIAF.length} registros cargados`;
+                const duplicadosEnArchivo = registrosImportados.filter((p, i, arr) => p.codigoPredio && arr.findIndex(q => normalizarClavePredio(q.codigoPredio) === normalizarClavePredio(p.codigoPredio)) !== i).length;
+                mostrarToast(`Padrón importado: ${registrosImportados.length} registros agregados; se conservaron los códigos duplicados${duplicadosEnArchivo ? ` (${duplicadosEnArchivo} filas con código repetido)` : ''}.`, 'success');
             } catch (err) { mostrarToast('No se pudo importar el padrón: ' + err.message, 'error'); }
             finally { event.target.value = ''; }
         }
