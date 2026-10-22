@@ -1914,9 +1914,10 @@
                         style="background: rgba(15,23,42,0.6); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem;">
                         <h3>📥 Importar y Agregar Datos</h3>
                         <p style="color: var(--text-secondary); font-size: 0.85rem;">
-                            Sube un archivo JSON de respaldo. Los registros importados <strong>se agregarán
-                                automáticamente a los datos ya existentes</strong> sin borrar tu avance.
+                            Sube un archivo JSON de respaldo. Los registros importados se agregarán a los existentes sin borrar tu avance.
+                            Después de seleccionar el archivo, podrás elegir si deseas procesar primero el número de muestreo menor o el mayor que contiene el archivo. Los registros se agregarán con numeración correlativa después del último número registrado.
                         </p>
+                        <small style="color:var(--text-secondary);">La elección determina el orden de los registros importados: del número original menor al mayor, o del mayor al menor. No se eliminan registros existentes y se evitan duplicados.</small>
                         <input type="file" id="input_importar_json" accept=".json" style="display: none;"
                             onchange="importarYAgregarDatos(event)">
                         <button class="btn btn-primary" onclick="document.getElementById('input_importar_json').click()"
@@ -3626,11 +3627,46 @@
                     }
 
                     let agregados = 0;
-                    // Los registros importados siempre continúan la secuencia local:
-                    // si el último registrado es MUE-0042, el primero importado será MUE-0043.
+                    if (datosImportados.length === 0) {
+                        mostrarToast("El archivo no contiene registros para importar.", "info");
+                        event.target.value = '';
+                        return;
+                    }
+
+                    // Detectar los números originales presentes en el archivo y pedir el criterio tras seleccionarlo.
+                    const extraerNumeroMuestreo = r => {
+                        const m = String(r?.id ?? r?.numeroMuestreo ?? r?.muestreo ?? '').match(/(\d+)\s*$/);
+                        return m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER;
+                    };
+                    const numerosArchivo = datosImportados.map(extraerNumeroMuestreo).filter(n => n !== Number.MAX_SAFE_INTEGER);
+                    const menorArchivo = numerosArchivo.length ? Math.min(...numerosArchivo) : null;
+                    const mayorArchivo = numerosArchivo.length ? Math.max(...numerosArchivo) : null;
+                    const seleccion = window.prompt(
+                        `Archivo seleccionado: ${file.name}\nRegistros encontrados: ${datosImportados.length}\nNúmero menor del archivo: ${menorArchivo === null ? 'no identificado' : 'MUE-' + String(menorArchivo).padStart(4, '0')}\nNúmero mayor del archivo: ${mayorArchivo === null ? 'no identificado' : 'MUE-' + String(mayorArchivo).padStart(4, '0')}\n\n¿Con cuál número original deseas comenzar el orden de importación?\nEscribe 1 para empezar por el MENOR (orden ascendente).\nEscribe 2 para empezar por el MAYOR (orden descendente).\n\nLa numeración nueva continuará después del mayor número ya registrado.`,
+                        '1'
+                    );
+                    if (seleccion !== '1' && seleccion !== '2') {
+                        mostrarToast("Importación cancelada. No se modificaron los registros.", "info");
+                        event.target.value = '';
+                        return;
+                    }
+                    datosImportados.sort((a, b) => {
+                        const na = extraerNumeroMuestreo(a), nb = extraerNumeroMuestreo(b);
+                        const diferencia = na - nb;
+                        return seleccion === '1' ? diferencia : -diferencia;
+                    });
+
+                    const numerosUsados = new Set();
+                    registros.forEach(r => {
+                        const m = String(r.id || '').match(/(\d+)\s*$/);
+                        if (m) numerosUsados.add(parseInt(m[1], 10));
+                    });
+                    // La numeración nueva siempre continúa después del máximo registrado; la elección define el orden importado.
                     let siguienteImportado = siguienteNumeroMuestreo();
                     datosImportados.forEach(nuevo => {
+                        while (numerosUsados.has(siguienteImportado)) siguienteImportado++;
                         nuevo.id = 'MUE-' + String(siguienteImportado).padStart(4, '0');
+                        numerosUsados.add(siguienteImportado);
                         siguienteImportado++;
                         // Compatibilidad si viene de versión con medidor único
                         if (!nuevo.medidoresLuz && nuevo.medidorLuz) nuevo.medidoresLuz = [nuevo.medidorLuz];
