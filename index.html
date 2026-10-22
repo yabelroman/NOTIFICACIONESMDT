@@ -1398,6 +1398,11 @@
                             <option value="SUBVALUANTE">Subvaluante</option>
                             <option value="OMISO">Omiso</option>
                         </select>
+                        <select id="orden_tabla_muestreo" onchange="filtrarTabla()"
+                            aria-label="Ordenar por número de muestreo" style="font-size: 0.85rem; width: auto;">
+                            <option value="ASC">Muestreo: menor a mayor</option>
+                            <option value="DESC">Muestreo: mayor a menor</option>
+                        </select>
                     </div>
                 </div>
 
@@ -3297,6 +3302,15 @@
                     String(r.propietarioNombre || '').toLowerCase().includes(busqueda) || String(r.direccionPredio || r.direccion || '').toLowerCase().includes(busqueda);
                 return matchTexto && (filtroEst === 'TODOS' || r.estadoFiscal === filtroEst);
             });
+            const ordenMuestreo = document.getElementById('orden_tabla_muestreo')?.value || 'ASC';
+            const numeroMuestreo = r => {
+                const coincidencia = String(r.id || '').match(/(\d+)\s*$/);
+                return coincidencia ? parseInt(coincidencia[1], 10) : Number.MAX_SAFE_INTEGER;
+            };
+            filtrados.sort((a, b) => {
+                const diferencia = numeroMuestreo(a) - numeroMuestreo(b);
+                return ordenMuestreo === 'DESC' ? -diferencia : diferencia;
+            });
             const totalPaginas = Math.max(1, Math.ceil(filtrados.length / FILAS_POR_PAGINA));
             paginaActualTabla = Math.min(Math.max(1, paginaActualTabla), totalPaginas);
             const inicio = (paginaActualTabla - 1) * FILAS_POR_PAGINA;
@@ -3717,12 +3731,12 @@
                     }
 
                     let agregados = 0;
+                    // Los registros importados siempre continúan la secuencia local:
+                    // si el último registrado es MUE-0042, el primero importado será MUE-0043.
+                    let siguienteImportado = siguienteNumeroMuestreo();
                     datosImportados.forEach(nuevo => {
-                        // Si ya existe el ID, le generamos uno nuevo para no duplicar
-                        const existeId = registros.some(r => r.id === nuevo.id);
-                        if (existeId) {
-                            nuevo.id = 'MUE-' + String(registros.length + 1).padStart(4, '0');
-                        }
+                        nuevo.id = 'MUE-' + String(siguienteImportado).padStart(4, '0');
+                        siguienteImportado++;
                         // Compatibilidad si viene de versión con medidor único
                         if (!nuevo.medidoresLuz && nuevo.medidorLuz) nuevo.medidoresLuz = [nuevo.medidorLuz];
                         if (!nuevo.medidoresAgua && nuevo.medidorAgua) nuevo.medidoresAgua = [nuevo.medidorAgua];
