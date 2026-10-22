@@ -2090,11 +2090,17 @@
                         <input type="file" id="input_importar_predios_siaf"
                             accept=".xlsx,.xls,.csv,.json,application/json,text/csv" style="display:none"
                             onchange="importarPadronPrediosSIAF(event)">
-                        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;"><button
-                                class="btn btn-success" type="button"
+                        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+                            <button class="btn btn-success" type="button"
                                 onclick="document.getElementById('input_importar_predios_siaf').click()">📂 Seleccionar
-                                padrón de predios</button><span id="badge_count_predios_siaf"
-                                style="font-size:.82rem;color:var(--text-secondary);">0 predios cargados</span></div>
+                                padrón de predios</button>
+                            <button class="btn btn-danger" type="button" onclick="limpiarPadronPrediosSIAF()">🗑️
+                                Limpiar datos de predios</button>
+                            <span id="badge_count_predios_siaf" style="font-size:.82rem;color:var(--text-secondary);">0
+                                registros cargados</span>
+                        </div>
+                        <small style="color:var(--text-secondary);">Limpiar elimina únicamente el padrón de predios
+                            importado; no elimina las fichas de muestreo ni los contrastes guardados.</small>
                     </div>
 
                     <!-- IMPORTAR DATOS (AGREGAR A LOS EXISTENTES) -->
@@ -3663,6 +3669,29 @@
             } else {
                 document.getElementById('siaf_estado_mensaje').textContent = 'Se quitó la marca de no registrado. Revise y seleccione el dictamen que corresponda.';
             }
+        }
+
+        function limpiarPadronPrediosSIAF() {
+            if (!cachePrediosSIAF.length) {
+                mostrarToast('No hay datos de predios importados para limpiar.', 'info');
+                return;
+            }
+            const confirmado = confirm(`¿Desea eliminar los ${cachePrediosSIAF.length} registros del padrón de predios importado?\n\nEsta acción no elimina las fichas de muestreo ni los contrastes guardados.`);
+            if (!confirmado) return;
+            cachePrediosSIAF = [];
+            SafeStorage.setItem('FISCALIZACION_PADRON_PREDIOS_SIAF', JSON.stringify(cachePrediosSIAF));
+            const badge = document.getElementById('badge_count_predios_siaf');
+            if (badge) badge.textContent = '0 registros cargados';
+            const mensaje = document.getElementById('siaf_estado_mensaje');
+            if (mensaje) {
+                mensaje.textContent = 'Se limpió el padrón de predios importado. Puede importar un nuevo archivo.';
+                mensaje.style.color = 'var(--text-secondary)';
+            }
+            const lista = document.getElementById('resultados_predios_contribuyente');
+            const panel = document.getElementById('lista_predios_contribuyente');
+            if (lista) lista.innerHTML = '';
+            if (panel) panel.style.display = 'none';
+            mostrarToast('Se limpiaron los datos del padrón de predios. Las fichas y contrastes se conservaron.', 'success');
         }
 
         async function importarPadronPrediosSIAF(event) {
