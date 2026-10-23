@@ -1358,6 +1358,24 @@
                         </div>
 
                         <div class="form-group full-width">
+                            <label>🏘️ Construcciones adicionales en el mismo predio</label>
+                            <p style="color:var(--text-secondary);font-size:.82rem;margin:.2rem 0 .6rem">Agregue una
+                                fila por cada construcción adicional, indicando pisos, material y fotografía. La primera
+                                construcción corresponde a los campos principales de arriba.</p>
+                            <div id="lista_construcciones_adicionales" style="display:grid;gap:.7rem"></div>
+                            <button type="button" class="btn btn-secondary" onclick="agregarConstruccionAdicional()"
+                                style="margin-top:.6rem">＋ Agregar otra construcción y fotografía</button>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>⚡ Fotografías adicionales de medidores de Electro Sur Este</label>
+                            <p style="color:var(--text-secondary);font-size:.82rem;margin:.2rem 0 .6rem">Permite
+                                adjuntar una foto por cada medidor adicional o evidencia eléctrica. Puede indicar el
+                                número de medidor para identificarla.</p>
+                            <div id="lista_fotos_medidores_electro" style="display:grid;gap:.7rem"></div>
+                            <button type="button" class="btn btn-secondary" onclick="agregarFotoMedidorElectro()"
+                                style="margin-top:.6rem">＋ Agregar fotografía de otro medidor Electro</button>
+                        </div>
+                        <div class="form-group full-width">
                             <label>💬 Observaciones de Campo (Opcional)</label>
                             <textarea id="observaciones_campo"
                                 placeholder="Detalles de inspección física, ampliaciones, etc."></textarea>
@@ -1838,6 +1856,30 @@
                             onclick="formatearModelo('justifyRight')">⇥</button>
                         <button type="button" class="btn btn-secondary btn-sm"
                             onclick="formatearModelo('justifyFull')">Justificar</button>
+                        <label class="btn btn-secondary btn-sm" style="display:flex;align-items:center;gap:5px;">🔠
+                            Tamaño de texto
+                            <select id="modelo_tamano_seleccion" onmousedown="guardarSeleccionTextoModelo()"
+                                onfocus="guardarSeleccionTextoModelo()"
+                                onchange="aplicarTamanoTextoSeleccionado(this.value)"
+                                style="padding:4px;border-radius:5px;border:1px solid #cbd5e1;color:#111827;background:#fff;">
+                                <option value="8">8 pt</option>
+                                <option value="9">9 pt</option>
+                                <option value="10">10 pt</option>
+                                <option value="11" selected>11 pt</option>
+                                <option value="12">12 pt</option>
+                                <option value="13">13 pt</option>
+                                <option value="14">14 pt</option>
+                                <option value="16">16 pt</option>
+                                <option value="18">18 pt</option>
+                                <option value="20">20 pt</option>
+                                <option value="22">22 pt</option>
+                                <option value="24">24 pt</option>
+                                <option value="28">28 pt</option>
+                                <option value="32">32 pt</option>
+                            </select>
+                        </label>
+                        <span style="font-size:11px;color:#475569;align-self:center;">Seleccione el texto y elija un
+                            tamaño</span>
                         <label class="btn btn-secondary btn-sm" style="cursor:pointer;">🎨 Color <input type="color"
                                 onchange="colorTextoModelo(this.value)"
                                 style="width:22px;height:18px;vertical-align:middle;"></label>
@@ -2085,8 +2127,9 @@
                         <h3>🏘️ Importar padrón de predios SIAF</h3>
                         <p style="color:var(--text-secondary);font-size:.85rem;">Importe un archivo Excel (.xlsx/.xls),
                             CSV o JSON con las columnas: código de predio, dirección de predio, DNI y nombres y
-                            apellidos. Al ingresar un código en el contraste, se completará la dirección y, si existen,
-                            los datos del titular.</p>
+                            apellidos. Al ingresar o seleccionar un código de predio en el contraste, solo se completará
+                            la dirección. Los datos del propietario se ingresan manualmente o seleccionando un
+                            contribuyente de la lista.</p>
                         <input type="file" id="input_importar_predios_siaf"
                             accept=".xlsx,.xls,.csv,.json,application/json,text/csv" style="display:none"
                             onchange="importarPadronPrediosSIAF(event)">
@@ -2137,6 +2180,12 @@
                         <button class="btn btn-secondary" onclick="exportarCSV()" style="align-self: flex-start;">
                             ⬇️ Descargar Archivo Excel (CSV)
                         </button>
+                        <button class="btn btn-success" type="button" onclick="exportarReporteFinalExcel()"
+                            style="align-self:flex-start;">
+                            📊 Descargar reporte final Excel (2 hojas)
+                        </button>
+                        <small style="color:var(--text-secondary)">Incluye todos los datos de muestreo/contraste y un
+                            listado de las cartas preparadas, con sus números y datos de contribuyentes.</small>
                     </div>
 
                     <!-- REINICIAR BASE LOCAL -->
@@ -2576,6 +2625,49 @@
             mostrarToast('Dirección del medidor copiada. Revísela y guarde el contraste.', 'success');
         }
 
+        function actualizarOpcionesAsignarMedidorOmiso() {
+            const esOmiso = document.getElementById('contraste_estado')?.value === 'OMISO' || !!document.getElementById('siaf_no_registrado')?.checked;
+            document.querySelectorAll('.btn-asignar-medidor-omiso').forEach(btn => {
+                btn.disabled = !esOmiso;
+                btn.style.opacity = esOmiso ? '1' : '.45';
+                btn.title = esOmiso ? 'Asignar este servicio/medidor a la ficha OMISO' : 'Seleccione el estado OMISO para habilitar esta opción';
+            });
+        }
+
+        function asignarMedidorAOmiso(datosCodificados) {
+            const esOmiso = document.getElementById('contraste_estado')?.value === 'OMISO' || !!document.getElementById('siaf_no_registrado')?.checked;
+            if (!esOmiso) {
+                mostrarToast('Primero seleccione el estado OMISO para asignar un medidor.', 'info');
+                return;
+            }
+            if (!registroSeleccionado) {
+                mostrarToast('Primero abra una ficha de muestreo.', 'error');
+                return;
+            }
+            let datos;
+            try { datos = JSON.parse(decodeURIComponent(datosCodificados)); }
+            catch (_) { mostrarToast('No se pudieron leer los datos del medidor seleccionado.', 'error'); return; }
+            if (datos.nombre) document.getElementById('contraste_propietario_nombre').value = String(datos.nombre).toUpperCase();
+            if (datos.direccion) document.getElementById('contraste_direccion_predio').value = String(datos.direccion).toUpperCase();
+            registroSeleccionado.medidorAsignadoOmiso = {
+                tipo: datos.tipo || '', medidor: datos.medidor || '', titular: datos.nombre || '',
+                direccion: datos.direccion || '', referencia: datos.referencia || '', fechaAsignacion: new Date().toISOString()
+            };
+            const mensaje = document.getElementById('siaf_estado_mensaje');
+            if (mensaje) {
+                mensaje.textContent = `Medidor asignado a esta ficha OMISO: ${datos.tipo} | ${datos.medidor}${datos.nombre ? ' | Titular: ' + datos.nombre : ''}. Revise los datos y guarde el contraste.`;
+                mensaje.style.color = '#f87171';
+            }
+            document.querySelectorAll('.btn-asignar-medidor-omiso').forEach(btn => {
+                btn.classList.remove('btn-success');
+                if (btn.getAttribute('onclick') === `asignarMedidorAOmiso('${datosCodificados}')`) {
+                    btn.classList.add('btn-success');
+                    btn.textContent = '✓ Medidor asignado';
+                }
+            });
+            mostrarToast(`Medidor ${datos.medidor || ''} asignado a la ficha OMISO. Guarde el contraste para conservarlo.`, 'success');
+        }
+
         function ejecutarCruceMedidores(reg) {
             const contenedorCruce = document.getElementById('cruce_resultados_medidores');
             const badgeCruce = document.getElementById('badge_cruce_estado');
@@ -2636,6 +2728,7 @@
                             <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
                             <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Suministro: <code>${encontrado.cod_largo || encontrado.cod_corto}</code></div>
                             ${direccionElectro ? `<button type="button" class="btn btn-outline btn-sm" onclick="usarDireccionPredioDesdeMedidor('${direccionElectroCodificada}')" style="margin-top:0.45rem;">📍 Usar esta dirección del medidor</button>` : ''}
+                            <button type="button" class="btn btn-outline btn-sm btn-asignar-medidor-omiso" disabled onclick="asignarMedidorAOmiso('${encodeURIComponent(JSON.stringify({ tipo: 'Electro Sur Este', medidor: `${encontrado.verificador || verif}-${encontrado.medidor || med}`, nombre: encontrado.nombre || '', direccion: encontrado.direccion || '', referencia: encontrado.cod_largo || encontrado.cod_corto || '' }))}')" style="margin-top:0.45rem;">📌 Asignar este medidor al OMISO</button>
                             ${encontrado.lat ? `<div style="color: #38bdf8; font-size: 0.75rem; font-family: monospace;">🌐 GPS Empresa: Lat ${encontrado.lat}, Lng ${encontrado.lng}</div>` : ''}
                         </div>
                     `;
@@ -2674,6 +2767,7 @@
                             <div>👤 <strong>Titular:</strong> ${encontrado.nombre}</div>
                             <div style="color: var(--text-muted);">📍 <strong>Dirección:</strong> ${encontrado.direccion || 'Sin dirección'} | Mz-Lt: ${encontrado.cod || '-'}</div>
                             ${direccionEmusap ? `<button type="button" class="btn btn-outline btn-sm" onclick="usarDireccionPredioDesdeMedidor('${direccionEmusapCodificada}')" style="margin-top:0.45rem;">📍 Usar esta dirección del medidor</button>` : ''}
+                            <button type="button" class="btn btn-outline btn-sm btn-asignar-medidor-omiso" disabled onclick="asignarMedidorAOmiso('${encodeURIComponent(JSON.stringify({ tipo: 'EMUSAP Abancay', medidor: encontrado.medidor || encontrado.inscripc || med, nombre: encontrado.nombre || '', direccion: encontrado.direccion || '', referencia: encontrado.cod || '' }))}')" style="margin-top:0.45rem;">📌 Asignar este medidor al OMISO</button>
                         </div>
                     `;
                 } else {
@@ -2691,6 +2785,7 @@
 
             // 3. Precarga automática de similitudes en Contribuyentes
             precargarSugerenciasContribuyentes(Array.from(titularesEncontrados));
+            actualizarOpcionesAsignarMedidorOmiso();
         }
 
         function precargarSugerenciasContribuyentes(titulares) {
@@ -2830,8 +2925,8 @@
             document.getElementById('contraste_codigo_predio').value = predio.codigoPredio || '';
             document.getElementById('siaf_codigo_predio').value = predio.codigoPredio || '';
             document.getElementById('contraste_direccion_predio').value = predio.direccion || '';
-            if (predio.dni) document.getElementById('contraste_propietario_dni').value = predio.dni;
-            if (predio.nombre) document.getElementById('contraste_propietario_nombre').value = predio.nombre;
+            // Seleccionar un predio del padrón solo completa código y dirección.
+            // Los datos del propietario se consignan manualmente o al asignar un contribuyente.
             document.getElementById('siaf_no_registrado').checked = false;
             buscarPredioSIAF(predio.codigoPredio || '', false);
             mostrarToast(`Predio ${predio.codigoPredio || ''} seleccionado; código y dirección completados.`, 'success');
@@ -3043,6 +3138,10 @@
 
         let fotoPredioBase64 = null;
         let fotoMedidorBase64 = null;
+        let construccionesTemporales = [];
+        let fotosMedidoresElectroTemporales = [];
+        const CARTAS_HISTORIAL_KEY = 'FISCALIZACION_CARTAS_GENERADAS_V1';
+        let cartasGeneradasHistorial = (() => { try { return JSON.parse(SafeStorage.getItem(CARTAS_HISTORIAL_KEY) || '[]'); } catch (_) { return []; } })();
         let gpsCapturado = { lat: '', lng: '', accuracy: '', fechaHora: '' };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -3325,6 +3424,40 @@
         }
 
         // ==========================================
+        // Construcciones y fotografías adicionales
+        function agregarConstruccionAdicional(datos = {}) {
+            const cont = document.getElementById('lista_construcciones_adicionales');
+            const idx = construccionesTemporales.length;
+            construccionesTemporales.push({ pisos: datos.pisos || '', material: datos.material || '', fotoB64: datos.fotoB64 || '' });
+            const div = document.createElement('div'); div.className = 'card construccion-extra'; div.dataset.idx = String(idx);
+            div.style.cssText = 'padding:.8rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;align-items:end';
+            div.innerHTML = `<div class="form-group"><label>Pisos / niveles</label><input type="number" min="0" max="50" class="extra-construccion-pisos" value="${escaparHTMLCarta(datos.pisos || '')}"></div><div class="form-group"><label>Material</label><select class="extra-construccion-material"><option value="">Seleccione…</option><option>Ladrillo y Concreto (Noble)</option><option>Adobe / Quincha</option><option>Drywall / Pre-fabricado</option><option>Madera</option><option>Estructura Metálica</option><option>Otro</option></select></div><div class="form-group"><label>Foto de esta construcción</label><input type="file" accept="image/*" class="extra-construccion-foto" onchange="procesarFotoConstruccionExtra(event,${idx})"><span class="extra-foto-estado" style="font-size:.78rem;color:var(--text-secondary)">${datos.fotoB64 ? 'Fotografía cargada' : 'Sin fotografía'}</span></div><button type="button" class="btn btn-danger btn-sm" onclick="eliminarConstruccionAdicional(${idx})">Eliminar</button>`;
+            cont.appendChild(div);
+            div.querySelector('.extra-construccion-material').value = datos.material || '';
+            return idx;
+        }
+        function procesarFotoConstruccionExtra(event, idx) {
+            const file = event.target.files && event.target.files[0]; if (!file) return;
+            const reader = new FileReader(); reader.onload = e => { if (!construccionesTemporales[idx]) return; construccionesTemporales[idx].fotoB64 = e.target.result; const row = event.target.closest('.construccion-extra'); if (row) row.querySelector('.extra-foto-estado').textContent = 'Fotografía cargada'; }; reader.readAsDataURL(file);
+        }
+        function eliminarConstruccionAdicional(idx) { construccionesTemporales[idx] = null; const row = document.querySelector(`.construccion-extra[data-idx="${idx}"]`); if (row) row.remove(); }
+        function obtenerConstruccionesAdicionales() { return construccionesTemporales.filter(Boolean).map((d, i) => { const row = document.querySelector(`.construccion-extra[data-idx="${construccionesTemporales.indexOf(d)}"]`); return { pisos: row?.querySelector('.extra-construccion-pisos')?.value ?? d.pisos ?? '', material: row?.querySelector('.extra-construccion-material')?.value ?? d.material ?? '', fotoB64: d.fotoB64 || '' }; }); }
+        function agregarFotoMedidorElectro(datos = {}) {
+            const cont = document.getElementById('lista_fotos_medidores_electro'); const idx = fotosMedidoresElectroTemporales.length;
+            fotosMedidoresElectroTemporales.push({ medidor: datos.medidor || '', fotoB64: datos.fotoB64 || '' });
+            const div = document.createElement('div'); div.className = 'card foto-medidor-extra'; div.dataset.idx = String(idx); div.style.cssText = 'padding:.8rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;align-items:end';
+            div.innerHTML = `<div class="form-group"><label>Número de medidor (opcional)</label><input type="text" class="extra-electro-numero" value="${escaparHTMLCarta(datos.medidor || '')}" placeholder="Verificador-medidor"></div><div class="form-group"><label>Fotografía</label><input type="file" accept="image/*" onchange="procesarFotoElectroExtra(event,${idx})"><span class="extra-foto-estado" style="font-size:.78rem;color:var(--text-secondary)">${datos.fotoB64 ? 'Fotografía cargada' : 'Sin fotografía'}</span></div><button type="button" class="btn btn-danger btn-sm" onclick="eliminarFotoMedidorElectro(${idx})">Eliminar</button>`; cont.appendChild(div);
+        }
+        function procesarFotoElectroExtra(event, idx) { const file = event.target.files && event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { if (!fotosMedidoresElectroTemporales[idx]) return; fotosMedidoresElectroTemporales[idx].fotoB64 = e.target.result; const row = event.target.closest('.foto-medidor-extra'); if (row) row.querySelector('.extra-foto-estado').textContent = 'Fotografía cargada'; }; reader.readAsDataURL(file); }
+        function eliminarFotoMedidorElectro(idx) { fotosMedidoresElectroTemporales[idx] = null; const row = document.querySelector(`.foto-medidor-extra[data-idx="${idx}"]`); if (row) row.remove(); }
+        function obtenerFotosMedidoresElectro() { return fotosMedidoresElectroTemporales.filter(Boolean).map(d => { const idx = fotosMedidoresElectroTemporales.indexOf(d); const row = document.querySelector(`.foto-medidor-extra[data-idx="${idx}"]`); return { medidor: row?.querySelector('.extra-electro-numero')?.value || d.medidor || '', fotoB64: d.fotoB64 || '' }; }); }
+        function cargarExtrasMuestreo(reg) {
+            construccionesTemporales = []; fotosMedidoresElectroTemporales = [];
+            document.getElementById('lista_construcciones_adicionales').innerHTML = ''; document.getElementById('lista_fotos_medidores_electro').innerHTML = '';
+            (reg.construccionesAdicionales || []).forEach(d => agregarConstruccionAdicional(d));
+            (reg.fotosMedidoresElectro || []).forEach(d => agregarFotoMedidorElectro(d));
+        }
+
         // GUARDAR FICHA DE MUESTREO
         // ==========================================
         function guardarMuestreo(event) {
@@ -3361,6 +3494,8 @@
                     registros[idx].medidoresAgua = medidoresAgua;
                     registros[idx].pisos = document.getElementById('predio_pisos').value;
                     registros[idx].material = document.getElementById('predio_material').value;
+                    registros[idx].construccionesAdicionales = obtenerConstruccionesAdicionales();
+                    registros[idx].fotosMedidoresElectro = obtenerFotosMedidoresElectro();
                     registros[idx].observacionesCampo = document.getElementById('observaciones_campo').value.trim();
                     registros[idx].latitud = document.getElementById('geo_lat').value || registros[idx].latitud;
                     registros[idx].longitud = document.getElementById('geo_lng').value || registros[idx].longitud;
@@ -3391,6 +3526,8 @@
                 medidoresAgua: medidoresAgua,
                 pisos: document.getElementById('predio_pisos').value,
                 material: document.getElementById('predio_material').value,
+                construccionesAdicionales: obtenerConstruccionesAdicionales(),
+                fotosMedidoresElectro: obtenerFotosMedidoresElectro(),
                 observacionesCampo: document.getElementById('observaciones_campo').value.trim(),
                 codigoPredio: '',
                 estadoFiscal: 'PENDIENTE',
@@ -3412,6 +3549,9 @@
         }
 
         function limpiarFormularioMuestreo() {
+            construccionesTemporales = []; fotosMedidoresElectroTemporales = [];
+            const extrasConstruccion = document.getElementById('lista_construcciones_adicionales'); if (extrasConstruccion) extrasConstruccion.innerHTML = '';
+            const extrasElectro = document.getElementById('lista_fotos_medidores_electro'); if (extrasElectro) extrasElectro.innerHTML = '';
             document.getElementById('muestreoForm').reset();
             fotoPredioBase64 = null;
             fotoMedidorBase64 = null;
@@ -3591,10 +3731,36 @@
             if (!w) { mostrarToast('El navegador bloqueó la ventana de impresión. Permita ventanas emergentes para este archivo.', 'error'); return; }
             w.document.open(); w.document.write(html); w.document.close();
         }
+        function limpiarBuscadoresYPrediosContraste() {
+            // Limpiar resultados transitorios de la persona anterior para evitar
+            // seleccionar por error un predio o contribuyente de otra ficha.
+            const idsTexto = [
+                'buscador_contribuyente_input',
+                'dropdown_resultados_contribuyentes',
+                'lista_predios_contribuyente',
+                'resultados_predios_contribuyente',
+                'lista_sugerencias_contribuyentes',
+                'badge_total_sugerencias'
+            ];
+            const buscador = document.getElementById('buscador_contribuyente_input');
+            if (buscador) buscador.value = '';
+            const dropdown = document.getElementById('dropdown_resultados_contribuyentes');
+            if (dropdown) { dropdown.innerHTML = ''; dropdown.style.display = 'none'; }
+            const panelPredios = document.getElementById('lista_predios_contribuyente');
+            if (panelPredios) panelPredios.style.display = 'none';
+            const listaPredios = document.getElementById('resultados_predios_contribuyente');
+            if (listaPredios) listaPredios.innerHTML = '';
+            const sugerencias = document.getElementById('lista_sugerencias_contribuyentes');
+            if (sugerencias) sugerencias.innerHTML = '<span style="color:var(--text-muted);font-size:.8rem;font-style:italic;">Cargando coincidencias para esta ficha…</span>';
+            const badge = document.getElementById('badge_total_sugerencias');
+            if (badge) badge.innerText = '0 sugerencias';
+        }
+
         function abrirPanelContraste(id) {
             const reg = registros.find(r => r.id === id);
             if (!reg) return;
 
+            limpiarBuscadoresYPrediosContraste();
             registroSeleccionado = reg;
             const panel = document.getElementById('panel_contraste_detalle');
             panel.style.display = 'grid';
@@ -3650,11 +3816,11 @@
             if (predio) {
                 document.getElementById('contraste_codigo_predio').value = predio.codigoPredio || codigo;
                 document.getElementById('contraste_direccion_predio').value = predio.direccion || document.getElementById('contraste_direccion_predio').value;
-                if (predio.dni) document.getElementById('contraste_propietario_dni').value = predio.dni;
-                if (predio.nombre) document.getElementById('contraste_propietario_nombre').value = predio.nombre;
-                msg.textContent = 'Predio encontrado en padrón importado. Dirección y datos disponibles precargados.';
+                // La búsqueda por código de predio completa únicamente la dirección.
+                // No sobrescribir DNI/nombre: el usuario los ingresa manualmente o elige un contribuyente.
+                msg.textContent = 'Predio encontrado en el padrón importado. Se completó la dirección; los datos del propietario se ingresan manualmente o seleccionando un contribuyente.';
                 msg.style.color = '#10b981';
-                if (avisar) mostrarToast('Predio encontrado en el padrón: dirección y titular precargados.', 'success');
+                if (avisar) mostrarToast('Predio encontrado: se completó únicamente el código y la dirección.', 'success');
             } else {
                 msg.textContent = cachePrediosSIAF.length ? 'Código no encontrado en el padrón importado; puede completar los datos manualmente.' : 'Aún no se ha importado un padrón de predios SIAF.';
                 msg.style.color = 'var(--text-secondary)';
@@ -3746,6 +3912,7 @@
             if (estado === 'CORRECTO') document.getElementById('card_st_correcto').className = 'status-radio-card active-correcto';
             else if (estado === 'SUBVALUANTE') document.getElementById('card_st_subvaluante').className = 'status-radio-card active-subvaluante';
             else if (estado === 'OMISO') document.getElementById('card_st_omiso').className = 'status-radio-card active-omiso';
+            actualizarOpcionesAsignarMedidorOmiso();
         }
 
         let modoEdicionId = null;
@@ -3866,6 +4033,7 @@
             document.getElementById('predio_pisos').value = reg.pisos || '2';
             document.getElementById('predio_material').value = reg.material || '';
             document.getElementById('observaciones_campo').value = reg.observacionesCampo || '';
+            cargarExtrasMuestreo(reg);
 
             // Actualizar botón submit
             const submitBtn = document.querySelector('#muestreoForm button[type="submit"]');
@@ -4079,10 +4247,10 @@
         function exportarCSV() {
             if (!registros.length) { mostrarToast('No hay registros para exportar.', 'error'); return; }
             // Incluye medidores estructurados y las imágenes completas codificadas en Base64.
-            const headers = ['ID', 'Fecha_Levantamiento', 'Latitud', 'Longitud', 'Precision_GPS', 'Medidores_Luz', 'Medidores_Agua', 'Pisos', 'Material', 'Obs_Campo', 'Codigo_Predio', 'DNI_Propietario', 'Nombre_Propietario', 'Direccion_Predio', 'Estado_Fiscal', 'Obs_Gabinete', 'Fecha_Contraste', 'Foto_Predio_Base64', 'Foto_Medidor_Base64'];
+            const headers = ['ID', 'Fecha_Levantamiento', 'Latitud', 'Longitud', 'Precision_GPS', 'Medidores_Luz', 'Medidores_Agua', 'Pisos', 'Material', 'Obs_Campo', 'Codigo_Predio', 'DNI_Propietario', 'Nombre_Propietario', 'Direccion_Predio', 'Estado_Fiscal', 'Obs_Gabinete', 'Fecha_Contraste', 'Foto_Predio_Base64', 'Foto_Medidor_Base64', 'Construcciones_Adicionales_JSON', 'Fotos_Medidores_Electro_JSON'];
             const cell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
             const medidoresTexto = arr => (arr || []).map(m => typeof m === 'object' ? [m.verificador ? `Verificador ${m.verificador}` : '', m.medidor || m.texto || ''].filter(Boolean).join(': ') : String(m || '')).filter(Boolean).join('; ');
-            const rows = registros.map(r => [r.id, r.timestamp, r.latitud, r.longitud, r.precision, medidoresTexto(r.medidoresLuz || [r.medidorLuz]), medidoresTexto(r.medidoresAgua || [r.medidorAgua]), r.pisos ?? 0, r.material, r.observacionesCampo, r.codigoPredio, r.propietarioDNI, r.propietarioNombre, r.direccionPredio || r.direccion, r.estadoFiscal, r.observacionesGabinete, r.fechaContraste, r.fotoPredioB64 || '', r.fotoMedidorB64 || ''].map(cell));
+            const rows = registros.map(r => [r.id, r.timestamp, r.latitud, r.longitud, r.precision, medidoresTexto(r.medidoresLuz || [r.medidorLuz]), medidoresTexto(r.medidoresAgua || [r.medidorAgua]), r.pisos ?? 0, r.material, r.observacionesCampo, r.codigoPredio, r.propietarioDNI, r.propietarioNombre, r.direccionPredio || r.direccion, r.estadoFiscal, r.observacionesGabinete, r.fechaContraste, r.fotoPredioB64 || '', r.fotoMedidorB64 || '', JSON.stringify(r.construccionesAdicionales || []), JSON.stringify(r.fotosMedidoresElectro || [])].map(cell));
             const csvContent = '\uFEFF' + [headers.map(cell).join(','), ...rows.map(row => row.join(','))].join('\r\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob); const a = document.createElement('a');
@@ -4113,6 +4281,34 @@
 
         function cerrarModalZoom() {
             document.getElementById('modalZoom').classList.remove('active');
+        }
+
+        function exportarReporteFinalExcel() {
+            if (!window.XLSX) { mostrarToast('No se pudo cargar la librería Excel. Verifique su conexión e inténtelo de nuevo.', 'error'); return; }
+            const libro = XLSX.utils.book_new();
+            const filasMuestreo = registros.map(r => ({
+                Numero_Muestreo: r.id, Fecha_Muestreo: r.timestamp, Latitud: r.latitud, Longitud: r.longitud, Precision_GPS: r.precision,
+                Medidores_Electro: (r.medidoresLuz || [r.medidorLuz || '']).map(m => typeof m === 'object' ? `${m.verificador || ''}-${m.medidor || ''}` : m).join(' | '),
+                Medidores_EMUSAP: (r.medidoresAgua || [r.medidorAgua || '']).join(' | '), Pisos_Principal: r.pisos, Material_Principal: r.material,
+                Construcciones_Adicionales_JSON: JSON.stringify((r.construccionesAdicionales || []).map((x, i) => ({ construccion: i + 2, pisos: x.pisos, material: x.material, fotoIncluida: !!x.fotoB64 }))), Fotos_Adicionales_Electro_JSON: JSON.stringify((r.fotosMedidoresElectro || []).map(x => ({ medidor: x.medidor, fotoIncluida: !!x.fotoB64 }))), Foto_Predio_Registrada: !!r.fotoPredioB64, Foto_Medidor_Registrada: !!r.fotoMedidorB64,
+                Codigo_Predio: r.codigoPredio, DNI_Contribuyente: r.propietarioDNI, Nombre_Contribuyente: r.propietarioNombre, Direccion_Predio: r.direccionPredio || r.direccion,
+                Estado_Fiscal: r.estadoFiscal, SIAF_No_Registrado: r.noRegistradoSIAF ? 'SI' : 'NO', SIAF_Codigo_Predio: r.siafCodigoPredio, SIAF_Pisos: r.siafPisos, SIAF_Material: r.siafMaterial,
+                Observaciones_Campo: r.observacionesCampo, Observaciones_Contraste: r.observacionesGabinete, Fecha_Contraste: r.fechaContraste,
+                Medidor_OMISO_Asignado: r.medidorAsignadoOmiso ? `${r.medidorAsignadoOmiso.tipo || ''} ${r.medidorAsignadoOmiso.medidor || ''}` : '', Foto_Predio_Incluida: !!r.fotoPredioB64, Foto_Medidor_Incluida: !!r.fotoMedidorB64
+            }));
+            const hoja1 = XLSX.utils.json_to_sheet(filasMuestreo); XLSX.utils.book_append_sheet(libro, hoja1, 'Muestreo y Contraste');
+            const cartas = (cartasGeneradasHistorial.length ? cartasGeneradasHistorial : cartasPreparadas).map(c => ({
+                Numero_Carta: `${c.numero}-2026-YJRR-FT-SGATR-MDT`, Numero_Correlativo: c.numero, Fecha_Carta: c.fecha,
+                DNI_Contribuyente: c.r?.propietarioDNI || '', Nombre_Contribuyente: c.r?.propietarioNombre || '', Estado_Fiscal: c.r?.estadoFiscal || '',
+                Numeros_Muestreo: (c.registros || [c.r]).filter(Boolean).map(r => r.id).join(' | '),
+                Codigos_Predio: (c.registros || [c.r]).filter(Boolean).map(r => r.codigoPredio || '').join(' | '),
+                Direcciones_Predio: (c.registros || [c.r]).filter(Boolean).map(r => r.direccionPredio || r.direccion || '').join(' | '),
+                Cantidad_Registros_Asociados: (c.registros || [c.r]).filter(Boolean).length,
+                Cantidad_Fotografias: (c.registros || [c.r]).filter(Boolean).reduce((n, r) => n + (r.cantidadFotos ?? ((r.fotoPredioB64 ? 1 : 0) + (r.fotoMedidorB64 ? 1 : 0) + (r.construccionesAdicionales || []).filter(x => x.fotoB64).length + (r.fotosMedidoresElectro || []).filter(x => x.fotoB64).length)), 0)
+            }));
+            const hoja2 = XLSX.utils.json_to_sheet(cartas); XLSX.utils.book_append_sheet(libro, hoja2, 'Cartas Generadas');
+            XLSX.writeFile(libro, `Reporte_Final_Fiscalizacion_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            mostrarToast('Reporte Excel generado con las hojas Muestreo y Contraste y Cartas Generadas.', 'success');
         }
 
         let cartasPreparadas = [];
@@ -4176,6 +4372,13 @@
             document.getElementById('modelo_pie').innerHTML = m.pie ?? MODELO_CARTA_DEFAULT.pie;
             document.getElementById('modelo_contenido').innerHTML = m.contenido ?? MODELO_CARTA_DEFAULT.contenido;
             aplicarEstiloModelo();
+            const editorTexto = document.getElementById('modelo_contenido');
+            if (editorTexto && editorTexto.dataset.eventosSeleccionTexto !== '1') {
+                editorTexto.dataset.eventosSeleccionTexto = '1';
+                editorTexto.addEventListener('mouseup', guardarSeleccionTextoModelo);
+                editorTexto.addEventListener('keyup', guardarSeleccionTextoModelo);
+                editorTexto.addEventListener('input', () => guardarModeloCarta(false));
+            }
             const estado = document.getElementById('modelo_estado');
             if (estado) estado.textContent = localStorage.getItem(MODELO_CARTA_KEY) ? 'Modelo guardado en este navegador.' : 'Modelo predeterminado cargado. Guárdelo al terminar de personalizarlo.';
         }
@@ -4304,9 +4507,54 @@
             editor.style.fontSize = document.getElementById('modelo_tamano').value + 'pt';
             editor.style.color = document.getElementById('modelo_color').value;
         }
+        let rangoTextoModeloGuardado = null;
+        function guardarSeleccionTextoModelo() {
+            const editor = document.getElementById('modelo_contenido');
+            const sel = window.getSelection();
+            if (!editor || !sel || sel.rangeCount === 0) return;
+            const range = sel.getRangeAt(0);
+            if (editor.contains(range.commonAncestorContainer)) rangoTextoModeloGuardado = range.cloneRange();
+        }
+        function restaurarSeleccionTextoModelo() {
+            const editor = document.getElementById('modelo_contenido');
+            if (!editor || !rangoTextoModeloGuardado || !editor.contains(rangoTextoModeloGuardado.commonAncestorContainer)) return false;
+            const sel = window.getSelection();
+            if (!sel) return false;
+            editor.focus();
+            sel.removeAllRanges();
+            sel.addRange(rangoTextoModeloGuardado);
+            return true;
+        }
+        function aplicarTamanoTextoSeleccionado(tamano) {
+            const editor = document.getElementById('modelo_contenido');
+            const pt = Math.max(8, Math.min(32, Number(tamano) || 11));
+            if (!restaurarSeleccionTextoModelo()) {
+                if (typeof mostrarToast === 'function') mostrarToast('Primero seleccione el texto que desea cambiar dentro de la carta.', 'info');
+                return;
+            }
+            const sel = window.getSelection();
+            if (!sel || sel.isCollapsed) {
+                if (typeof mostrarToast === 'function') mostrarToast('Seleccione una parte del texto antes de cambiar su tamaño.', 'info');
+                return;
+            }
+            // execCommand conserva selecciones que abarcan más de un nodo; luego se convierte
+            // la etiqueta FONT temporal en un span con tamaño explícito en puntos.
+            document.execCommand('fontSize', false, '7');
+            editor.querySelectorAll('font[size="7"]').forEach(font => {
+                const span = document.createElement('span');
+                span.style.fontSize = pt + 'pt';
+                while (font.firstChild) span.appendChild(font.firstChild);
+                font.parentNode.replaceChild(span, font);
+            });
+            guardarModeloCarta(false);
+            guardarSeleccionTextoModelo();
+        }
         function formatearModelo(cmd) {
-            document.getElementById('modelo_contenido').focus();
+            const editor = document.getElementById('modelo_contenido');
+            if (rangoTextoModeloGuardado) restaurarSeleccionTextoModelo();
+            else editor.focus();
             document.execCommand(cmd, false, null);
+            guardarSeleccionTextoModelo();
         }
         function colorTextoModelo(color) {
             document.getElementById('modelo_contenido').focus();
@@ -4455,9 +4703,25 @@
                 fecha = `Tamburco, ${d.getDate()} de ${meses[d.getMonth()]} del ${d.getFullYear()}`;
                 document.getElementById('cartas_fecha').value = fecha;
             }
-            cartasPreparadas = elegibles.map((r, i) => ({ r, numero: String(inicio + i).padStart(4, '0'), fecha }));
+            // Unificar en una sola carta los registros que corresponden a la misma persona.
+            // Prioridad: DNI/RUC; para omisos sin documento, nombre normalizado.
+            const grupos = new Map();
+            elegibles.forEach(r => {
+                const doc = String(r.propietarioDNI || '').replace(/\D/g, '');
+                const nombre = String(r.propietarioNombre || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+                const key = doc ? `DOC:${doc}` : `NOM:${nombre || 'SIN NOMBRE'}:${String(r.estadoFiscal || '').toUpperCase()}`;
+                if (!grupos.has(key)) grupos.set(key, []);
+                grupos.get(key).push(r);
+            });
+            const gruposCarta = [...grupos.values()];
+            cartasPreparadas = gruposCarta.map((grupo, i) => ({ r: grupo[0], registros: grupo, numero: String(inicio + i).padStart(4, '0'), fecha }));
+            const nuevasCartasResumen = cartasPreparadas.map(c => ({ numero: c.numero, fecha: c.fecha, r: { id: c.r.id, propietarioDNI: c.r.propietarioDNI || '', propietarioNombre: c.r.propietarioNombre || '', estadoFiscal: c.r.estadoFiscal || '', codigoPredio: c.r.codigoPredio || '', direccionPredio: c.r.direccionPredio || c.r.direccion || '' }, registros: (c.registros || [c.r]).map(x => ({ id: x.id, codigoPredio: x.codigoPredio || '', direccionPredio: x.direccionPredio || x.direccion || '', propietarioDNI: x.propietarioDNI || '', propietarioNombre: x.propietarioNombre || '', estadoFiscal: x.estadoFiscal || '', cantidadFotos: (x.fotoPredioB64 ? 1 : 0) + (x.fotoMedidorB64 ? 1 : 0) + (x.construccionesAdicionales || []).filter(y => y.fotoB64).length + (x.fotosMedidoresElectro || []).filter(y => y.fotoB64).length })) }));
+            const firma = c => `${c.numero}|${c.r?.propietarioDNI || ''}|${c.r?.propietarioNombre || ''}|${(c.registros || []).map(x => x.id).join(',')}`;
+            const firmasPrevias = new Set(cartasGeneradasHistorial.map(firma));
+            nuevasCartasResumen.forEach(c => { if (!firmasPrevias.has(firma(c))) cartasGeneradasHistorial.push(c); });
+            SafeStorage.setItem(CARTAS_HISTORIAL_KEY, JSON.stringify(cartasGeneradasHistorial));
             const preview = document.getElementById('cartas_preview');
-            preview.innerHTML = `<p><strong>${cartasPreparadas.length} cartas preparadas</strong>, numeración ${cartasPreparadas[0].numero}–${cartasPreparadas[cartasPreparadas.length - 1].numero}. Cada carta incluirá una segunda hoja con las fotografías disponibles del predio y del medidor.</p><ol>${cartasPreparadas.slice(0, 10).map(c => `<li>${escaparHTMLCarta(c.numero)} — ${escaparHTMLCarta(c.r.propietarioNombre || 'SIN NOMBRE')} (${escaparHTMLCarta(c.r.estadoFiscal)})</li>`).join('')}${cartasPreparadas.length > 10 ? '<li>… y más cartas</li>' : ''}</ol>`;
+            preview.innerHTML = `<p><strong>${cartasPreparadas.length} cartas preparadas para ${elegibles.length} registros</strong>, numeración ${cartasPreparadas[0].numero}–${cartasPreparadas[cartasPreparadas.length - 1].numero}. Los registros de una misma persona se agrupan en una carta, con sus evidencias fotográficas unificadas.</p><ol>${cartasPreparadas.slice(0, 10).map(c => `<li>${escaparHTMLCarta(c.numero)} — ${escaparHTMLCarta(c.r.propietarioNombre || 'SIN NOMBRE')} (${escaparHTMLCarta(c.r.estadoFiscal)}; ${c.registros.length} registro(s) asociado(s))</li>`).join('')}${cartasPreparadas.length > 10 ? '<li>… y más cartas</li>' : ''}</ol>`;
             document.getElementById('cartas_acciones').style.display = 'flex';
         }
         function reemplazarCamposCarta(html, r, numero, fecha) {
@@ -4486,8 +4750,18 @@
                 const cartaHTML = reemplazarCamposCarta(m.contenido, r, numero, fecha);
                 const nombre = r.propietarioNombre || 'CONTRIBUYENTE';
                 const direccion = r.direccion || r.direccionPredio || r.direccionReferencial || 'No consignada';
-                const predio = r.fotoPredioB64 ? `<img src="${r.fotoPredioB64}" alt="Fotografía del predio">` : '<div class="sin-foto">Fotografía del predio no disponible</div>';
-                const medidor = r.fotoMedidorB64 ? `<img src="${r.fotoMedidorB64}" alt="Fotografía del medidor">` : '<div class="sin-foto">Fotografía del medidor no disponible</div>';
+                const asociados = (cartasPreparadas.find(c => c.numero === numero)?.registros || [r]);
+                const evidencias = [];
+                asociados.forEach((reg, ri) => {
+                    const direccionReg = reg.direccionPredio || reg.direccion || reg.codigoPredio || `Muestreo ${reg.id}`;
+                    if (reg.fotoPredioB64) evidencias.push({ titulo: `Predio — ${direccionReg}`, foto: reg.fotoPredioB64 });
+                    if (reg.fotoMedidorB64) evidencias.push({ titulo: `Medidor principal — ${direccionReg}`, foto: reg.fotoMedidorB64 });
+                    (reg.construccionesAdicionales || []).forEach((co, ci) => { if (co.fotoB64) evidencias.push({ titulo: `Construcción adicional ${ci + 1} — ${co.pisos || '?'} piso(s), ${co.material || 'material no indicado'} — ${direccionReg}`, foto: co.fotoB64 }); });
+                    (reg.fotosMedidoresElectro || []).forEach((fm, mi) => { if (fm.fotoB64) evidencias.push({ titulo: `Medidor Electro ${fm.medidor || mi + 1} — ${direccionReg}`, foto: fm.fotoB64 }); });
+                });
+                const fotosHTML = evidencias.length ? evidencias.map(ev => `<figure><figcaption>${escaparHTMLCarta(ev.titulo)}</figcaption><img src="${ev.foto}" alt="${escaparHTMLCarta(ev.titulo)}"></figure>`).join('') : '<div class="sin-foto">No hay fotografías registradas</div>';
+                const direccionesAsociadas = [...new Set(asociados.map(x => x.direccionPredio || x.direccion).filter(Boolean))];
+                const direccionAnexo = direccionesAsociadas.length ? direccionesAsociadas.join('; ') : direccion;
                 return `<section class="hoja carta-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor || '') ? m.fondoColor : '#ffffff'}">
                     ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
                     <header class="encabezado">${m.encabezado || ''}</header>
@@ -4499,11 +4773,8 @@
                     <header class="encabezado">${m.encabezado || ''}</header>
                     <h2>ANEXO FOTOGRÁFICO</h2>
                     <p class="anexo-subtitulo">CARTA INDUCTIVA N.° ${escaparHTMLCarta(numero)}-2026-YJRR-FT-SGATR-MDT</p>
-                    <div class="datos"><strong>Contribuyente:</strong> ${escaparHTMLCarta(nombre)}<br><strong>Domicilio del predio:</strong> ${escaparHTMLCarta(direccion)}</div>
-                    <div class="fotos-grid">
-                        <figure><figcaption>FOTOGRAFÍA DEL PREDIO</figcaption>${predio}</figure>
-                        <figure><figcaption>FOTOGRAFÍA DEL MEDIDOR</figcaption>${medidor}</figure>
-                    </div>
+                    <div class="datos"><strong>Contribuyente:</strong> ${escaparHTMLCarta(nombre)}<br><strong>Domicilio(s) del predio:</strong> ${escaparHTMLCarta(direccionAnexo)}<br><strong>Registros de muestreo asociados:</strong> ${escaparHTMLCarta(asociados.map(x => x.id).join(', '))}</div>
+                    <div class="fotos-grid">${fotosHTML}</div>
                     <p class="anexo-nota">Registro fotográfico de apoyo a la verificación de campo.</p>
                     <footer class="pie">${m.pie || ''}</footer>
                 </section>`;
@@ -4519,7 +4790,7 @@
             .encabezado{font-size:9pt;text-align:center;border-bottom:1px solid #b7bec8;padding:0 0 4px;margin-bottom:${Math.max(0, Math.min(40, Number(m.separacionEncabezado ?? 5) || 0))}mm}.contenido{flex:1}.contenido p{margin:0 0 10px;text-align:justify}.contenido h2,.contenido h3{text-align:center}.contenido img{max-width:100%;height:auto}
             .pie{font-size:8.5pt;text-align:center;border-top:1px solid #b7bec8;padding-top:3px;margin-top:auto;margin-bottom:0;flex-shrink:0}.pie img{vertical-align:bottom;display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}.pie img:last-child{margin-bottom:calc(-1 * ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm)}
             .anexo-hoja h2{text-align:center;font-size:15pt;margin:16px 0 5px;letter-spacing:.5px}.anexo-subtitulo{text-align:center;font-size:10pt;margin:0 0 18px}.datos{font-size:10pt;padding:10px 12px;background:#f2f5f8;border-left:3px solid #536b85;margin-bottom:18px}
-            .fotos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:10px}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:8px;border-radius:5px;break-inside:avoid}.fotos-grid figcaption{font-size:9pt;font-weight:bold;text-align:center;margin-bottom:8px;letter-spacing:.3px}.fotos-grid img{display:block;width:100%;height:105mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:105mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}.anexo-nota{margin-top:18px;font-size:9pt;font-style:italic;text-align:center}
+            .fotos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-top:10px}.fotos-grid figure{break-inside:avoid}.fotos-grid img{height:72mm}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:8px;border-radius:5px;break-inside:avoid}.fotos-grid figcaption{font-size:9pt;font-weight:bold;text-align:center;margin-bottom:8px;letter-spacing:.3px}.fotos-grid img{display:block;width:100%;height:72mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:72mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}.anexo-nota{margin-top:18px;font-size:9pt;font-style:italic;text-align:center}
             @media screen{body{background:#e5e7eb}.hoja{background:#fff;width:210mm;height:297mm;min-height:297mm;margin:12px auto;padding:${Math.max(0, Math.min(40, Number(m.margenSuperior ?? 12) || 0))}mm ${Number(m.margen) || 18}mm ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm;box-shadow:0 2px 12px #0002}}
             </style></head><body>${contenido}<script>window.onload=()=>setTimeout(()=>window.print(),700);<\\/script></body></html>`);
             w.document.close();
