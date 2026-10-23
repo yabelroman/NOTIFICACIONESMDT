@@ -1219,7 +1219,7 @@
                             Fotografía del Medidor (Captura GPS Automática Interna)
                         </h2>
                         <span style="font-size: 0.78rem; color: #10b981; font-family: 'JetBrains Mono', monospace;">
-                            Captura GPS Automática al instante
+                            Captura GPS Automática de Alta Precisión
                         </span>
                     </div>
 
@@ -1234,7 +1234,8 @@
                         <div class="photo-preview-box" id="box_foto_medidor">
                             <div class="photo-placeholder" id="ph_foto_medidor">
                                 <span style="font-size: 2.2rem;">⏱️</span>
-                                <span>Al tomar esta foto se obtendrán las coordenadas GPS en segundo plano</span>
+                                <span>Al tomar esta foto se buscará la mejor lectura GPS durante un máximo de 30
+                                    segundos</span>
                             </div>
                             <img id="img_preview_medidor" style="display: none;"
                                 onclick="abrirModalZoom(this.src, 'Fotografía del Medidor')" alt="Medidor">
@@ -1907,6 +1908,113 @@
                         <span id="modelo_img_estado" style="font-size:12px;color:#475569;">Seleccione una imagen
                             haciendo clic sobre ella.</span>
                     </div>
+                </div>
+                <div class="form-group"
+                    style="margin-top:22px;padding:14px;border:1px solid var(--border-color);border-radius:10px;background:#f8fafc;">
+                    <h3 style="margin:0 0 6px;">📷 Diseñador del anexo fotográfico</h3>
+                    <p style="font-size:12px;color:#64748b;margin:0 0 12px;">Edite el texto del anexo, inserte imágenes
+                        institucionales, seleccione una imagen para redimensionarla y arrástrela dentro del editor para
+                        cambiarla de posición. Los campos entre llaves se completan al generar cada carta.</p>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="anexo_fuente">Tipo de letra del anexo</label><select
+                                id="anexo_fuente" onchange="guardarModeloCarta(false)">
+                                <option>Arial</option>
+                                <option>Calibri</option>
+                                <option>Times New Roman</option>
+                                <option>Verdana</option>
+                                <option>Georgia</option>
+                            </select></div>
+                        <div class="form-group"><label for="anexo_tamano">Tamaño base del anexo</label><select
+                                id="anexo_tamano" onchange="guardarModeloCarta(false)">
+                                <option value="8">8 pt</option>
+                                <option value="9">9 pt</option>
+                                <option value="10">10 pt</option>
+                                <option value="11" selected>11 pt</option>
+                                <option value="12">12 pt</option>
+                                <option value="14">14 pt</option>
+                                <option value="16">16 pt</option>
+                                <option value="18">18 pt</option>
+                                <option value="20">20 pt</option>
+                                <option value="24">24 pt</option>
+                            </select></div>
+                        <div class="form-group"><label for="anexo_color">Color de texto</label><input id="anexo_color"
+                                type="color" value="#202124" onchange="guardarModeloCarta(false)"></div>
+                        <div class="form-group"><label for="anexo_interlineado">Interlineado</label><select
+                                id="anexo_interlineado" onchange="guardarModeloCarta(false)">
+                                <option value="1">Sencillo (1.0)</option>
+                                <option value="1.15">1.15</option>
+                                <option value="1.3" selected>1.3</option>
+                                <option value="1.5">1.5</option>
+                                <option value="2">Doble (2.0)</option>
+                            </select></div>
+                        <div class="form-group"><label for="anexo_espacio_parrafo">Espacio entre párrafos
+                                (px)</label><input id="anexo_espacio_parrafo" type="number" min="0" max="40" value="8"
+                                onchange="guardarModeloCarta(false)"></div>
+                        <div class="form-group"><label for="anexo_columnas_fotos">Columnas de fotografías</label><select
+                                id="anexo_columnas_fotos" onchange="guardarModeloCarta(false)">
+                                <option value="1">1 por fila</option>
+                                <option value="2" selected>2 por fila</option>
+                                <option value="3">3 por fila</option>
+                            </select></div>
+                        <div class="form-group"><label for="anexo_alto_foto">Alto de fotografías (mm)</label><input
+                                id="anexo_alto_foto" type="number" min="25" max="110" value="72"
+                                onchange="guardarModeloCarta(false)"></div>
+                        <div class="form-group"><label for="anexo_espacio_fotos">Espacio entre fotografías
+                                (mm)</label><input id="anexo_espacio_fotos" type="number" min="0" max="20" value="3"
+                                onchange="guardarModeloCarta(false)"></div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;">
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearAnexo('bold')"><b>B</b></button><button type="button"
+                            class="btn btn-secondary btn-sm" onclick="formatearAnexo('italic')"><i>I</i></button><button
+                            type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearAnexo('underline')"><u>U</u></button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="formatearAnexo('justifyLeft')">⇤
+                            Izquierda</button><button type="button" class="btn btn-secondary btn-sm"
+                            onclick="formatearAnexo('justifyCenter')">≡ Centrar</button><button type="button"
+                            class="btn btn-secondary btn-sm" onclick="formatearAnexo('justifyRight')">⇥ Derecha</button>
+                        <label class="btn btn-secondary btn-sm" style="display:flex;align-items:center;gap:5px;">Tamaño
+                            de selección <select id="anexo_tamano_seleccion" onchange="aplicarTamanoAnexo(this.value)"
+                                style="padding:4px">
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option selected>11</option>
+                                <option>12</option>
+                                <option>14</option>
+                                <option>16</option>
+                                <option>18</option>
+                                <option>20</option>
+                                <option>24</option>
+                                <option>28</option>
+                                <option>32</option>
+                            </select> pt</label>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="insertarImagenEnZona('modelo_anexo_contenido')">🖼️ Insertar imagen</button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="alinearImagenAnexo('left')">Imagen a izquierda</button><button type="button"
+                            class="btn btn-secondary btn-sm" onclick="alinearImagenAnexo('center')">Imagen al
+                            centro</button><button type="button" class="btn btn-secondary btn-sm"
+                            onclick="alinearImagenAnexo('right')">Imagen a derecha</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="quitarImagenSeleccionada()">✖
+                            Quitar imagen</button>
+                    </div>
+                    <div id="modelo_anexo_contenido" class="editor-imagenes" contenteditable="true" spellcheck="true"
+                        style="min-height:230px;border:1px solid #cbd5e1;background:#fff;color:#202124;padding:24px;line-height:1.3;outline:none;">
+                        <h2 style="text-align:center">ANEXO FOTOGRÁFICO</h2>
+                        <p style="text-align:center">CARTA INDUCTIVA N.° {{NUMERO}}-2026-YJRR-FT-SGATR-MDT</p>
+                        <p><strong>Contribuyente:</strong> {{CONTRIBUYENTE}}</p>
+                        <p><strong>Domicilio(s) del predio:</strong> {{DIRECCIONES}}</p>
+                        <p><strong>Registros de muestreo asociados:</strong> {{REGISTROS}}</p>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center"><strong>Imagen
+                            seleccionada:</strong><label>Ancho (px) <input id="anexo_img_ancho" type="number" min="20"
+                                max="1600" value="300" style="width:85px;padding:5px"></label><label>Alto (px) <input
+                                id="anexo_img_alto" type="number" min="20" max="1600" placeholder="Auto"
+                                style="width:85px;padding:5px"></label><button type="button"
+                            class="btn btn-primary btn-sm" onclick="aplicarTamanoImagenAnexo()">Aplicar
+                            tamaño</button><span style="font-size:12px;color:#64748b">Haga clic en una imagen y
+                            arrástrela para moverla.</span></div>
                 </div>
                 <div class="form-group"><label>Pie de página (puede contener texto, logotipo e imágenes)</label>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
@@ -3385,21 +3493,65 @@
                 reader.readAsDataURL(file);
             };
 
-            // Intentar GPS nativo automáticamente
+            // Captura GPS progresiva: conserva la lectura con menor margen de error.
+            // El navegador no puede garantizar precisión <= 1 m; depende del equipo y la señal.
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
+                let watchId = null;
+                let finalizado = false;
+                let mejorPosicion = null;
+                const inicioGPS = Date.now();
+                const tiempoMaximoGPS = 30000; // hasta 30 segundos para estabilizar la señal
+
+                const finalizarGPS = (posicion) => {
+                    if (finalizado) return;
+                    finalizado = true;
+                    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+
+                    if (posicion && posicion.coords) {
+                        const precision = Number(posicion.coords.accuracy);
+                        procederConEstampado(
+                            posicion.coords.latitude,
+                            posicion.coords.longitude,
+                            Number.isFinite(precision) ? precision : null
+                        );
+                        const aviso = Number.isFinite(precision) && precision <= 1
+                            ? `GPS de alta precisión: margen informado ±${precision.toFixed(2)} m.`
+                            : `Mejor lectura GPS: ±${Number.isFinite(precision) ? precision.toFixed(1) : '?'} m. No se alcanzó el objetivo de 1 m; la precisión depende del dispositivo y las condiciones de señal.`;
+                        console.info(aviso);
+                        if (!Number.isFinite(precision) || precision > 1) {
+                            setTimeout(() => mostrarToast('⚠️ ' + aviso, 'info'), 350);
+                        }
+                    } else {
+                        console.warn('GPS no disponible; se guardará la fotografía sin coordenadas válidas.');
+                        procederConEstampado(null, null, null);
+                        setTimeout(() => mostrarToast('⚠️ No se obtuvo GPS. Activa la ubicación precisa en Android y vuelve a tomar la foto en un lugar despejado.', 'info'), 350);
+                    }
+                };
+
+                mostrarToast('📡 Buscando la mejor lectura GPS (hasta 30 segundos). Mantén el celular quieto y con el cielo despejado.', 'info');
+                watchId = navigator.geolocation.watchPosition(
                     (pos) => {
-                        procederConEstampado(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+                        const acc = Number(pos.coords.accuracy);
+                        if (!mejorPosicion || (Number.isFinite(acc) && acc < Number(mejorPosicion.coords.accuracy))) {
+                            mejorPosicion = pos;
+                        }
+                        if (Number.isFinite(acc) && acc <= 1) {
+                            finalizarGPS(pos);
+                        } else if (Date.now() - inicioGPS >= tiempoMaximoGPS) {
+                            finalizarGPS(mejorPosicion);
+                        }
                     },
                     (err) => {
-                        console.warn("GPS no disponible:", err.message);
-                        // Fallback con marca de tiempo
-                        procederConEstampado(null, null, null);
+                        console.warn('Aviso de geolocalización:', err.message);
+                        if (mejorPosicion && Date.now() - inicioGPS >= tiempoMaximoGPS) finalizarGPS(mejorPosicion);
                     },
-                    { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: tiempoMaximoGPS, maximumAge: 0 }
                 );
+                // Cierre de seguridad si watchPosition no entrega nuevas lecturas.
+                setTimeout(() => finalizarGPS(mejorPosicion), tiempoMaximoGPS);
             } else {
                 procederConEstampado(null, null, null);
+                mostrarToast('⚠️ Este navegador no admite geolocalización.', 'info');
             }
         }
 
@@ -4371,7 +4523,19 @@
             document.getElementById('modelo_encabezado').innerHTML = m.encabezado ?? MODELO_CARTA_DEFAULT.encabezado;
             document.getElementById('modelo_pie').innerHTML = m.pie ?? MODELO_CARTA_DEFAULT.pie;
             document.getElementById('modelo_contenido').innerHTML = m.contenido ?? MODELO_CARTA_DEFAULT.contenido;
+            document.getElementById('modelo_anexo_contenido').innerHTML = m.anexoContenido ?? '<h2 style="text-align:center">ANEXO FOTOGRÁFICO</h2><p style="text-align:center">CARTA INDUCTIVA N.° {{NUMERO}}-2026-YJRR-FT-SGATR-MDT</p><p><strong>Contribuyente:</strong> {{CONTRIBUYENTE}}</p><p><strong>Domicilio(s) del predio:</strong> {{DIRECCIONES}}</p><p><strong>Registros de muestreo asociados:</strong> {{REGISTROS}}</p>';
+            const anexDefaults = { anexo_fuente: m.anexoFuente || 'Arial', anexo_tamano: m.anexoTamano || '10', anexo_color: m.anexoColor || '#202124', anexo_interlineado: m.anexoInterlineado || '1.3', anexo_espacio_parrafo: m.anexoEspacioParrafo ?? '8', anexo_columnas_fotos: m.anexoColumnasFotos || '2', anexo_alto_foto: m.anexoAltoFoto || '72', anexo_espacio_fotos: m.anexoEspacioFotos ?? '3' };
+            Object.entries(anexDefaults).forEach(([id, v]) => { const e = document.getElementById(id); if (e) e.value = String(v) });
             aplicarEstiloModelo();
+            inicializarEventosImagenesModelo();
+            const editorAnexoSel = document.getElementById('modelo_anexo_contenido');
+            if (editorAnexoSel && editorAnexoSel.dataset.eventosMover !== '1') {
+                editorAnexoSel.dataset.eventosMover = '1';
+                editorAnexoSel.addEventListener('click', ev => { if (ev.target && ev.target.tagName === 'IMG') { imagenModeloSeleccionada = ev.target; document.getElementById('anexo_img_ancho').value = Math.round(ev.target.getBoundingClientRect().width || parseFloat(ev.target.style.width) || 300); document.getElementById('anexo_img_alto').value = ev.target.style.height && ev.target.style.height !== 'auto' ? parseInt(ev.target.style.height, 10) : ''; } });
+                editorAnexoSel.addEventListener('dragstart', ev => { if (ev.target && ev.target.tagName === 'IMG') { imagenModeloSeleccionada = ev.target; ev.dataTransfer.setData('text/plain', 'mover-imagen-anexo'); ev.dataTransfer.effectAllowed = 'move'; } });
+                editorAnexoSel.addEventListener('dragover', ev => { if (imagenModeloSeleccionada && editorAnexoSel.contains(imagenModeloSeleccionada)) ev.preventDefault(); });
+                editorAnexoSel.addEventListener('drop', ev => { if (!imagenModeloSeleccionada || !editorAnexoSel.contains(imagenModeloSeleccionada)) return; ev.preventDefault(); const target = ev.target; if (target === imagenModeloSeleccionada) return; if (target && target.parentNode && editorAnexoSel.contains(target)) { const rect = target.getBoundingClientRect(); const after = (ev.clientY - rect.top) > (rect.height / 2); target.parentNode.insertBefore(imagenModeloSeleccionada, after ? target.nextSibling : target); guardarModeloCarta(false); } });
+            }
             const editorTexto = document.getElementById('modelo_contenido');
             if (editorTexto && editorTexto.dataset.eventosSeleccionTexto !== '1') {
                 editorTexto.dataset.eventosSeleccionTexto = '1';
@@ -4397,7 +4561,16 @@
                 fondoOpacidad: document.getElementById('modelo_fondo_opacidad').value || '15',
                 encabezado: document.getElementById('modelo_encabezado').innerHTML,
                 pie: document.getElementById('modelo_pie').innerHTML,
-                contenido: document.getElementById('modelo_contenido').innerHTML
+                contenido: document.getElementById('modelo_contenido').innerHTML,
+                anexoContenido: document.getElementById('modelo_anexo_contenido').innerHTML,
+                anexoFuente: document.getElementById('anexo_fuente').value,
+                anexoTamano: document.getElementById('anexo_tamano').value,
+                anexoColor: document.getElementById('anexo_color').value,
+                anexoInterlineado: document.getElementById('anexo_interlineado').value,
+                anexoEspacioParrafo: document.getElementById('anexo_espacio_parrafo').value || '8',
+                anexoColumnasFotos: document.getElementById('anexo_columnas_fotos').value,
+                anexoAltoFoto: document.getElementById('anexo_alto_foto').value || '72',
+                anexoEspacioFotos: document.getElementById('anexo_espacio_fotos').value || '3'
             };
         }
         window.fondoImagenModeloActual = '';
@@ -4487,6 +4660,9 @@
                     document.getElementById('modelo_encabezado').innerHTML = String(m.encabezado);
                     document.getElementById('modelo_pie').innerHTML = String(m.pie);
                     document.getElementById('modelo_contenido').innerHTML = String(m.contenido);
+                    if (m.anexoContenido !== undefined) document.getElementById('modelo_anexo_contenido').innerHTML = String(m.anexoContenido);
+                    const anexImport = { anexo_fuente: m.anexoFuente, anexo_tamano: m.anexoTamano, anexo_color: m.anexoColor, anexo_interlineado: m.anexoInterlineado, anexo_espacio_parrafo: m.anexoEspacioParrafo, anexo_columnas_fotos: m.anexoColumnasFotos, anexo_alto_foto: m.anexoAltoFoto, anexo_espacio_fotos: m.anexoEspacioFotos };
+                    Object.entries(anexImport).forEach(([id, v]) => { const e = document.getElementById(id); if (e && v !== undefined && v !== null) e.value = String(v) });
                     aplicarEstiloModelo();
                     guardarModeloCarta(false);
                     const estado = document.getElementById('modelo_estado');
@@ -4576,7 +4752,7 @@
             }
         }
         function inicializarEventosImagenesModelo() {
-            ['modelo_encabezado', 'modelo_contenido', 'modelo_pie'].forEach(id => {
+            ['modelo_encabezado', 'modelo_contenido', 'modelo_pie', 'modelo_anexo_contenido'].forEach(id => {
                 const el = document.getElementById(id);
                 if (!el || el.dataset.eventosImagen === '1') return;
                 el.dataset.eventosImagen = '1';
@@ -4771,11 +4947,8 @@
                 <section class="hoja anexo-hoja" style="background-color:${/^#[0-9a-fA-F]{6}$/.test(m.fondoColor || '') ? m.fondoColor : '#ffffff'}">
                     ${m.fondoImagen ? `<img class="fondo-hoja" src="${m.fondoImagen}" alt="">` : ''}
                     <header class="encabezado">${m.encabezado || ''}</header>
-                    <h2>ANEXO FOTOGRÁFICO</h2>
-                    <p class="anexo-subtitulo">CARTA INDUCTIVA N.° ${escaparHTMLCarta(numero)}-2026-YJRR-FT-SGATR-MDT</p>
-                    <div class="datos"><strong>Contribuyente:</strong> ${escaparHTMLCarta(nombre)}<br><strong>Domicilio(s) del predio:</strong> ${escaparHTMLCarta(direccionAnexo)}<br><strong>Registros de muestreo asociados:</strong> ${escaparHTMLCarta(asociados.map(x => x.id).join(', '))}</div>
+                    <div class="anexo-contenido-personalizado">${(m.anexoContenido || '<h2 style="text-align:center">ANEXO FOTOGRÁFICO</h2><p style="text-align:center">CARTA INDUCTIVA N.° {{NUMERO}}-2026-YJRR-FT-SGATR-MDT</p><p><strong>Contribuyente:</strong> {{CONTRIBUYENTE}}</p><p><strong>Domicilio(s) del predio:</strong> {{DIRECCIONES}}</p><p><strong>Registros de muestreo asociados:</strong> {{REGISTROS}}</p>').replaceAll('{{NUMERO}}', escaparHTMLCarta(numero)).replaceAll('{{CONTRIBUYENTE}}', escaparHTMLCarta(nombre)).replaceAll('{{DIRECCIONES}}', escaparHTMLCarta(direccionAnexo)).replaceAll('{{REGISTROS}}', escaparHTMLCarta(asociados.map(x => x.id).join(', ')))}</div>
                     <div class="fotos-grid">${fotosHTML}</div>
-                    <p class="anexo-nota">Registro fotográfico de apoyo a la verificación de campo.</p>
                     <footer class="pie">${m.pie || ''}</footer>
                 </section>`;
             }).join('');
@@ -4789,8 +4962,8 @@
             .encabezado,.contenido,.pie,.anexo-hoja h2,.anexo-subtitulo,.datos,.fotos-grid,.anexo-nota{position:relative;z-index:1}
             .encabezado{font-size:9pt;text-align:center;border-bottom:1px solid #b7bec8;padding:0 0 4px;margin-bottom:${Math.max(0, Math.min(40, Number(m.separacionEncabezado ?? 5) || 0))}mm}.contenido{flex:1}.contenido p{margin:0 0 10px;text-align:justify}.contenido h2,.contenido h3{text-align:center}.contenido img{max-width:100%;height:auto}
             .pie{font-size:8.5pt;text-align:center;border-top:1px solid #b7bec8;padding-top:3px;margin-top:auto;margin-bottom:0;flex-shrink:0}.pie img{vertical-align:bottom;display:block;max-width:100%;height:auto;margin-left:auto;margin-right:auto}.pie img:last-child{margin-bottom:calc(-1 * ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm)}
-            .anexo-hoja h2{text-align:center;font-size:15pt;margin:16px 0 5px;letter-spacing:.5px}.anexo-subtitulo{text-align:center;font-size:10pt;margin:0 0 18px}.datos{font-size:10pt;padding:10px 12px;background:#f2f5f8;border-left:3px solid #536b85;margin-bottom:18px}
-            .fotos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-top:10px}.fotos-grid figure{break-inside:avoid}.fotos-grid img{height:72mm}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:8px;border-radius:5px;break-inside:avoid}.fotos-grid figcaption{font-size:9pt;font-weight:bold;text-align:center;margin-bottom:8px;letter-spacing:.3px}.fotos-grid img{display:block;width:100%;height:72mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:72mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}.anexo-nota{margin-top:18px;font-size:9pt;font-style:italic;text-align:center}
+            .anexo-contenido-personalizado{font-family:${m.anexoFuente || 'Arial'},sans-serif;font-size:${Number(m.anexoTamano) || 10}pt;color:${m.anexoColor || '#202124'};line-height:${Number(m.anexoInterlineado) || 1.3};margin-bottom:${Math.max(0, Math.min(40, Number(m.anexoEspacioParrafo) || 0))}px}.anexo-contenido-personalizado p{margin:0 0 ${Math.max(0, Math.min(40, Number(m.anexoEspacioParrafo) || 0))}px}.anexo-contenido-personalizado img{max-width:100%;height:auto}.anexo-hoja h2{text-align:center;font-size:15pt;margin:8px 0 5px;letter-spacing:.5px}
+            .fotos-grid{display:grid;grid-template-columns:repeat(${Math.max(1, Math.min(3, Number(m.anexoColumnasFotos) || 2))},minmax(0,1fr));gap:${Math.max(0, Math.min(20, Number(m.anexoEspacioFotos) || 0))}mm;align-items:start;margin-top:4mm}.fotos-grid figure{break-inside:avoid;min-width:0}.fotos-grid figure{margin:0;border:1px solid #c9d0d8;padding:5px;border-radius:3px;break-inside:avoid}.fotos-grid figcaption{font-family:${m.anexoFuente || 'Arial'},sans-serif;font-size:${Math.max(7, (Number(m.anexoTamano) || 10) - 1)}pt;font-weight:bold;text-align:center;margin-bottom:4px;letter-spacing:0}.fotos-grid img{display:block;width:100%;height:${Math.max(25, Math.min(110, Number(m.anexoAltoFoto) || 72))}mm;object-fit:contain;background:#f7f8fa}.sin-foto{height:${Math.max(25, Math.min(110, Number(m.anexoAltoFoto) || 72))}mm;display:flex;align-items:center;justify-content:center;text-align:center;color:#777;background:#f7f8fa;font-size:10pt;padding:12px}
             @media screen{body{background:#e5e7eb}.hoja{background:#fff;width:210mm;height:297mm;min-height:297mm;margin:12px auto;padding:${Math.max(0, Math.min(40, Number(m.margenSuperior ?? 12) || 0))}mm ${Number(m.margen) || 18}mm ${Math.max(0, Math.min(40, Number(m.margenInferior ?? 12) || 0))}mm;box-shadow:0 2px 12px #0002}}
             </style></head><body>${contenido}<script>window.onload=()=>setTimeout(()=>window.print(),700);<\\/script></body></html>`);
             w.document.close();
@@ -4798,8 +4971,14 @@
         function inicializarModeloCartas() {
             cargarModeloCartaEnEditor();
             inicializarEventosImagenesModelo();
+            const edAnexo = document.getElementById('modelo_anexo_contenido');
+            if (edAnexo && edAnexo.dataset.autoguardado !== '1') { edAnexo.dataset.autoguardado = '1'; edAnexo.addEventListener('input', () => guardarModeloCarta(false)); }
             actualizarResumenCartas();
         }
+        function formatearAnexo(cmd) { const e = document.getElementById('modelo_anexo_contenido'); e.focus(); document.execCommand(cmd, false, null); guardarModeloCarta(false); }
+        function aplicarTamanoAnexo(t) { const e = document.getElementById('modelo_anexo_contenido'); e.focus(); document.execCommand('fontSize', false, '7'); e.querySelectorAll('font[size="7"]').forEach(n => { const sp = document.createElement('span'); sp.style.fontSize = Number(t) + 'pt'; sp.innerHTML = n.innerHTML; n.replaceWith(sp) }); guardarModeloCarta(false); }
+        function alinearImagenAnexo(pos) { if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected || !document.getElementById('modelo_anexo_contenido').contains(imagenModeloSeleccionada)) { alert('Seleccione primero una imagen del anexo.'); return; } imagenModeloSeleccionada.style.display = 'block'; imagenModeloSeleccionada.style.marginLeft = pos === 'right' ? 'auto' : pos === 'center' ? 'auto' : '0'; imagenModeloSeleccionada.style.marginRight = pos === 'left' ? 'auto' : 'auto'; if (pos === 'left') imagenModeloSeleccionada.style.marginRight = 'auto'; guardarModeloCarta(false); }
+        function aplicarTamanoImagenAnexo() { const ed = document.getElementById('modelo_anexo_contenido'); if (!imagenModeloSeleccionada || !imagenModeloSeleccionada.isConnected || !ed.contains(imagenModeloSeleccionada)) { alert('Seleccione una imagen dentro del editor del anexo.'); return; } const w = Number(document.getElementById('anexo_img_ancho').value), ht = document.getElementById('anexo_img_alto').value; const h = ht === '' ? null : Number(ht); if (!Number.isFinite(w) || w < 20 || w > 1600 || (h !== null && (!Number.isFinite(h) || h < 20 || h > 1600))) { alert('Use valores de 20 a 1600 px.'); return; } imagenModeloSeleccionada.style.width = w + 'px'; imagenModeloSeleccionada.style.maxWidth = '100%'; imagenModeloSeleccionada.style.height = h === null ? 'auto' : h + 'px'; imagenModeloSeleccionada.style.objectFit = 'contain'; guardarModeloCarta(false); }
         const estiloImagenesModelo = document.createElement('style');
         estiloImagenesModelo.textContent = `.editor-imagenes img{max-width:100%;height:auto;cursor:pointer;vertical-align:middle}.editor-imagenes img.imagen-modelo-seleccionada{outline:2px solid #2563eb;outline-offset:2px;}`;
         document.head.appendChild(estiloImagenesModelo);
