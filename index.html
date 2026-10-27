@@ -1497,7 +1497,15 @@
                         </div>
                         <div class="field-row">
                             <span class="label">Geolocalización GPS:</span>
-                            <span class="value" id="c_view_gps" style="color: #38bdf8;">-</span>
+                            <div
+                                style="display:flex; align-items:center; justify-content:flex-end; gap:0.55rem; flex-wrap:wrap;">
+                                <span class="value" id="c_view_gps" style="color: #38bdf8;">-</span>
+                                <button type="button" id="btn_ver_google_maps" class="btn btn-secondary btn-sm"
+                                    onclick="abrirUbicacionEnGoogleMaps()"
+                                    style="display:none; white-space:nowrap; padding:0.4rem 0.65rem;">
+                                    📍 Ver en Google Maps
+                                </button>
+                            </div>
                         </div>
                         <div class="field-row">
                             <span class="label">Medidor(es) de Luz:</span>
@@ -3908,6 +3916,26 @@
             if (badge) badge.innerText = '0 sugerencias';
         }
 
+        function abrirUbicacionEnGoogleMaps() {
+            const reg = registroSeleccionado;
+            if (!reg) {
+                mostrarToast('⚠️ Selecciona primero un registro de contraste.', 'info');
+                return;
+            }
+            const lat = Number(reg.latitud);
+            const lng = Number(reg.longitud);
+            const valido = reg.latitud !== undefined && reg.longitud !== undefined &&
+                reg.latitud !== '' && reg.longitud !== '' && reg.latitud !== 'Sin GPS' &&
+                reg.longitud !== 'Sin GPS' && Number.isFinite(lat) && Number.isFinite(lng) &&
+                lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+            if (!valido) {
+                mostrarToast('⚠️ Este registro no tiene coordenadas GPS válidas.', 'info');
+                return;
+            }
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat + ',' + lng)}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
         function abrirPanelContraste(id) {
             const reg = registros.find(r => r.id === id);
             if (!reg) return;
@@ -3921,8 +3949,18 @@
             document.getElementById('contraste_img_predio').src = reg.fotoPredioB64;
             document.getElementById('contraste_img_medidor').src = reg.fotoMedidorB64;
 
-            document.getElementById('c_view_fecha').innerText = reg.timestamp.slice(0, 19).replace('T', ' ');
-            document.getElementById('c_view_gps').innerText = `Lat: ${reg.latitud}, Lng: ${reg.longitud} (${reg.precision || 'GPS'})`;
+            document.getElementById('c_view_fecha').innerText = (reg.timestamp || '').slice(0, 19).replace('T', ' ') || '-';
+            const latGps = Number(reg.latitud);
+            const lngGps = Number(reg.longitud);
+            const gpsValido = reg.latitud !== undefined && reg.longitud !== undefined &&
+                reg.latitud !== '' && reg.longitud !== '' && reg.latitud !== 'Sin GPS' &&
+                reg.longitud !== 'Sin GPS' && Number.isFinite(latGps) && Number.isFinite(lngGps) &&
+                latGps >= -90 && latGps <= 90 && lngGps >= -180 && lngGps <= 180;
+            document.getElementById('c_view_gps').innerText = gpsValido
+                ? `Lat: ${latGps.toFixed(6)}, Lng: ${lngGps.toFixed(6)} (${reg.precision || 'precisión no registrada'})`
+                : 'Ubicación GPS no disponible';
+            const btnGoogleMaps = document.getElementById('btn_ver_google_maps');
+            if (btnGoogleMaps) btnGoogleMaps.style.display = gpsValido ? 'inline-flex' : 'none';
 
             const luzList = reg.medidoresLuz || [reg.medidorLuz];
             const aguaList = reg.medidoresAgua || [reg.medidorAgua];
