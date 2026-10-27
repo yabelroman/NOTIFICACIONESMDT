@@ -3814,7 +3814,7 @@
                     <td><strong>${r.id}</strong></td>
                     <td>${r.fotoPredioB64 ? `<img class="table-thumb" src="${r.fotoPredioB64}" onclick="abrirModalZoom(this.src, 'Foto Predio: ${safeId}')" title="Ver foto del predio">` : '—'}</td>
                     <td>${r.fotoMedidorB64 ? `<img class="table-thumb" src="${r.fotoMedidorB64}" onclick="abrirModalZoom(this.src, 'Foto Medidor: ${safeId}')" title="Ver foto del medidor">` : '—'}</td>
-                    <td><div style="font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#38bdf8;">Lat: ${r.latitud || '—'}<br>Lng: ${r.longitud || '—'}</div></td>
+                    <td><div style="font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#38bdf8;">Lat: ${r.latitud || '—'}<br>Lng: ${r.longitud || '—'}</div><button type="button" class="btn btn-secondary btn-sm" onclick="abrirRegistroEnGoogleMaps('${safeId}')" style="display:inline-flex;align-items:center;gap:4px;margin-top:5px;white-space:nowrap;padding:5px 8px;">📍 Ver en Maps</button></td>
                     <td>${medidoresLuzHTML}</td><td>${medidoresAguaHTML}</td>
                     <td>${r.pisos ?? 0} pisos<br><span style="font-size:.72rem;color:var(--text-muted);">${r.material || ''}</span></td>
                     <td><code>${codigoPredioText}</code></td>
@@ -3916,8 +3916,17 @@
             if (badge) badge.innerText = '0 sugerencias';
         }
 
-        function abrirUbicacionEnGoogleMaps() {
-            const reg = registroSeleccionado;
+        function abrirRegistroEnGoogleMaps(id) {
+            const reg = registros.find(r => String(r.id) === String(id));
+            if (!reg) {
+                mostrarToast('⚠️ No se encontró el registro seleccionado.', 'info');
+                return;
+            }
+            abrirUbicacionEnGoogleMaps(reg);
+        }
+
+        function abrirUbicacionEnGoogleMaps(registro = registroSeleccionado) {
+            const reg = registro;
             if (!reg) {
                 mostrarToast('⚠️ Selecciona primero un registro de contraste.', 'info');
                 return;
@@ -3960,7 +3969,7 @@
                 ? `Lat: ${latGps.toFixed(6)}, Lng: ${lngGps.toFixed(6)} (${reg.precision || 'precisión no registrada'})`
                 : 'Ubicación GPS no disponible';
             const btnGoogleMaps = document.getElementById('btn_ver_google_maps');
-            if (btnGoogleMaps) btnGoogleMaps.style.display = gpsValido ? 'inline-flex' : 'none';
+            if (btnGoogleMaps) btnGoogleMaps.style.display = 'inline-flex';
 
             const luzList = reg.medidoresLuz || [reg.medidorLuz];
             const aguaList = reg.medidoresAgua || [reg.medidorAgua];
